@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TaskbarTray (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TaskbarTray (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
