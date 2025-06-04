@@ -21,7 +21,7 @@
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsWindowVisible, Converter={StaticResource BoolToImageSourceConverter}}"
+        IconSource="{x:Bind IsWindowVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
         LeftClickCommand="{x:Bind ShowHideWindowCommand}"
         NoLeftClickDelay="True">
 

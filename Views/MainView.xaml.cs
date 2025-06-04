@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -33,7 +34,11 @@ namespace TaskbarTray.Views
                 TransitionInfoOverride = args.RecommendedNavigationTransitionInfo,
             };
 
-            switch (((string)args.InvokedItem))
+
+            var invokedItem = (string)args.InvokedItem;
+            Debug.WriteLine($"Invoked {invokedItem}");
+
+            switch (invokedItem)
             {
                 case "Notifications":
                     _ = NavigationViewFrame.NavigateToType(typeof(NotificationView), null, options);

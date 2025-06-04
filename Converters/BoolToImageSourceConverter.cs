@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 
 namespace TaskbarTray.Converters;
@@ -19,6 +20,13 @@ public class BoolToImageSourceConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-        throw new NotImplementedException();
+
+        if (value is BitmapImage)
+        {
+            return value == TrueImage ? true : false;
+        }
+        return false;
+
+        //throw new NotImplementedException();
     }
 }
