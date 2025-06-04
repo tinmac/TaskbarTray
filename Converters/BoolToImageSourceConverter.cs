@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using System.Diagnostics;
 
 namespace TaskbarTray.Converters;
 
@@ -20,11 +21,14 @@ public class BoolToImageSourceConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-
         if (value is BitmapImage)
         {
-            return value == TrueImage ? true : false;
+            var ret = value == TrueImage ? true : false;
+           // Debug.WriteLine($"TrueImage {ret}");
+            return ret;
         }
+
+       // Debug.WriteLine($"Not a bitmap");
         return false;
 
         //throw new NotImplementedException();

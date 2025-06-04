@@ -17,11 +17,20 @@
             TrueImage="ms-appx:///Assets/Red.ico" />
     </UserControl.Resources>
 
+
+    <!--
+        Use new GUAGE FA icons
+
+        IconSource="{x:Bind IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
+
+        <FontIcon Foreground="Green" Glyph="&#xe4e8;" />
+    -->
+    
     <tb:TaskbarIcon
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsWindowVisible, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
+        IconSource="{x:Bind IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
         LeftClickCommand="{x:Bind ShowHideWindowCommand}"
         NoLeftClickDelay="True">
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Application
     x:Class="TaskbarTray.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,11 +6,41 @@
     xmlns:local="using:TaskbarTray">
     <Application.Resources>
         <ResourceDictionary>
+
             <ResourceDictionary.MergedDictionaries>
+
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
+
+                <!--
+                    Other merged dictionaries here
+                -->
+
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+
+            <!--
+                Other app resources here
+            -->
+
+            <!--  Font Awesome 6 - Aetherx ver  -->
+            <FontFamily x:Key="FA6_Thin">/Assets/Fonts/fa_6/Font Awesome 6 Pro-Thin-100.otf#Font Awesome 6 Pro</FontFamily>
+            <FontFamily x:Key="FA6_Light">/Assets/Fonts/fa_6/Font Awesome 6 Pro-Light-300.otf#Font Awesome 6 Pro</FontFamily>
+            <FontFamily x:Key="FA6_Reg">/Assets/Fonts/fa_6/Font Awesome 6 Pro-Regular-400.otf#Font Awesome 6 Pro</FontFamily>
+            <FontFamily x:Key="FA6_Solid">/Assets/Fonts/fa_6/Font Awesome 6 Pro-Solid-900.otf#Font Awesome 6 Pro Solid</FontFamily>
+            <FontFamily x:Key="FA6_Duo">/Assets/Fonts/fa_6/Font Awesome 6 Duotone-Solid-900.otf#Font Awesome 6 Duotone Solid</FontFamily>
+            <FontFamily x:Key="FA6_Brands">/Assets/Fonts/fa_6/Font Awesome 6 Brands-Regular-400.otf#Font Awesome 6 Brands</FontFamily>
+
+            <FontFamily x:Key="FA6_Sharp_Thin">/Assets/Fonts/fa_6/Font Awesome 6 Sharp-Thin-100.otf#Font Awesome 6 Sharp</FontFamily>
+            <FontFamily x:Key="FA6_Sharp_Light">/Assets/Fonts/fa_6/Font Awesome 6 Sharp-Light-300.otf#Font Awesome 6 Sharp</FontFamily>
+            <FontFamily x:Key="FA6_Sharp_Reg">/Assets/Fonts/fa_6/Font Awesome 6 Sharp-Regular-400.otf#Font Awesome 6 Sharp</FontFamily>
+            <FontFamily x:Key="FA6_Sharp_Solid">/Assets/Fonts/fa_6/Font Awesome 6 Sharp-Solid-900.otf#Font Awesome 6 Sharp Solid</FontFamily>
+
+            <!--  Set Default FontIcon  -->
+            <Style TargetType="FontIcon">
+                <Setter Property="FontFamily" Value="{StaticResource FA6_Thin}" />
+            </Style>
+
+
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
