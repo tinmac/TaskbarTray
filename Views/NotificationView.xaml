@@ -13,6 +13,21 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Spacing="20">
+
+
+            <StackPanel Margin="0 0 0 20">
+                <TextBlock
+                    Margin="0 0 0 20"
+                    Style="{ThemeResource DisplayTextBlockStyle}"
+                    Text="Tray Icon App" />
+
+                <TextBlock
+                    FontFamily="{StaticResource FA6_Light}"
+                    FontSize="32"
+                    Foreground="Gray"
+                    Text="&#xf62d;" />
+            </StackPanel>
+
             <RadioButtons x:Name="Type">
                 <RadioButton Content="None" IsChecked="True" />
                 <RadioButton Content="Information" />

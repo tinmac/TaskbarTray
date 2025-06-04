@@ -11,28 +11,81 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <converters:BoolToImageSourceConverter
+        <!--<converters:BoolToImageSourceConverter
             x:Key="BoolToImageSourceConverter"
             FalseImage="ms-appx:///Assets/Inactive.ico"
-            TrueImage="ms-appx:///Assets/Red.ico" />
+            TrueImage="ms-appx:///Assets/Red.ico" />-->
+
+        <converters:BoolToImageSourceConverter
+            x:Key="BoolToImageSourceConverter"
+            FalseImage="/Assets/gauge_low.ico"
+            TrueImage="/Assets/gauge_high.ico" />
+        
     </UserControl.Resources>
 
 
     <!--
         Use new GUAGE FA icons
+        - Find the heart icon used in I.Notify and use it her ewith FA??
+        - IT WASNT in I.Notify, you founf it in a git hub quesiton on the H.NotifyIcon repo
 
         IconSource="{x:Bind IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
 
-        <FontIcon Foreground="Green" Glyph="&#xe4e8;" />
+        FontFamily="{StaticResource FA6_Light}"
+
+        Guage Empty ie slow
+        <FontIcon Foreground="Green" Glyph="&#f62d;" />
+
+        Guage Full ie fast
+        <FontIcon Foreground="Green" Glyph="&#f62d;" />
+
+
     -->
-    
+
     <tb:TaskbarIcon
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
-        LeftClickCommand="{x:Bind ShowHideWindowCommand}"
+        IconSource="{x:Bind IsBalanced, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
+        LeftClickCommand="{x:Bind ToggleSpeedCommand}"
         NoLeftClickDelay="True">
+
+        <!--<tb:TaskbarIcon.IconSource>
+            <tb:GeneratedIconSource
+                FontFamily="{StaticResource FA6_Light}"
+                FontSize="32"
+                Foreground="Gray"
+                Text="&#xf2b9;" />
+        </tb:TaskbarIcon.IconSource>-->
+
+        <!--<tb:TaskbarIcon.IconSource>
+
+            <tb:GeneratedIconSource
+                FontFamily="{StaticResource FA6_Light}"
+                Foreground="Gray"
+                Text="\uf62d" />
+
+        </tb:TaskbarIcon.IconSource>-->
+
+        <!--<tb:TaskbarIcon.IconSource>
+            <tb:GeneratedIconSource
+                BorderThickness="1"
+                FontSize="36"
+                Text="❤️">
+                <tb:GeneratedIconSource.Foreground>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="128,128">
+                        <GradientStop Color="White" />
+                        <GradientStop Color="Red" />
+                    </LinearGradientBrush>
+                </tb:GeneratedIconSource.Foreground>
+                <tb:GeneratedIconSource.BorderBrush>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="128,128">
+                        <GradientStop Color="White" />
+                        <GradientStop Color="Red" />
+                    </LinearGradientBrush>
+                </tb:GeneratedIconSource.BorderBrush>
+            </tb:GeneratedIconSource>
+        </tb:TaskbarIcon.IconSource>-->
 
         <tb:TaskbarIcon.ContextFlyout>
 
@@ -41,28 +94,29 @@
                 AreOpenCloseAnimationsEnabled="False"
                 Closing="MyMenuFlyout_Closing">
 
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind OptionOneCommand}"
-                    IsChecked="{x:Bind IsOptionOneChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Option One" />
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+
+                <MenuFlyoutSeparator />
 
                 <ToggleMenuFlyoutItem
-                    Command="{x:Bind OptionTwoCommand}"
-                    IsChecked="{x:Bind IsOptionTwoChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Option Two" />
+                    Command="{x:Bind HighPerformanceCommand}"
+                    IsChecked="{x:Bind IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="High Performance" />
 
                 <ToggleMenuFlyoutItem
-                    Command="{x:Bind OptionThreeCommand}"
-                    IsChecked="{x:Bind IsOptionThreeChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Option Three" />
+                    Command="{x:Bind BalancedCommand}"
+                    IsChecked="{x:Bind IsBalancedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Balanced" />
+
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind PowerSaverCommand}"
+                    IsChecked="{x:Bind IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Power Saver" />
 
                 <MenuFlyoutSeparator />
 
                 <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />
 
-                <MenuFlyoutSeparator />
-
-                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
 
             </MenuFlyout>
 

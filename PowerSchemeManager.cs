@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace TaskbarTray
         private const uint ACCESS_SCHEME = 16;
 
 
+        #region DllImport Declarations
         //
         // AC CPU % Management
         [DllImport("powrprof.dll", SetLastError = true)]
@@ -57,6 +59,65 @@ namespace TaskbarTray
         [DllImport("kernel32.dll")]
         private static extern void LocalFree(IntPtr ptr);
 
+        #endregion
+
+
+        #region Power Schemes
+
+        public static List<PowerScheme> LoadPowerSchemes()
+        {
+            var plans = new List<PowerScheme>();
+            Guid activeGuid = GetActivePlanGuid();
+
+            uint index = 0;
+            IntPtr guidPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Guid)));
+            uint bufferSize;
+
+            while (true)
+            {
+                bufferSize = (uint)Marshal.SizeOf(typeof(Guid));
+                if (PowerEnumerate(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, ACCESS_SCHEME, index, guidPtr, ref bufferSize) != 0)
+                    break;
+
+                Guid planGuid = (Guid)Marshal.PtrToStructure(guidPtr, typeof(Guid));
+
+                uint nameSize = 1024;
+                byte[] nameBuffer = new byte[nameSize];
+                string name = "(Unnamed)";
+                if (PowerReadFriendlyName(IntPtr.Zero, ref planGuid, IntPtr.Zero, IntPtr.Zero, nameBuffer, ref nameSize) == 0)
+                    name = Encoding.Unicode.GetString(nameBuffer, 0, (int)nameSize - 2);
+
+                plans.Add(new PowerScheme
+                {
+                    Guid = planGuid,
+                    Name = name,
+                    IsActive = planGuid == activeGuid
+                });
+
+                index++;
+            }
+
+            Marshal.FreeHGlobal(guidPtr);
+            return plans;
+        }
+
+        public static Guid GetActivePlanGuid()
+        {
+            PowerGetActiveScheme(IntPtr.Zero, out IntPtr ptr);
+            Guid guid = (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
+            LocalFree(ptr);
+            return guid;
+        }
+
+        public static bool SetActivePowerPlan(Guid planGuid)
+        {
+            return PowerSetActiveScheme(IntPtr.Zero, ref planGuid) == 0;
+        }
+
+        #endregion
+
+
+        #region CPU
 
         /// <summary>
         /// Gets the CPU max percentage for Plugged-In (AC Power)
@@ -148,57 +209,7 @@ namespace TaskbarTray
             return true;
         }
 
+        #endregion
 
-        // Power Schemes
-        //
-        public static List<PowerScheme> LoadPowerSchemes()
-        {
-            var plans = new List<PowerScheme>();
-            Guid activeGuid = GetActivePlanGuid();
-
-            uint index = 0;
-            IntPtr guidPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Guid)));
-            uint bufferSize;
-
-            while (true)
-            {
-                bufferSize = (uint)Marshal.SizeOf(typeof(Guid));
-                if (PowerEnumerate(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, ACCESS_SCHEME, index, guidPtr, ref bufferSize) != 0)
-                    break;
-
-                Guid planGuid = (Guid)Marshal.PtrToStructure(guidPtr, typeof(Guid));
-
-                uint nameSize = 1024;
-                byte[] nameBuffer = new byte[nameSize];
-                string name = "(Unnamed)";
-                if (PowerReadFriendlyName(IntPtr.Zero, ref planGuid, IntPtr.Zero, IntPtr.Zero, nameBuffer, ref nameSize) == 0)
-                    name = Encoding.Unicode.GetString(nameBuffer, 0, (int)nameSize - 2);
-
-                plans.Add(new PowerScheme
-                {
-                    Guid = planGuid,
-                    Name = name,
-                    IsActive = planGuid == activeGuid
-                });
-
-                index++;
-            }
-
-            Marshal.FreeHGlobal(guidPtr);
-            return plans;
-        }
-
-        public static Guid GetActivePlanGuid()
-        {
-            PowerGetActiveScheme(IntPtr.Zero, out IntPtr ptr);
-            Guid guid = (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
-            LocalFree(ptr);
-            return guid;
-        }
-
-        public static bool SetActivePowerPlan(Guid planGuid)
-        {
-            return PowerSetActiveScheme(IntPtr.Zero, ref planGuid) == 0;
-        }
     }
 }

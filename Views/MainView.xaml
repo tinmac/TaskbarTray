@@ -10,7 +10,7 @@
     mc:Ignorable="d">
 
     <Grid>
-        <NavigationView x:Name="NavigationView">
+        <NavigationView x:Name="NavigationView" Grid.Row="1">
 
             <NavigationView.MenuItems>
 

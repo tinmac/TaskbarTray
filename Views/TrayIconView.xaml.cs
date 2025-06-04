@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using PowerPlanSwitcher;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 
@@ -14,6 +15,14 @@ namespace TaskbarTray.Views;
 public sealed partial class TrayIconView : UserControl
 {
 
+    private bool _isPowerSaver;
+    public bool IsBalanced
+    {
+        get => _isPowerSaver;
+        set => SetProperty(ref _isPowerSaver, value);
+    }
+
+
     private bool _isWindowVisible;
     public bool IsWindowVisible
     {
@@ -21,27 +30,37 @@ public sealed partial class TrayIconView : UserControl
         set => SetProperty(ref _isWindowVisible, value);
     }
 
-    private bool _isOptionOneChecked;
-    public bool IsOptionOneChecked
+
+    private bool _isSaverChecked;
+    public bool IsSaverChecked
     {
-        get => _isOptionOneChecked;
-        set => SetProperty(ref _isOptionOneChecked, value);
+        get => _isSaverChecked;
+        set => SetProperty(ref _isSaverChecked, value);
     }
 
-    private bool _isOptionTwoChecked;
-    public bool IsOptionTwoChecked
+    private bool _isBalancedChecked;
+    public bool IsBalancedChecked
     {
-        get => _isOptionTwoChecked;
-        set => SetProperty(ref _isOptionTwoChecked, value);
+        get => _isBalancedChecked;
+        set => SetProperty(ref _isBalancedChecked, value);
     }
 
-    private bool _isOptionThreeChecked;
-    public bool IsOptionThreeChecked
+    private bool _isHighChecked;
+    public bool IsHighChecked
     {
-        get => _isOptionThreeChecked;
-        set => SetProperty(ref _isOptionThreeChecked, value);
+        get => _isHighChecked;
+        set => SetProperty(ref _isHighChecked, value);
     }
 
+    private PowerScheme _activeScheme;
+    public PowerScheme ActiveScheme
+    {
+        get => _activeScheme;
+        set => SetProperty(ref _activeScheme, value);
+    }
+
+
+    public TrayIconVM ViewModel { get; } = new TrayIconVM();
 
     public TrayIconView()
     {
@@ -51,27 +70,28 @@ public sealed partial class TrayIconView : UserControl
 
         TrayIcon.PopupActivation = PopupActivationMode.LeftClick;
 
-        var currnet_plan = LoadPlansAsync();
+        IsSaverChecked = false;
+        IsBalancedChecked = false;
+        IsHighChecked = false;
 
+        var currnet_plan = LoadPlansAsync();
 
         //SetPowerPlan(); 
 
-        SetCPUPercentage(); // Set CPU Max %
+        //SetCPUPercentage(); // Set CPU Max %
     }
 
     private async Task LoadPlansAsync()
     {
-       // PowerPlanList.ItemsSource = null;
         try
         {
             var plans = await Task.Run(() => PowerPlanManager.LoadPowerPlans());
-            //List<PowerPlan> plans = await Task.Run(() => PowerPlanManager.LoadPowerPlans());
-            //PowerPlanList.ItemsSource = plans;
-           // Debug.WriteLine($"\n");
-            foreach (var plan in plans)
-            {
-                Debug.WriteLine($"Plan: {plan.Name} - Active: {plan.IsActive} - {plan.Guid}");
-            }
+
+            ActiveScheme = plans.FirstOrDefault(p => p.IsActive);
+
+            Debug.WriteLine($"\nActive Plan: {ActiveScheme?.Name}");
+
+            UpdateUi();
         }
         catch (Exception ex)
         {
@@ -79,8 +99,59 @@ public sealed partial class TrayIconView : UserControl
         }
     }
 
-    private async void SetPowerPlan()
+
+    private void UpdateUi()
     {
+        if (ActiveScheme.DisplayName.ToLower().Contains("power saver"))
+        {
+            IsBalanced = false;
+
+            IsSaverChecked = true;
+            IsBalancedChecked = false;
+            IsHighChecked = false;
+
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("balanced"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = true;
+            IsHighChecked = false;
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("high performance"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = true;
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("ultimate performance"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = false;
+        }
+        else
+        {
+            IsBalanced = false;
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = false; // No known plan is active
+
+            Debug.WriteLine($"No known plan!");
+        }
+
+    }
+
+
+    private async void SetPowerPlan(PowerScheme Scheme)
+    {
+        #region Notes
+
         // MLAP has four power plans in the registry
         // 
         // Power Saver            a1841308-3541-4fab-bc81-f71556f20b4a
@@ -112,52 +183,20 @@ public sealed partial class TrayIconView : UserControl
         // How can I programatically set the CPU Min/Max in a certain power plan?
         //
 
-
-        var power_saver = new PowerScheme
-        {
-            Name = "Power Saver",
-            Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
-            IsActive = false
-        };
-
-        var balanced = new PowerScheme
-        {
-            Name = "Balanced",
-            Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
-            IsActive = true // Assume this is the active plan for demonstration
-        };
-
-        var high_performance = new PowerScheme
-        {
-            Name = "High Performance",
-            Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
-            IsActive = false
-        };
-
-        var ultimate_performance = new PowerScheme
-        {
-            Name = "Ultimate Performance",
-            Guid = Guid.Parse("e9a42b02-d5df-448d-aa00-03f14749eb61"),
-            IsActive = false
-        };
-
-        // if (PowerPlanList.SelectedItem is not PowerPlan selected) return;
-
-        //var selected = power_saver; // For demo
-        var selected = balanced; 
-        //var selected = high_performance; 
-        //var selected = ultimate_performance; // error using this plan
+        #endregion
 
 
+        ActiveScheme = Scheme;
 
         try
         {
-            bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(selected.Guid));
+            bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(Scheme.Guid));
 
             if (success)
             {
-                Debug.WriteLine($"\nSwitched to: {selected.Name}");
-                await LoadPlansAsync();
+                UpdateUi();
+
+                Debug.WriteLine($"\nSwitched to: {Scheme.Name}");
             }
             else
             {
@@ -169,6 +208,7 @@ public sealed partial class TrayIconView : UserControl
             Debug.WriteLine($"Exception while switching plans: {ex.Message}");
         }
     }
+
 
     private void SetCPUPercentage()
     {
@@ -186,24 +226,78 @@ public sealed partial class TrayIconView : UserControl
 
 
 
+
+
     [RelayCommand]
-    public void OptionOne()
+    public void PowerSaver()
     {
-        DisplayValues();
+        var power_saver = new PowerScheme
+        {
+            Name = "Power Saver",
+            Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
+            IsActive = true
+        };
+
+        SetPowerPlan(power_saver);
     }
 
 
     [RelayCommand]
-    public void OptionTwo()
+    public void Balanced()
     {
-        DisplayValues();
+        var balanced = new PowerScheme
+        {
+            Name = "Balanced",
+            Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
+            IsActive = true // Assume this is the active plan for demonstration
+        };
+
+        SetPowerPlan(balanced);
+    }
+
+    [RelayCommand]
+    public void HighPerformance()
+    {
+        var high_performance = new PowerScheme
+        {
+            Name = "High Performance",
+            Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
+            IsActive = false
+        };
+
+        SetPowerPlan(high_performance);
+    }
+
+    [RelayCommand]
+    public void UltimatePerformance()
+    {
+        var high_performance = new PowerScheme
+        {
+            Name = "Ultimate Performance",
+            Guid = Guid.Parse("e9a42b02-d5df-448d-aa00-03f14749eb61"),
+            IsActive = false
+        };
+
+        SetPowerPlan(high_performance);
     }
 
 
+
     [RelayCommand]
-    public void OptionThree()
+    public void ToggleSpeed()
     {
-        DisplayValues();
+        // At the mo we toggle between Power Saver and Balanced
+        // IsBalanced is bound to the Icon in the tray, but it really needs 4 icons bound to an enum of PowerModes
+        //
+        if (IsBalanced)
+        {
+            PowerSaver();
+
+        }
+        else
+        {
+            Balanced();
+        }
     }
 
 
@@ -254,11 +348,6 @@ public sealed partial class TrayIconView : UserControl
         App.MainWindow?.Close();
     }
 
-
-    private void DisplayValues()
-    {
-        Debug.WriteLine($"Option  [1 {IsOptionOneChecked}]  [2 {IsOptionTwoChecked}]  [3 {IsOptionThreeChecked}]");
-    }
 
 
     private void MyMenuFlyout_Closing(FlyoutBase sender, FlyoutBaseClosingEventArgs args)
