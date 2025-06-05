@@ -55,18 +55,18 @@ public sealed partial class TrayIconView : UserControl
 
         // Show/Hide Main screen Menu item
 
-        if (!ViewModel.IsWindowVisible)
-        {
-            var window_item = new MenuFlyoutItem { Text = "Show Main Window", };
-            window_item.Click += (_, _) => { ViewModel.ShowHideWindow(true); };
-            flyout.Items.Add(window_item);
-        }
-        else
-        {
-            var window_item = new MenuFlyoutItem { Text = "Hide Main Window", };
-            window_item.Click += (_, _) => { ViewModel.ShowHideWindow(false); };
-            flyout.Items.Add(window_item);
-        }
+        //if (!ViewModel.IsWindowVisible)
+        //{
+        //    var window_item = new MenuFlyoutItem { Text = "Show Main Window", };
+        //    window_item.Click += (_, _) => { ViewModel.ShowHideWindow(true); };
+        //    flyout.Items.Add(window_item);
+        //}
+        //else
+        //{
+        //    var window_item = new MenuFlyoutItem { Text = "Hide Main Window", };
+        //    window_item.Click += (_, _) => { ViewModel.ShowHideWindow(false); };
+        //    flyout.Items.Add(window_item);
+        //}
 
         // Add Power Mode Menu items
 

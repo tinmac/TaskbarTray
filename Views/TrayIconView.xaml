@@ -44,7 +44,7 @@
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind ViewModel.SelectedImage, Mode=OneWay}"
+        IconSource="{x:Bind ViewModel.SelectedImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         IsRightTapEnabled="True"
         LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
         NoLeftClickDelay="True">
@@ -88,9 +88,7 @@
 
         <tb:TaskbarIcon.ContextFlyout>
 
-            <MenuFlyout
-                x:Name="MyMenuFlyout"
-                AreOpenCloseAnimationsEnabled="False">
+            <MenuFlyout x:Name="MyMenuFlyout" AreOpenCloseAnimationsEnabled="False">
 
                 <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
 
@@ -112,46 +110,17 @@
                     Text="Power Saver" />
 
 
-                <!--<MenuFlyoutItem Command="{x:Bind ViewModel.Set_HighPerformanceCommand}" Text="High Performance">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon
-                            Margin="0 1 0 0"
-                            FontFamily="{StaticResource FA6_Thin}"
-                            FontSize="8"
-                            Glyph="&#xf058;"
-                            Visibility="{x:Bind ViewModel.IsHighVisible}" />
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-
-                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_BalancedCommand}" Text="Balanced">
-                    <MenuFlyoutItem.Icon>
-
-                        <FontIcon
-                            Margin="0 1 0 0"
-                            FontFamily="{StaticResource FA6_Thin}"
-                            FontSize="8"
-                            Glyph="&#xf006;"
-                            Visibility="{x:Bind ViewModel.IsBalancedVisible}" />
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-
-                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_PowerSaverCommand}" Text="Power Saver">
-                    <MenuFlyoutItem.Icon>
-
-                        <FontIcon
-                            Margin="0 1 0 0"
-                            FontFamily="{StaticResource FA6_Thin}"
-                            FontSize="8"
-                            Glyph="&#xf058;"
-                            Visibility="{x:Bind ViewModel.IsEcoVisible}" />
-
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>-->
-
                 <MenuFlyoutSeparator />
 
-                <MenuFlyoutItem Command="{x:Bind ViewModel.ShowHideWindowCommand}" Text="Show/Hide Window" />
+                <MenuFlyoutItem
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="True"
+                    Text="Show Main Window"
+                    Visibility="{x:Bind ViewModel.IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
 
+                <MenuFlyoutItem
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="False"
+                    Text="Hide Main Window"
+                    Visibility="{x:Bind ViewModel.IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}" />
 
             </MenuFlyout>
 

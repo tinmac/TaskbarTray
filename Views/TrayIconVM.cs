@@ -31,7 +31,8 @@ namespace TaskbarTray.Views
 
     public partial class TrayIconVM : ObservableObject
     {
-        public BitmapImage SelectedImage => ConvertEnumToImage(ActiveScheme);
+        [ObservableProperty]
+        public BitmapImage _selectedImage;// => ConvertEnumToImage(ActiveScheme);
 
 
         [ObservableProperty]
@@ -93,25 +94,31 @@ namespace TaskbarTray.Views
         private bool _isHighChecked;
 
 
-        partial void OnSelectedPowerModeChanged(PowerMode oldValue, PowerMode newValue)
-        {
-            // Notify related booleans so the UI updates
-            Debug.WriteLine($"On Selected Power Mode Changed...");
+        //partial void OnSelectedPowerModeChanged(PowerMode oldValue, PowerMode newValue)
+        //{
+        //    // Notify related booleans so the UI updates
+        //    Debug.WriteLine($"On Selected Power Mode Changed...");
 
-            OnPropertyChanged(nameof(SelectedImage));
+        //    OnPropertyChanged(nameof(SelectedImage));
 
-            //OnPropertyChanged(nameof(IsEco));
-            //OnPropertyChanged(nameof(IsBalanced));
-            //OnPropertyChanged(nameof(IsHigh));
+        //    //OnPropertyChanged(nameof(IsEco));
+        //    //OnPropertyChanged(nameof(IsBalanced));
+        //    //OnPropertyChanged(nameof(IsHigh));
 
-            UpdateUi();
-        }
+        //    OnPropertyChanged(nameof(IsSaverChecked));
+        //    OnPropertyChanged(nameof(IsBalancedChecked));
+        //    OnPropertyChanged(nameof(IsHighChecked));
+
+        //    //UpdateUi();
+        //}
 
 
 
         private BitmapImage ConvertEnumToImage(PowerScheme Schene)
         {
             var PowerMode = Schene.PowerMode;
+
+            Debug.WriteLine($"Active PowerMode {PowerMode}");
 
             if (PowerMode == PowerMode.None)
             {
@@ -140,7 +147,7 @@ namespace TaskbarTray.Views
 
                 ActiveScheme = plans.FirstOrDefault(p => p.IsActive);
 
-                Debug.WriteLine($"\nActive Plan: {ActiveScheme?.Name}");
+                Debug.WriteLine($"\nInitial Plan: {ActiveScheme?.Name}");
 
                 UpdateUi();
             }
@@ -236,7 +243,8 @@ namespace TaskbarTray.Views
         {
             if (ActiveScheme.PowerMode == PowerMode.Eco)
             {
-                //IsBalanced = false;
+                var img = new BitmapImage(new Uri("ms-appx:///Assets/gauge_low.ico"));
+                SelectedImage = img;
 
                 IsSaverChecked = true;
                 IsBalancedChecked = false;
@@ -245,7 +253,8 @@ namespace TaskbarTray.Views
             }
             else if (ActiveScheme.PowerMode == PowerMode.Balanced)
             {
-                //IsBalanced = true;
+                var img = new BitmapImage(new Uri("ms-appx:///Assets/Inactive.ico"));
+                SelectedImage = img;
 
                 IsSaverChecked = false;
                 IsBalancedChecked = true;
@@ -253,7 +262,8 @@ namespace TaskbarTray.Views
             }
             else if (ActiveScheme.PowerMode == PowerMode.High)
             {
-                //IsBalanced = true;
+                var img = new BitmapImage(new Uri("ms-appx:///Assets/gauge_high.ico"));
+                SelectedImage = img;
 
                 IsSaverChecked = false;
                 IsBalancedChecked = false;
@@ -286,26 +296,19 @@ namespace TaskbarTray.Views
         [RelayCommand]
         public void Set_PowerSaver()
         {
+            if (ActiveScheme.PowerMode == PowerMode.Eco)
+            {
+                UpdateUi();
+                return;
+            }
 
             var power_saver = new PowerScheme
             {
                 Name = "Power Saver",
                 Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
-                IsActive = true
+                IsActive = true,
+                PowerMode = PowerMode.Eco
             };
-
-           // IsEco = true;
-
-            // There is no need to set to true to show the check mark as its bound
-            // to IsChecked of the ToggleMenuFlyoutItem (Power Saver in this case) 
-            // ie we dont need to: IsPowerSaver_Selected = true;
-
-            // Set the other ToggleMenuFlyoutItem's to false so it removes their check mark - or else 
-            //IsHigh = false;
-            //IsBalanced = false;
-
-            // Change TrayIcon image
-            // SelectedImageType = ImageSourceType.PowerSaver_Icon;
 
             SetPowerPlan(power_saver);
         }
@@ -314,19 +317,19 @@ namespace TaskbarTray.Views
         [RelayCommand]
         public void Set_Balanced()
         {
+            if (ActiveScheme.PowerMode == PowerMode.Balanced)
+            {
+                UpdateUi();
+                return;
+            }
+
             var balanced = new PowerScheme
             {
                 Name = "Balanced",
                 Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
-                IsActive = true // Assume this is the active plan for demonstration
+                IsActive = true, // Assume this is the active plan for demonstration
+                PowerMode = PowerMode.Balanced
             };
-
-            //IsBalanced = true;
-
-            //IsEco = false;
-            //IsHigh = false;
-
-            // SelectedImageType = ImageSourceType.Balanced_Icon;
 
             SetPowerPlan(balanced);
         }
@@ -334,43 +337,23 @@ namespace TaskbarTray.Views
         [RelayCommand]
         public void Set_HighPerformance()
         {
+            if (ActiveScheme.PowerMode == PowerMode.High)
+            {
+                UpdateUi();
+                return;
+            }
+
             var high_performance = new PowerScheme
             {
                 Name = "High Performance",
                 Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
-                IsActive = false
+                IsActive = false,
+                PowerMode = PowerMode.High
             };
-
-            //IsHigh = true;
-
-            //IsEco = false;
-            //IsBalanced = false;
-
-            //SelectedImageType = ImageSourceType.High_Icon;
 
             SetPowerPlan(high_performance);
         }
 
-
-        //[RelayCommand]
-        //public void Set_UltimatePerformance()
-        //{
-        //    var ultimate_performance = new PowerScheme
-        //    {
-        //        Name = "Ultimate Performance",
-        //        Guid = Guid.Parse("e9a42b02-d5df-448d-aa00-03f14749eb61"),
-        //        IsActive = false
-        //    };
-
-        //    IsHigh_Selected = false;
-        //    IsBalanced_Selected = false;
-        //    IsPowerSaver_Selected = false;
-
-
-        //    SelectedImageType = ImageSourceType.Ultimate_Icon;
-
-        //    SetPowerPlan(ultimate_performance);
-        //}
 
 
 
@@ -392,7 +375,7 @@ namespace TaskbarTray.Views
 
 
          [RelayCommand]
-        public void ShowHideWindow(bool show)
+        public void ShowHideWindow(string show)
         {
 
             // MyMenuFlyout.ShowAt(TrayIcon);
@@ -403,7 +386,7 @@ namespace TaskbarTray.Views
                 return;
             }
 
-            if (show)
+            if (show == "True")
             {
                 Debug.WriteLine($"Show Main Window...");
 
