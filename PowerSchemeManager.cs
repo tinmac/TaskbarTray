@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.Views;
 
 
 namespace TaskbarTray
@@ -87,11 +88,42 @@ namespace TaskbarTray
                 if (PowerReadFriendlyName(IntPtr.Zero, ref planGuid, IntPtr.Zero, IntPtr.Zero, nameBuffer, ref nameSize) == 0)
                     name = Encoding.Unicode.GetString(nameBuffer, 0, (int)nameSize - 2);
 
+
+                // PowerMode is derived from the Plan Guid, in case language is different
+              
+                #region Plan GUIDs notes...
+                //
+                // Power Saver            a1841308-3541-4fab-bc81-f71556f20b4a
+                // Balanced               381b4222-f694-41f0-9685-ff5bb260df2e
+                // High Performance       8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+                // Ultimate Performance   8c5e7fda-e8bf-4a96-b3b9-1b0c2d0f2d3a  - not on MLAP - sited on tinternet as Windows 10 Pro for Workstations only 
+                //
+                // I havent included the plans below as they are not commonly used 
+                //
+                // found on my laptop but may not be present on all systems:
+                // Ultimate Performance   e9a42b02-d5df-448d-aa00-03f14749eb61  - on MLAP
+                //
+                // may not be present on all systems, but found on some AMD systems:
+                // AMD Ryzen Balanced     45bcc044-d885-43e2-8605-ee558b2a56b0 (varies by driver/version)
+                //
+                #endregion
+
+                PowerMode pm = PowerMode.None;
+                if (planGuid == Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"))
+                    pm = PowerMode.Eco;
+                else if (planGuid == Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"))
+                    pm = PowerMode.Balanced;
+                else if (planGuid == Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"))
+                    pm = PowerMode.High;
+
+                Debug.WriteLine($"Power Mode [{pm}]");
+
                 plans.Add(new PowerScheme
                 {
                     Guid = planGuid,
                     Name = name,
-                    IsActive = planGuid == activeGuid
+                    IsActive = planGuid == activeGuid,
+                    PowerMode = pm
                 });
 
                 index++;

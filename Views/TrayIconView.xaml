@@ -11,16 +11,13 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <!--<converters:BoolToImageSourceConverter
-            x:Key="BoolToImageSourceConverter"
-            FalseImage="ms-appx:///Assets/Inactive.ico"
-            TrueImage="ms-appx:///Assets/Red.ico" />-->
+        <converters:PowerModeToVisibilityConverter x:Key="PowerModeToVisibilityConverter" />
 
         <converters:BoolToImageSourceConverter
             x:Key="BoolToImageSourceConverter"
             FalseImage="/Assets/gauge_low.ico"
             TrueImage="/Assets/gauge_high.ico" />
-        
+
     </UserControl.Resources>
 
 
@@ -39,6 +36,7 @@
         Guage Full ie fast
         <FontIcon Foreground="Green" Glyph="&#f62d;" />
 
+        RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
 
     -->
 
@@ -47,6 +45,8 @@
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
         IconSource="{x:Bind ViewModel.SelectedImage, Mode=OneWay}"
+        IsRightTapEnabled="True"
+       RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
         LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
         NoLeftClickDelay="True">
 
@@ -87,47 +87,51 @@
             </tb:GeneratedIconSource>
         </tb:TaskbarIcon.IconSource>-->
 
-        <tb:TaskbarIcon.ContextFlyout>
+        <!--<tb:TaskbarIcon.ContextFlyout>
 
             <MenuFlyout
                 x:Name="MyMenuFlyout"
-                AreOpenCloseAnimationsEnabled="False"
-                Closing="MyMenuFlyout_Closing">
+                AreOpenCloseAnimationsEnabled="False">
 
                 <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
 
                 <MenuFlyoutSeparator />
 
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind ViewModel.Set_HighPerformanceCommand}"
-                    IsChecked="{x:Bind ViewModel.IsHigh_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="High Performance" />
+                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_HighPerformanceCommand}" Text="High Performance">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon
+                            Margin="0 1 0 0"
+                            FontFamily="{StaticResource FA6_Thin}"
+                            FontSize="8"
+                            Glyph="&#xf058;"
+                            Visibility="{x:Bind ViewModel.IsHighVisible}" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
 
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind ViewModel.Set_BalancedCommand}"
-                    IsChecked="{x:Bind ViewModel.IsBalanced_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Balanced" />
+                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_BalancedCommand}" Text="Balanced">
+                    <MenuFlyoutItem.Icon>
 
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind ViewModel.Set_PowerSaverCommand}"
-                    IsChecked="{x:Bind ViewModel.IsPowerSaver_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Power Saver" />
+                        <FontIcon
+                            Margin="0 1 0 0"
+                            FontFamily="{StaticResource FA6_Thin}"
+                            FontSize="8"
+                            Glyph="&#xf006;"
+                            Visibility="{x:Bind ViewModel.IsBalancedVisible}" />
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
 
+                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_PowerSaverCommand}" Text="Power Saver">
+                    <MenuFlyoutItem.Icon>
 
-                <!--<ToggleMenuFlyoutItem
-                    Command="{x:Bind HighPerformanceCommand}"
-                    IsChecked="{x:Bind IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="High Performance" />
+                        <FontIcon
+                            Margin="0 1 0 0"
+                            FontFamily="{StaticResource FA6_Thin}"
+                            FontSize="8"
+                            Glyph="&#xf058;"
+                            Visibility="{x:Bind ViewModel.IsEcoVisible}" />
 
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind BalancedCommand}"
-                    IsChecked="{x:Bind IsBalancedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Balanced" />
-
-                <ToggleMenuFlyoutItem
-                    Command="{x:Bind PowerSaverCommand}"
-                    IsChecked="{x:Bind IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Power Saver" />-->
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
 
                 <MenuFlyoutSeparator />
 
@@ -136,7 +140,7 @@
 
             </MenuFlyout>
 
-        </tb:TaskbarIcon.ContextFlyout>
+        </tb:TaskbarIcon.ContextFlyout>-->
 
     </tb:TaskbarIcon>
 
