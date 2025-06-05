@@ -46,8 +46,8 @@
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsBalanced, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
-        LeftClickCommand="{x:Bind ToggleSpeedCommand}"
+        IconSource="{x:Bind ViewModel.SelectedImage, Mode=OneWay}"
+        LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
         NoLeftClickDelay="True">
 
         <!--<tb:TaskbarIcon.IconSource>
@@ -99,6 +99,22 @@
                 <MenuFlyoutSeparator />
 
                 <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_HighPerformanceCommand}"
+                    IsChecked="{x:Bind ViewModel.IsHigh_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="High Performance" />
+
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_BalancedCommand}"
+                    IsChecked="{x:Bind ViewModel.IsBalanced_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Balanced" />
+
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_PowerSaverCommand}"
+                    IsChecked="{x:Bind ViewModel.IsPowerSaver_Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Power Saver" />
+
+
+                <!--<ToggleMenuFlyoutItem
                     Command="{x:Bind HighPerformanceCommand}"
                     IsChecked="{x:Bind IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Text="High Performance" />
@@ -111,11 +127,11 @@
                 <ToggleMenuFlyoutItem
                     Command="{x:Bind PowerSaverCommand}"
                     IsChecked="{x:Bind IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Text="Power Saver" />
+                    Text="Power Saver" />-->
 
                 <MenuFlyoutSeparator />
 
-                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />
+                <MenuFlyoutItem Command="{x:Bind ViewModel.ShowHideWindowCommand}" Text="Show/Hide Window" />
 
 
             </MenuFlyout>

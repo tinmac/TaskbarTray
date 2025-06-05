@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
+using PowerPlanSwitcher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -12,64 +15,401 @@ namespace TaskbarTray.Views
 {
     public enum ImageSourceType
     {
-        Icon1,
-        Icon2,
-        Icon3,
-        Icon4
+        Ultimate_Icon,
+        High_Icon,
+        Balanced_Icon,
+        PowerSaver_Icon
     }
 
     public partial class TrayIconVM : ObservableObject
     {
-        [ObservableProperty]
-        private ImageSourceType selectedImageType = ImageSourceType.Icon1;
+        private bool _isWindowVisible;
+        public bool IsWindowVisible
+        {
+            get => _isWindowVisible;
+            set => SetProperty(ref _isWindowVisible, value);
+        }
+
+        private PowerScheme _activeScheme;
+        public PowerScheme ActiveScheme
+        {
+            get => _activeScheme;
+            set => SetProperty(ref _activeScheme, value);
+        }
+
 
         public BitmapImage SelectedImage => ConvertEnumToImage(SelectedImageType);
 
-        public bool IsIcon1Selected
-        {
-            get => SelectedImageType == ImageSourceType.Icon1;
-            set { if (value) SelectedImageType = ImageSourceType.Icon1; }
-        }
 
-        public bool IsIcon2Selected
-        {
-            get => SelectedImageType == ImageSourceType.Icon2;
-            set { if (value) SelectedImageType = ImageSourceType.Icon2; }
-        }
+        [ObservableProperty]
+        private ImageSourceType selectedImageType = ImageSourceType.Ultimate_Icon;
 
-        public bool IsIcon3Selected
-        {
-            get => SelectedImageType == ImageSourceType.Icon3;
-            set { if (value) SelectedImageType = ImageSourceType.Icon3; }
-        }
 
-        public bool IsIcon4Selected
-        {
-            get => SelectedImageType == ImageSourceType.Icon4;
-            set { if (value) SelectedImageType = ImageSourceType.Icon4; }
-        }
+
+        [ObservableProperty]
+        private bool _isUltimate_Selected;
+
+        [ObservableProperty]
+        private bool _isHigh_Selected;
+
+        [ObservableProperty]
+        private bool _isBalanced_Selected;
+
+        [ObservableProperty]
+        private bool _isPowerSaver_Selected;
+
+
+        //public bool IsUltimate_Selected
+        //{
+        //    get => SelectedImageType == ImageSourceType.Ultimate_Icon;
+        //    set { if (value) SelectedImageType = ImageSourceType.Ultimate_Icon; }
+        //}
+
+        //public bool IsHigh_Selected
+        //{
+        //    get
+        //    {
+        //        if(SelectedImageType == ImageSourceType.High_Icon)
+        //        {
+        //            _isHigh_Selected = true;
+        //        }
+        //        else
+        //        {
+        //            _isHigh_Selected = false;
+        //        }
+
+        //        return _isHigh_Selected;
+        //    }
+        //    set 
+        //    {
+        //        if (value) 
+        //            SelectedImageType = ImageSourceType.High_Icon;
+        //    }
+        //}
+
+        //public bool IsBalanced_Selected
+        //{
+        //    get => SelectedImageType == ImageSourceType.Balanced_Icon;
+        //    set { if (value) SelectedImageType = ImageSourceType.Balanced_Icon; }
+        //}
+
+        //public bool IsPowerSaver_Selected
+        //{
+        //    get => SelectedImageType == ImageSourceType.PowerSaver_Icon;
+        //    set { if (value) SelectedImageType = ImageSourceType.PowerSaver_Icon; }
+        //}
+
 
         partial void OnSelectedImageTypeChanged(ImageSourceType oldValue, ImageSourceType newValue)
         {
             OnPropertyChanged(nameof(SelectedImage));
-            OnPropertyChanged(nameof(IsIcon1Selected));
-            OnPropertyChanged(nameof(IsIcon2Selected));
-            OnPropertyChanged(nameof(IsIcon3Selected));
-            OnPropertyChanged(nameof(IsIcon4Selected));
+            OnPropertyChanged(nameof(IsHigh_Selected));
+            OnPropertyChanged(nameof(IsBalanced_Selected));
+            OnPropertyChanged(nameof(IsPowerSaver_Selected));
+            OnPropertyChanged(nameof(IsUltimate_Selected));
         }
 
         private BitmapImage ConvertEnumToImage(ImageSourceType sourceType)
         {
             string uri = sourceType switch
             {
-                ImageSourceType.Icon1 => "ms-appx:///Assets/Icon1.png",
-                ImageSourceType.Icon2 => "ms-appx:///Assets/Icon2.png",
-                ImageSourceType.Icon3 => "ms-appx:///Assets/Icon3.png",
-                ImageSourceType.Icon4 => "ms-appx:///Assets/Icon4.png",
+                ImageSourceType.Ultimate_Icon => "ms-appx:///Assets/Red.ico",
+                ImageSourceType.High_Icon => "ms-appx:///Assets/gauge_high.ico",
+                ImageSourceType.Balanced_Icon => "ms-appx:///Assets/Inactive.ico",
+                ImageSourceType.PowerSaver_Icon => "ms-appx:///Assets/gauge_low.ico",
                 _ => throw new ArgumentOutOfRangeException()
             };
             return new BitmapImage(new Uri(uri));
         }
+
+
+        // METHODS
+        public async Task LoadPlansAsync()
+        {
+            try
+            {
+                var plans = await Task.Run(() => PowerPlanManager.LoadPowerPlans());
+
+                ActiveScheme = plans.FirstOrDefault(p => p.IsActive);
+
+                Debug.WriteLine($"\nActive Plan: {ActiveScheme?.Name}");
+
+                // UpdateUi();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading power plans: {ex.Message}");
+            }
+        }
+
+
+        public async void SetPowerPlan(PowerScheme Scheme)
+        {
+            #region Notes
+
+            // MLAP has four power plans in the registry
+            // 
+            // Power Saver            a1841308-3541-4fab-bc81-f71556f20b4a
+            // Balanced               381b4222-f694-41f0-9685-ff5bb260df2e
+            // High Performance       8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+            // Ultimate Performance   e9a42b02-d5df-448d-aa00-03f14749eb61  - on MLAP
+            //
+            // AMD Ryzen Balanced     45bcc044-d885-43e2-8605-ee558b2a56b0 (varies by driver/version)
+            //
+            // Ultimate Performance   8c5e7fda-e8bf-4a96-b3b9-1b0c2d0f2d3a  - not on MLAP - sited on tinternet as Windows 10 Pro for Workstations only 
+
+
+            // Power plans are stored in the registry under
+            // HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\User\PowerSchemes
+
+
+            // Power Schemes (plans) & W11 Power Mode 
+            // 
+            // Power Mode is essentially a UI layer on top of Power Schemes, especially Balanced:
+            // When you move the Power Mode slider, Windows tweaks processor and thermal policies within the Balanced plan.
+            // So changing Power Mode doesn't switch the scheme, but modifies behavior within the active plan.
+            //
+            // When we change Power Plan to Balanced the Control Panel -> Power settings page
+            // all the plans are removed from the Ui but if you refresh the page Balanced appears!  
+            // So I can edit the plan in advanced settings TO QUIETEN THE FAN! ie I want to change the CPU Max to 60% and back to 100%
+            //
+            // If we set CPU Max @ 60% then this quietens the fan down and cools the Laptop 
+
+            // How can I programatically set the CPU Min/Max in a certain power plan?
+            //
+
+            #endregion
+
+
+            ActiveScheme = Scheme;
+
+            try
+            {
+                bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(Scheme.Guid));
+
+                if (success)
+                {
+                    // UpdateUi();
+
+                    Debug.WriteLine($"\nSwitched to: {Scheme.Name}");
+                }
+                else
+                {
+                    Debug.WriteLine("Failed to set power plan.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Exception while switching plans: {ex.Message}");
+            }
+        }
+
+
+        //private void UpdateUi()
+        //{
+        //    if (ActiveScheme.DisplayName.ToLower().Contains("power saver"))
+        //    {
+        //        IsBalanced = false;
+
+        //        IsSaverChecked = true;
+        //        IsBalancedChecked = false;
+        //        IsHighChecked = false;
+
+        //    }
+        //    else if (ActiveScheme.DisplayName.ToLower().Contains("balanced"))
+        //    {
+        //        IsBalanced = true;
+
+        //        IsSaverChecked = false;
+        //        IsBalancedChecked = true;
+        //        IsHighChecked = false;
+        //    }
+        //    else if (ActiveScheme.DisplayName.ToLower().Contains("high performance"))
+        //    {
+        //        IsBalanced = true;
+
+        //        IsSaverChecked = false;
+        //        IsBalancedChecked = false;
+        //        IsHighChecked = true;
+        //    }
+        //    else if (ActiveScheme.DisplayName.ToLower().Contains("ultimate performance"))
+        //    {
+        //        IsBalanced = true;
+
+        //        IsSaverChecked = false;
+        //        IsBalancedChecked = false;
+        //        IsHighChecked = false;
+        //    }
+        //    else
+        //    {
+        //        IsBalanced = false;
+        //        IsSaverChecked = false;
+        //        IsBalancedChecked = false;
+        //        IsHighChecked = false; // No known plan is active
+
+        //        Debug.WriteLine($"No known plan!");
+        //    }
+
+        //}
+
+
+        private void SetCPUPercentage()
+        {
+            Guid plan = PowerPlanManager.GetActivePlanGuid();
+
+            int acCpu = PowerPlanManager.GetCpuMaxPercentage(plan);
+            int dcCpu = PowerPlanManager.GetCpuMaxPercentageDC(plan);
+
+            Console.WriteLine($"AC Max CPU: {acCpu}%");
+            Console.WriteLine($"DC Max CPU: {dcCpu}%");
+
+            PowerPlanManager.SetCpuMaxPercentage(plan, 65);    // AC
+            PowerPlanManager.SetCpuMaxPercentageDC(plan, 63);  // DC
+        }
+
+
+
+        // RELAY COMMANDS
+
+        [RelayCommand]
+        public void Set_PowerSaver()
+        {
+            var power_saver = new PowerScheme
+            {
+                Name = "Power Saver",
+                Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
+                IsActive = true
+            };
+
+            IsUltimate_Selected = false;
+            IsHigh_Selected = false;
+            IsBalanced_Selected = false;
+            IsPowerSaver_Selected = true;
+
+            SelectedImageType = ImageSourceType.PowerSaver_Icon;
+
+            SetPowerPlan(power_saver);
+        }
+
+
+        [RelayCommand]
+        public void Set_Balanced()
+        {
+            var balanced = new PowerScheme
+            {
+                Name = "Balanced",
+                Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
+                IsActive = true // Assume this is the active plan for demonstration
+            };
+
+            IsUltimate_Selected = false;
+            IsHigh_Selected = false;
+            IsBalanced_Selected = true;
+            IsPowerSaver_Selected = false;
+
+            SelectedImageType = ImageSourceType.Balanced_Icon;
+
+            SetPowerPlan(balanced);
+        }
+
+        [RelayCommand]
+        public void Set_HighPerformance()
+        {
+            var high_performance = new PowerScheme
+            {
+                Name = "High Performance",
+                Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
+                IsActive = false
+            };
+
+            IsUltimate_Selected = false;
+            IsHigh_Selected = true;
+            IsBalanced_Selected = false;
+            IsPowerSaver_Selected = false;
+
+            SelectedImageType = ImageSourceType.High_Icon;
+
+            SetPowerPlan(high_performance);
+        }
+
+
+        [RelayCommand]
+        public void Set_UltimatePerformance()
+        {
+            var ultimate_performance = new PowerScheme
+            {
+                Name = "Ultimate Performance",
+                Guid = Guid.Parse("e9a42b02-d5df-448d-aa00-03f14749eb61"),
+                IsActive = false
+            };
+
+            IsUltimate_Selected = true;
+            IsHigh_Selected = false;
+            IsBalanced_Selected = false;
+            IsPowerSaver_Selected = false;
+
+
+            SelectedImageType = ImageSourceType.Ultimate_Icon;
+
+            SetPowerPlan(ultimate_performance);
+        }
+
+
+
+        [RelayCommand]
+        public void ToggleSpeed()
+        {
+            // Left click toggles between Power Saver and Balanced
+            //
+            if (IsPowerSaver_Selected)
+            {
+                Set_Balanced();
+            }
+
+            if (IsBalanced_Selected)
+            {
+                Set_PowerSaver();
+            }
+        }
+
+
+        [RelayCommand]
+        public void ShowHideWindow()
+        {
+            // If we try to show the context flyout on left click,
+            // it does not work
+            //
+            bool LeftClickOpensContextFlyout = false;
+
+            if (LeftClickOpensContextFlyout)
+            {
+                Debug.WriteLine($"Left: Show Context...");
+
+               // MyMenuFlyout.ShowAt(TrayIcon);
+
+            }
+            else
+            {
+                Debug.WriteLine($"Left: Show/Hide Main...");
+
+                var window = App.MainWindow;
+                if (window == null)
+                {
+                    return;
+                }
+
+                if (window.Visible)
+                {
+                    window.Hide();
+                }
+                else
+                {
+                    window.Show();
+                }
+                IsWindowVisible = window.Visible;
+            }
+        }
+
     }
 }
 
