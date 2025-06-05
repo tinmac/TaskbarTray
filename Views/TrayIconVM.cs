@@ -19,6 +19,7 @@ namespace TaskbarTray.Views
 
     public class TrayIconVM : INotifyPropertyChanged
     {
+
         private ImageSourceType _selectedImageType = ImageSourceType.Icon1;
 
         public ImageSourceType SelectedImageType

@@ -14,6 +14,10 @@ namespace TaskbarTray.Views;
 [ObservableObject]
 public sealed partial class TrayIconView : UserControl
 {
+    // Bind ViewModel to the View
+    public TrayIconVM ViewModel { get; } = new TrayIconVM();
+
+
 
     private bool _isPowerSaver;
     public bool IsBalanced
@@ -60,7 +64,6 @@ public sealed partial class TrayIconView : UserControl
     }
 
 
-    public TrayIconVM ViewModel { get; } = new TrayIconVM();
 
     public TrayIconView()
     {
@@ -97,54 +100,6 @@ public sealed partial class TrayIconView : UserControl
         {
             Debug.WriteLine($"Error loading power plans: {ex.Message}");
         }
-    }
-
-
-    private void UpdateUi()
-    {
-        if (ActiveScheme.DisplayName.ToLower().Contains("power saver"))
-        {
-            IsBalanced = false;
-
-            IsSaverChecked = true;
-            IsBalancedChecked = false;
-            IsHighChecked = false;
-
-        }
-        else if (ActiveScheme.DisplayName.ToLower().Contains("balanced"))
-        {
-            IsBalanced = true;
-
-            IsSaverChecked = false;
-            IsBalancedChecked = true;
-            IsHighChecked = false;
-        }
-        else if (ActiveScheme.DisplayName.ToLower().Contains("high performance"))
-        {
-            IsBalanced = true;
-
-            IsSaverChecked = false;
-            IsBalancedChecked = false;
-            IsHighChecked = true;
-        }
-        else if (ActiveScheme.DisplayName.ToLower().Contains("ultimate performance"))
-        {
-            IsBalanced = true;
-
-            IsSaverChecked = false;
-            IsBalancedChecked = false;
-            IsHighChecked = false;
-        }
-        else
-        {
-            IsBalanced = false;
-            IsSaverChecked = false;
-            IsBalancedChecked = false;
-            IsHighChecked = false; // No known plan is active
-
-            Debug.WriteLine($"No known plan!");
-        }
-
     }
 
 
@@ -210,6 +165,54 @@ public sealed partial class TrayIconView : UserControl
     }
 
 
+    private void UpdateUi()
+    {
+        if (ActiveScheme.DisplayName.ToLower().Contains("power saver"))
+        {
+            IsBalanced = false;
+
+            IsSaverChecked = true;
+            IsBalancedChecked = false;
+            IsHighChecked = false;
+
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("balanced"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = true;
+            IsHighChecked = false;
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("high performance"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = true;
+        }
+        else if (ActiveScheme.DisplayName.ToLower().Contains("ultimate performance"))
+        {
+            IsBalanced = true;
+
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = false;
+        }
+        else
+        {
+            IsBalanced = false;
+            IsSaverChecked = false;
+            IsBalancedChecked = false;
+            IsHighChecked = false; // No known plan is active
+
+            Debug.WriteLine($"No known plan!");
+        }
+
+    }
+
+
     private void SetCPUPercentage()
     {
         Guid plan = PowerPlanManager.GetActivePlanGuid();
@@ -267,6 +270,7 @@ public sealed partial class TrayIconView : UserControl
 
         SetPowerPlan(high_performance);
     }
+
 
     [RelayCommand]
     public void UltimatePerformance()
