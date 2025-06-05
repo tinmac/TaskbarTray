@@ -46,7 +46,6 @@
         ContextMenuMode="SecondWindow"
         IconSource="{x:Bind ViewModel.SelectedImage, Mode=OneWay}"
         IsRightTapEnabled="True"
-       RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
         LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
         NoLeftClickDelay="True">
 

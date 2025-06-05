@@ -31,7 +31,7 @@ namespace TaskbarTray.Views
 
     public partial class TrayIconVM : ObservableObject
     {
-        public BitmapImage SelectedImage => ConvertEnumToImage(SelectedPowerMode);
+        public BitmapImage SelectedImage => ConvertEnumToImage(ActiveScheme);
 
 
         [ObservableProperty]
@@ -52,36 +52,36 @@ namespace TaskbarTray.Views
 
         }
 
-        public bool IsEco
-        {
-            get => SelectedPowerMode == PowerMode.Eco;
-            set
-            {
-                if (value && SelectedPowerMode != PowerMode.Eco)
-                    SelectedPowerMode = PowerMode.Eco;
-                // Ignore false or redundant toggle
-            }
-        }
+        //public bool IsEco
+        //{
+        //    get => SelectedPowerMode == PowerMode.Eco;
+        //    set
+        //    {
+        //        if (value && SelectedPowerMode != PowerMode.Eco)
+        //            SelectedPowerMode = PowerMode.Eco;
+        //        // Ignore false or redundant toggle
+        //    }
+        //}
 
-        public bool IsBalanced
-        {
-            get => SelectedPowerMode == PowerMode.Balanced;
-            set
-            {
-                if (value && SelectedPowerMode != PowerMode.Balanced)
-                    SelectedPowerMode = PowerMode.Balanced;
-            }
-        }
+        //public bool IsBalanced
+        //{
+        //    get => SelectedPowerMode == PowerMode.Balanced;
+        //    set
+        //    {
+        //        if (value && SelectedPowerMode != PowerMode.Balanced)
+        //            SelectedPowerMode = PowerMode.Balanced;
+        //    }
+        //}
 
-        public bool IsHigh
-        {
-            get => SelectedPowerMode == PowerMode.High;
-            set
-            {
-                if (value && SelectedPowerMode != PowerMode.High)
-                    SelectedPowerMode = PowerMode.High;
-            }
-        }
+        //public bool IsHigh
+        //{
+        //    get => SelectedPowerMode == PowerMode.High;
+        //    set
+        //    {
+        //        if (value && SelectedPowerMode != PowerMode.High)
+        //            SelectedPowerMode = PowerMode.High;
+        //    }
+        //}
 
         [ObservableProperty]
         private bool _isSaverChecked;
@@ -100,22 +100,32 @@ namespace TaskbarTray.Views
 
             OnPropertyChanged(nameof(SelectedImage));
 
-            OnPropertyChanged(nameof(IsEco));
-            OnPropertyChanged(nameof(IsBalanced));
-            OnPropertyChanged(nameof(IsHigh));
+            //OnPropertyChanged(nameof(IsEco));
+            //OnPropertyChanged(nameof(IsBalanced));
+            //OnPropertyChanged(nameof(IsHigh));
+
+            UpdateUi();
         }
 
 
 
-        private BitmapImage ConvertEnumToImage(PowerMode PowerMode)
+        private BitmapImage ConvertEnumToImage(PowerScheme Schene)
         {
+            var PowerMode = Schene.PowerMode;
+
+            if (PowerMode == PowerMode.None)
+            {
+                Debug.WriteLine($"PowerMode is None, returning null image.");
+                return null; // No image for None mode
+            }
+
             string uri = PowerMode switch
             {
                 PowerMode.Eco => "ms-appx:///Assets/gauge_low.ico",
                 PowerMode.Balanced => "ms-appx:///Assets/Inactive.ico",
                 PowerMode.High => "ms-appx:///Assets/gauge_high.ico",
                 //  ImageSourceType.Ultimate_Icon => "ms-appx:///Assets/Red.ico",
-                _ => throw new ArgumentOutOfRangeException()
+                //_ => throw new ArgumentOutOfRangeException()
             };
             return new BitmapImage(new Uri(uri));
         }
@@ -132,20 +142,7 @@ namespace TaskbarTray.Views
 
                 Debug.WriteLine($"\nActive Plan: {ActiveScheme?.Name}");
 
-                if (ActiveScheme.PowerMode == PowerMode.Eco)
-                {
-                    IsEco = true;
-                }
-                else if (ActiveScheme.PowerMode == PowerMode.Balanced)
-                {
-                    IsBalanced = true;
-                }
-                else if (ActiveScheme.PowerMode == PowerMode.High)
-                {
-                    IsHigh = true;
-                }
-
-                // UpdateUi();
+                UpdateUi();
             }
             catch (Exception ex)
             {
@@ -235,6 +232,54 @@ namespace TaskbarTray.Views
         }
 
 
+        private void UpdateUi()
+        {
+            if (ActiveScheme.PowerMode == PowerMode.Eco)
+            {
+                //IsBalanced = false;
+
+                IsSaverChecked = true;
+                IsBalancedChecked = false;
+                IsHighChecked = false;
+
+            }
+            else if (ActiveScheme.PowerMode == PowerMode.Balanced)
+            {
+                //IsBalanced = true;
+
+                IsSaverChecked = false;
+                IsBalancedChecked = true;
+                IsHighChecked = false;
+            }
+            else if (ActiveScheme.PowerMode == PowerMode.High)
+            {
+                //IsBalanced = true;
+
+                IsSaverChecked = false;
+                IsBalancedChecked = false;
+                IsHighChecked = true;
+            }
+            else if (ActiveScheme.PowerMode == PowerMode.None)
+            {
+                //IsBalanced = false;
+
+                IsSaverChecked = false;
+                IsBalancedChecked = false;
+                IsHighChecked = false;
+            }
+            else
+            {
+                //IsBalanced = false;
+                IsSaverChecked = false;
+                IsBalancedChecked = false;
+                IsHighChecked = false; // No known plan is active
+
+                Debug.WriteLine($"No known plan!");
+            }
+
+        }
+
+
 
         // RELAY COMMANDS
 
@@ -249,7 +294,7 @@ namespace TaskbarTray.Views
                 IsActive = true
             };
 
-            IsEco = true;
+           // IsEco = true;
 
             // There is no need to set to true to show the check mark as its bound
             // to IsChecked of the ToggleMenuFlyoutItem (Power Saver in this case) 
@@ -276,7 +321,7 @@ namespace TaskbarTray.Views
                 IsActive = true // Assume this is the active plan for demonstration
             };
 
-            IsBalanced = true;
+            //IsBalanced = true;
 
             //IsEco = false;
             //IsHigh = false;
@@ -296,7 +341,7 @@ namespace TaskbarTray.Views
                 IsActive = false
             };
 
-            IsHigh = true;
+            //IsHigh = true;
 
             //IsEco = false;
             //IsBalanced = false;
@@ -334,12 +379,12 @@ namespace TaskbarTray.Views
         {
             // Left click toggles between Power Saver and Balanced
             //
-            if (IsEco)
+            if (IsSaverChecked)
             {
                 Set_Balanced();
             }
 
-            if (IsBalanced)
+            if (IsBalancedChecked)
             {
                 Set_PowerSaver();
             }
