@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Media.Imaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,28 +18,10 @@ namespace TaskbarTray.Views
         Icon4
     }
 
-    public class TrayIconVM : INotifyPropertyChanged
+    public partial class TrayIconVM : ObservableObject
     {
-
-        private ImageSourceType _selectedImageType = ImageSourceType.Icon1;
-
-        public ImageSourceType SelectedImageType
-        {
-            get => _selectedImageType;
-            set
-            {
-                if (_selectedImageType != value)
-                {
-                    _selectedImageType = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(SelectedImage));
-                    OnPropertyChanged(nameof(IsIcon1Selected));
-                    OnPropertyChanged(nameof(IsIcon2Selected));
-                    OnPropertyChanged(nameof(IsIcon3Selected));
-                    OnPropertyChanged(nameof(IsIcon4Selected));
-                }
-            }
-        }
+        [ObservableProperty]
+        private ImageSourceType selectedImageType = ImageSourceType.Icon1;
 
         public BitmapImage SelectedImage => ConvertEnumToImage(SelectedImageType);
 
@@ -66,22 +49,27 @@ namespace TaskbarTray.Views
             set { if (value) SelectedImageType = ImageSourceType.Icon4; }
         }
 
+        partial void OnSelectedImageTypeChanged(ImageSourceType oldValue, ImageSourceType newValue)
+        {
+            OnPropertyChanged(nameof(SelectedImage));
+            OnPropertyChanged(nameof(IsIcon1Selected));
+            OnPropertyChanged(nameof(IsIcon2Selected));
+            OnPropertyChanged(nameof(IsIcon3Selected));
+            OnPropertyChanged(nameof(IsIcon4Selected));
+        }
+
         private BitmapImage ConvertEnumToImage(ImageSourceType sourceType)
         {
             string uri = sourceType switch
             {
-                ImageSourceType.Icon1 => "/Assets/gauge_low.ico",
-                ImageSourceType.Icon2 => "/Assets/Inactive.ico",
-                ImageSourceType.Icon3 => "/Assets/Red.ico",
-                ImageSourceType.Icon4 => "/Assets/gauge_high.ico",
+                ImageSourceType.Icon1 => "ms-appx:///Assets/Icon1.png",
+                ImageSourceType.Icon2 => "ms-appx:///Assets/Icon2.png",
+                ImageSourceType.Icon3 => "ms-appx:///Assets/Icon3.png",
+                ImageSourceType.Icon4 => "ms-appx:///Assets/Icon4.png",
                 _ => throw new ArgumentOutOfRangeException()
             };
             return new BitmapImage(new Uri(uri));
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 
