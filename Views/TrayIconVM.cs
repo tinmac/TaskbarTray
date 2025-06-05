@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Imaging;
 using PowerPlanSwitcher;
 using System;
@@ -41,7 +42,7 @@ namespace TaskbarTray.Views
 
 
         [ObservableProperty]
-        private bool _isWindowVisible;
+        private bool _show_OpenWindowMenuItem;
 
         [ObservableProperty]
         private PowerScheme _activeScheme;
@@ -53,65 +54,52 @@ namespace TaskbarTray.Views
 
         }
 
-        //public bool IsEco
-        //{
-        //    get => SelectedPowerMode == PowerMode.Eco;
-        //    set
-        //    {
-        //        if (value && SelectedPowerMode != PowerMode.Eco)
-        //            SelectedPowerMode = PowerMode.Eco;
-        //        // Ignore false or redundant toggle
-        //    }
-        //}
-
-        //public bool IsBalanced
-        //{
-        //    get => SelectedPowerMode == PowerMode.Balanced;
-        //    set
-        //    {
-        //        if (value && SelectedPowerMode != PowerMode.Balanced)
-        //            SelectedPowerMode = PowerMode.Balanced;
-        //    }
-        //}
-
-        //public bool IsHigh
-        //{
-        //    get => SelectedPowerMode == PowerMode.High;
-        //    set
-        //    {
-        //        if (value && SelectedPowerMode != PowerMode.High)
-        //            SelectedPowerMode = PowerMode.High;
-        //    }
-        //}
 
         [ObservableProperty]
         private bool _isSaverChecked;
 
         [ObservableProperty]
         private bool _isBalancedChecked;
-   
+
         [ObservableProperty]
         private bool _isHighChecked;
 
 
-        //partial void OnSelectedPowerModeChanged(PowerMode oldValue, PowerMode newValue)
-        //{
-        //    // Notify related booleans so the UI updates
-        //    Debug.WriteLine($"On Selected Power Mode Changed...");
+        public TrayIconVM()
+        {
 
-        //    OnPropertyChanged(nameof(SelectedImage));
+            WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) => 
+            {
+                Debug.WriteLine($"Rx CloseMainWin: {message.Content}");
+                Show_OpenWindowMenuItem = true;
+            });
 
-        //    //OnPropertyChanged(nameof(IsEco));
-        //    //OnPropertyChanged(nameof(IsBalanced));
-        //    //OnPropertyChanged(nameof(IsHigh));
+            #region old Messenger code
+         
+            //App.Messenger.Register<MyMessage>(this, (recipient, message) =>
+            //{
+            //    Console.WriteLine($"Received message: {message.Content}");
+            //});
 
-        //    OnPropertyChanged(nameof(IsSaverChecked));
-        //    OnPropertyChanged(nameof(IsBalancedChecked));
-        //    OnPropertyChanged(nameof(IsHighChecked));
+            //App.Messenger.Register<TrayIconVM, MyMessage, string>(this, "MyToken", (recipient, message) =>
+            //{
+            //    Debug.WriteLine($"Rx CloseMainWin: {message.Content}");
 
-        //    //UpdateUi();
-        //}
+            //    Show_OpenWindowMenuItem = true;
+            //});
 
+            //App.Messenger.Register<TrayIconVM, Msg_CloseMainWin, string>(this, string.Empty, (recipient, message) =>
+            //{
+            //    // Handle the message  
+            //    Debug.WriteLine($"Rx CloseMainWin: {message.CloseMainWin}");
+
+            //    Show_OpenWindowMenuItem = true;
+            //});
+
+            #endregion
+
+            Show_OpenWindowMenuItem = true; // Initially show the menu item to open the main window
+        }
 
 
         private BitmapImage ConvertEnumToImage(PowerScheme Schene)
@@ -374,7 +362,7 @@ namespace TaskbarTray.Views
         }
 
 
-         [RelayCommand]
+        [RelayCommand]
         public void ShowHideWindow(string show)
         {
 
@@ -390,17 +378,19 @@ namespace TaskbarTray.Views
             {
                 Debug.WriteLine($"Show Main Window...");
 
-
                 window.Show();
+
+                Show_OpenWindowMenuItem = false;
             }
             else
             {
                 Debug.WriteLine($"Hide Main Window...");
 
                 window.Hide();
+
+                Show_OpenWindowMenuItem = true;
             }
-            
-            IsWindowVisible = window.Visible;
+
         }
 
     }

@@ -115,12 +115,12 @@
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="True"
                     Text="Show Main Window"
-                    Visibility="{x:Bind ViewModel.IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
+                    Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <MenuFlyoutItem
                     Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="False"
                     Text="Hide Main Window"
-                    Visibility="{x:Bind ViewModel.IsWindowVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
 
             </MenuFlyout>
 
