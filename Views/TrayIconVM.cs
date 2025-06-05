@@ -83,17 +83,15 @@ namespace TaskbarTray.Views
             }
         }
 
-        public Visibility IsEcoVisible => SelectedPowerMode == PowerMode.Eco ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsBalancedVisible => SelectedPowerMode == PowerMode.Balanced ? Visibility.Visible : Visibility.Collapsed;
-        public Visibility IsHighVisible => SelectedPowerMode == PowerMode.High ? Visibility.Visible : Visibility.Collapsed;
+        [ObservableProperty]
+        private bool _isSaverChecked;
 
+        [ObservableProperty]
+        private bool _isBalancedChecked;
+   
+        [ObservableProperty]
+        private bool _isHighChecked;
 
-        public Visibility GetSelectedVisibility(PowerMode mode)
-        {
-            var ret = SelectedPowerMode == mode ? Visibility.Visible : Visibility.Collapsed;
-            Debug.WriteLine($"Selected pm = {SelectedPowerMode}   Ui pm = {mode}  {ret}");
-            return ret;
-        }
 
         partial void OnSelectedPowerModeChanged(PowerMode oldValue, PowerMode newValue)
         {
@@ -105,10 +103,6 @@ namespace TaskbarTray.Views
             OnPropertyChanged(nameof(IsEco));
             OnPropertyChanged(nameof(IsBalanced));
             OnPropertyChanged(nameof(IsHigh));
-
-            OnPropertyChanged(nameof(IsEcoVisible));
-            OnPropertyChanged(nameof(IsBalancedVisible));
-            OnPropertyChanged(nameof(IsHighVisible));
         }
 
 
