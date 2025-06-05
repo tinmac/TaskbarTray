@@ -23,26 +23,18 @@ namespace TaskbarTray.Views
 
     public partial class TrayIconVM : ObservableObject
     {
-        private bool _isWindowVisible;
-        public bool IsWindowVisible
-        {
-            get => _isWindowVisible;
-            set => SetProperty(ref _isWindowVisible, value);
-        }
-
-        private PowerScheme _activeScheme;
-        public PowerScheme ActiveScheme
-        {
-            get => _activeScheme;
-            set => SetProperty(ref _activeScheme, value);
-        }
-
-
         public BitmapImage SelectedImage => ConvertEnumToImage(SelectedImageType);
-
 
         [ObservableProperty]
         private ImageSourceType selectedImageType = ImageSourceType.Ultimate_Icon;
+
+
+
+        [ObservableProperty]
+        private bool _isWindowVisible;
+
+        [ObservableProperty]
+        private PowerScheme _activeScheme;
 
 
 
@@ -59,49 +51,17 @@ namespace TaskbarTray.Views
         private bool _isPowerSaver_Selected;
 
 
-        //public bool IsUltimate_Selected
-        //{
-        //    get => SelectedImageType == ImageSourceType.Ultimate_Icon;
-        //    set { if (value) SelectedImageType = ImageSourceType.Ultimate_Icon; }
-        //}
-
-        //public bool IsHigh_Selected
-        //{
-        //    get
-        //    {
-        //        if(SelectedImageType == ImageSourceType.High_Icon)
-        //        {
-        //            _isHigh_Selected = true;
-        //        }
-        //        else
-        //        {
-        //            _isHigh_Selected = false;
-        //        }
-
-        //        return _isHigh_Selected;
-        //    }
-        //    set 
-        //    {
-        //        if (value) 
-        //            SelectedImageType = ImageSourceType.High_Icon;
-        //    }
-        //}
-
-        //public bool IsBalanced_Selected
-        //{
-        //    get => SelectedImageType == ImageSourceType.Balanced_Icon;
-        //    set { if (value) SelectedImageType = ImageSourceType.Balanced_Icon; }
-        //}
-
-        //public bool IsPowerSaver_Selected
-        //{
-        //    get => SelectedImageType == ImageSourceType.PowerSaver_Icon;
-        //    set { if (value) SelectedImageType = ImageSourceType.PowerSaver_Icon; }
-        //}
-
-
         partial void OnSelectedImageTypeChanged(ImageSourceType oldValue, ImageSourceType newValue)
         {
+            // This method changes the TrayIcon image, if we comment it out th eocon doesnt change
+            //
+            // calling OnPropertyChanged here will raise the PropertyChanged event of the Property
+            //
+            // its wired up in the partial class created by the [ObservableProperty] attribute of selectedImageType above
+            //
+
+            Debug.WriteLine($"On Selected Image Type Changed...");
+
             OnPropertyChanged(nameof(SelectedImage));
             OnPropertyChanged(nameof(IsHigh_Selected));
             OnPropertyChanged(nameof(IsBalanced_Selected));
@@ -205,54 +165,6 @@ namespace TaskbarTray.Views
         }
 
 
-        //private void UpdateUi()
-        //{
-        //    if (ActiveScheme.DisplayName.ToLower().Contains("power saver"))
-        //    {
-        //        IsBalanced = false;
-
-        //        IsSaverChecked = true;
-        //        IsBalancedChecked = false;
-        //        IsHighChecked = false;
-
-        //    }
-        //    else if (ActiveScheme.DisplayName.ToLower().Contains("balanced"))
-        //    {
-        //        IsBalanced = true;
-
-        //        IsSaverChecked = false;
-        //        IsBalancedChecked = true;
-        //        IsHighChecked = false;
-        //    }
-        //    else if (ActiveScheme.DisplayName.ToLower().Contains("high performance"))
-        //    {
-        //        IsBalanced = true;
-
-        //        IsSaverChecked = false;
-        //        IsBalancedChecked = false;
-        //        IsHighChecked = true;
-        //    }
-        //    else if (ActiveScheme.DisplayName.ToLower().Contains("ultimate performance"))
-        //    {
-        //        IsBalanced = true;
-
-        //        IsSaverChecked = false;
-        //        IsBalancedChecked = false;
-        //        IsHighChecked = false;
-        //    }
-        //    else
-        //    {
-        //        IsBalanced = false;
-        //        IsSaverChecked = false;
-        //        IsBalancedChecked = false;
-        //        IsHighChecked = false; // No known plan is active
-
-        //        Debug.WriteLine($"No known plan!");
-        //    }
-
-        //}
-
-
         private void SetCPUPercentage()
         {
             Guid plan = PowerPlanManager.GetActivePlanGuid();
@@ -274,6 +186,10 @@ namespace TaskbarTray.Views
         [RelayCommand]
         public void Set_PowerSaver()
         {
+            Debug.WriteLine($"SelectedImageType {SelectedImageType}");
+            if (SelectedImageType == ImageSourceType.PowerSaver_Icon)
+                return;
+
             var power_saver = new PowerScheme
             {
                 Name = "Power Saver",
@@ -281,11 +197,16 @@ namespace TaskbarTray.Views
                 IsActive = true
             };
 
+            // There is no need to set to true to show the check mark as its bound
+            // to IsChecked of the ToggleMenuFlyoutItem (Power Saver in this case) 
+            // ie we dont need to: IsPowerSaver_Selected = true;
+
+            // Set the other ToggleMenuFlyoutItem's to false so it removes their check mark - or else 
             IsUltimate_Selected = false;
             IsHigh_Selected = false;
             IsBalanced_Selected = false;
-            IsPowerSaver_Selected = true;
 
+            // Change TrayIcon image
             SelectedImageType = ImageSourceType.PowerSaver_Icon;
 
             SetPowerPlan(power_saver);
@@ -304,7 +225,6 @@ namespace TaskbarTray.Views
 
             IsUltimate_Selected = false;
             IsHigh_Selected = false;
-            IsBalanced_Selected = true;
             IsPowerSaver_Selected = false;
 
             SelectedImageType = ImageSourceType.Balanced_Icon;
@@ -323,7 +243,6 @@ namespace TaskbarTray.Views
             };
 
             IsUltimate_Selected = false;
-            IsHigh_Selected = true;
             IsBalanced_Selected = false;
             IsPowerSaver_Selected = false;
 
@@ -343,7 +262,6 @@ namespace TaskbarTray.Views
                 IsActive = false
             };
 
-            IsUltimate_Selected = true;
             IsHigh_Selected = false;
             IsBalanced_Selected = false;
             IsPowerSaver_Selected = false;
@@ -385,7 +303,7 @@ namespace TaskbarTray.Views
             {
                 Debug.WriteLine($"Left: Show Context...");
 
-               // MyMenuFlyout.ShowAt(TrayIcon);
+                // MyMenuFlyout.ShowAt(TrayIcon);
 
             }
             else
@@ -413,4 +331,3 @@ namespace TaskbarTray.Views
     }
 }
 
-                
