@@ -87,7 +87,7 @@
             </tb:GeneratedIconSource>
         </tb:TaskbarIcon.IconSource>-->
 
-        <!--<tb:TaskbarIcon.ContextFlyout>
+        <tb:TaskbarIcon.ContextFlyout>
 
             <MenuFlyout
                 x:Name="MyMenuFlyout"
@@ -97,7 +97,23 @@
 
                 <MenuFlyoutSeparator />
 
-                <MenuFlyoutItem Command="{x:Bind ViewModel.Set_HighPerformanceCommand}" Text="High Performance">
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_HighPerformanceCommand}"
+                    IsChecked="{x:Bind ViewModel.IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="High Performance" />
+
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_BalancedCommand}"
+                    IsChecked="{x:Bind ViewModel.IsBalancedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Balanced" />
+
+                <ToggleMenuFlyoutItem
+                    Command="{x:Bind ViewModel.Set_PowerSaverCommand}"
+                    IsChecked="{x:Bind ViewModel.IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Text="Power Saver" />
+
+
+                <!--<MenuFlyoutItem Command="{x:Bind ViewModel.Set_HighPerformanceCommand}" Text="High Performance">
                     <MenuFlyoutItem.Icon>
                         <FontIcon
                             Margin="0 1 0 0"
@@ -131,7 +147,7 @@
                             Visibility="{x:Bind ViewModel.IsEcoVisible}" />
 
                     </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
+                </MenuFlyoutItem>-->
 
                 <MenuFlyoutSeparator />
 
@@ -140,7 +156,7 @@
 
             </MenuFlyout>
 
-        </tb:TaskbarIcon.ContextFlyout>-->
+        </tb:TaskbarIcon.ContextFlyout>
 
     </tb:TaskbarIcon>
 

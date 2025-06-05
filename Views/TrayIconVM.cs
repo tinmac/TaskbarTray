@@ -204,7 +204,7 @@ namespace TaskbarTray.Views
 
                 if (success)
                 {
-                    // UpdateUi();
+                    UpdateUi();
 
                     Debug.WriteLine($"\nSwitched to: {Scheme.Name}");
                 }
