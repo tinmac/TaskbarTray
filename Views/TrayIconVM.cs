@@ -39,17 +39,33 @@ namespace TaskbarTray.Views
 
 
         [ObservableProperty]
-        private bool _isUltimate_Selected;
+        private PowerScheme selectedMode = PowerScheme.Balanced;
 
-        [ObservableProperty]
-        private bool _isHigh_Selected;
+        public bool IsEco
+        {
+            get => SelectedMode == PowerMode.Eco;
+            set { if (value) SelectedMode = PowerMode.Eco; }
+        }
 
-        [ObservableProperty]
-        private bool _isBalanced_Selected;
+        public bool IsBalanced
+        {
+            get => SelectedMode == PowerMode.Balanced;
+            set { if (value) SelectedMode = PowerMode.Balanced; }
+        }
 
-        [ObservableProperty]
-        private bool _isPowerSaver_Selected;
+        public bool IsPerformance
+        {
+            get => SelectedMode == PowerMode.Performance;
+            set { if (value) SelectedMode = PowerMode.Performance; }
+        }
 
+        partial void OnSelectedModeChanged(PowerMode oldValue, PowerMode newValue)
+        {
+            // Notify related booleans so the UI updates
+            OnPropertyChanged(nameof(IsEco));
+            OnPropertyChanged(nameof(IsBalanced));
+            OnPropertyChanged(nameof(IsPerformance));
+        }
 
         partial void OnSelectedImageTypeChanged(ImageSourceType oldValue, ImageSourceType newValue)
         {
