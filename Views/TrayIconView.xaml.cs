@@ -112,7 +112,6 @@ public sealed partial class TrayIconView : UserControl
     public void ExitApplication()
     {
         WeakReferenceMessenger.Default.UnregisterAll(this); // Unregister all messages for this view
-        App.MainWindowClosedWithX = false; 
         App.HandleClosedEvents = false;
         TrayIcon.Dispose();
         App.MainWindow?.Close();

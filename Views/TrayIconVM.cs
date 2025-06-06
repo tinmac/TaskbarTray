@@ -11,6 +11,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.stuff;
+using Windows.Devices.Power;
 using Windows.Security.Isolation;
 
 namespace TaskbarTray.Views
@@ -48,11 +50,6 @@ namespace TaskbarTray.Views
         private PowerScheme _activeScheme;
 
 
-        public void Init()
-        {
-            LoadPlansAsync();
-
-        }
 
 
         [ObservableProperty]
@@ -64,18 +61,24 @@ namespace TaskbarTray.Views
         [ObservableProperty]
         private bool _isHighChecked;
 
+        [ObservableProperty]
+        private string _batteryPercentage;
+
+
+        List<PowerScheme> PowerPlans = new();
+
 
         public TrayIconVM()
         {
 
-            WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) => 
+            WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) =>
             {
                 Debug.WriteLine($"Rx CloseMainWin: {message.Content}");
                 Show_OpenWindowMenuItem = true;
             });
 
             #region old Messenger code
-         
+
             //App.Messenger.Register<MyMessage>(this, (recipient, message) =>
             //{
             //    Console.WriteLine($"Received message: {message.Content}");
@@ -99,6 +102,62 @@ namespace TaskbarTray.Views
             #endregion
 
             Show_OpenWindowMenuItem = true; // Initially show the menu item to open the main window
+
+            //GetBatteryPercentage();
+        }
+
+
+        // NEXT: Detect when user changes theme and change Icon to dark/wh
+        // get battery level on opening context menu
+        // other features?
+        // package into MSIX
+        //
+
+        public void Init()
+        {
+            CreatePlans();
+
+            LoadPlansAsync();
+
+            GetBatteryPercentage();
+        }
+
+        private void CreatePlans()
+        {
+            var power_saver = new PowerScheme
+            {
+                Name = "Power Saver",
+                Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
+                IsActive = true,
+                PowerMode = PowerMode.Eco,
+                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-min.ico",
+                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-min-wh.ico"
+            };
+
+            var balanced = new PowerScheme
+            {
+                Name = "Balanced",
+                Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
+                IsActive = true, // Assume this is the active plan for demonstration
+                PowerMode = PowerMode.Balanced,
+                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge.ico",
+                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-wh.ico"
+            };
+
+
+            var high_performance = new PowerScheme
+            {
+                Name = "High Performance",
+                Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
+                IsActive = false,
+                PowerMode = PowerMode.High,
+                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-max.ico",
+                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-max-wh.ico"
+            };
+
+            PowerPlans.Add(power_saver);
+            PowerPlans.Add(balanced);
+            PowerPlans.Add(high_performance);
         }
 
 
@@ -131,9 +190,10 @@ namespace TaskbarTray.Views
         {
             try
             {
-                var plans = await Task.Run(() => PowerSchemeManager.LoadPowerSchemes());
+                var active_plan_guid = await Task.Run(() => PowerSchemeManager.GetActivePlanGuid());
 
-                ActiveScheme = plans.FirstOrDefault(p => p.IsActive);
+                ActiveScheme = PowerPlans.First(p=> p.Guid == active_plan_guid);
+
 
                 Debug.WriteLine($"\nInitial Plan: {ActiveScheme?.Name}");
 
@@ -226,33 +286,67 @@ namespace TaskbarTray.Views
             PowerPlanManager.SetCpuMaxPercentageDC(plan, 63);  // DC
         }
 
+        private void GetBatteryPercentage()
+        {
+            var report = Battery.AggregateBattery.GetReport();
+            var remaining = report.RemainingCapacityInMilliwattHours;
+            var full = report.FullChargeCapacityInMilliwattHours;
+
+            var left = report.Status;
+
+            Debug.WriteLine($"status {left}");
+
+            if (remaining.HasValue && full.HasValue && full != 0)
+            {
+                int percentage = (int)((remaining.Value / (double)full.Value) * 100);
+                BatteryPercentage = $"Battery: {percentage}%";
+            }
+            else
+            {
+                BatteryPercentage = "Battery info not available.";
+            }
+
+
+            Debug.WriteLine($"{BatteryPercentage}");
+        }
 
         private void UpdateUi()
         {
+            // There are two settings App Dark & Windows Dark
+            //
+            // To discover if the Task Bar is Dark/Light for .ico Tray Icons use ThemeHelper.IsWindowsInDarkMode();
+
+            var isWinDark = ThemeHelper.IsWindowsInDarkMode();// Use to work out if we use Light/Dark Tray icons
+
+            Debug.WriteLine($"Win Dark {isWinDark}");
+
+            if (isWinDark)
+            {
+                var img = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
+
+                SelectedImage = img;
+            }
+            else
+            {
+                var img = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
+
+                SelectedImage = img;
+            }
+
             if (ActiveScheme.PowerMode == PowerMode.Eco)
             {
-                var img = new BitmapImage(new Uri("ms-appx:///Assets/gauge_low.ico"));
-                SelectedImage = img;
-
                 IsSaverChecked = true;
                 IsBalancedChecked = false;
                 IsHighChecked = false;
-
             }
             else if (ActiveScheme.PowerMode == PowerMode.Balanced)
             {
-                var img = new BitmapImage(new Uri("ms-appx:///Assets/Inactive.ico"));
-                SelectedImage = img;
-
                 IsSaverChecked = false;
                 IsBalancedChecked = true;
                 IsHighChecked = false;
             }
             else if (ActiveScheme.PowerMode == PowerMode.High)
             {
-                var img = new BitmapImage(new Uri("ms-appx:///Assets/gauge_high.ico"));
-                SelectedImage = img;
-
                 IsSaverChecked = false;
                 IsBalancedChecked = false;
                 IsHighChecked = true;
@@ -275,6 +369,8 @@ namespace TaskbarTray.Views
                 Debug.WriteLine($"No known plan!");
             }
 
+            GetBatteryPercentage();
+
         }
 
 
@@ -290,14 +386,7 @@ namespace TaskbarTray.Views
                 return;
             }
 
-            var power_saver = new PowerScheme
-            {
-                Name = "Power Saver",
-                Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
-                IsActive = true,
-                PowerMode = PowerMode.Eco
-            };
-
+            var power_saver = PowerPlans.First(p => p.PowerMode == PowerMode.Eco);
             SetPowerPlan(power_saver);
         }
 
@@ -311,14 +400,7 @@ namespace TaskbarTray.Views
                 return;
             }
 
-            var balanced = new PowerScheme
-            {
-                Name = "Balanced",
-                Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
-                IsActive = true, // Assume this is the active plan for demonstration
-                PowerMode = PowerMode.Balanced
-            };
-
+            var balanced = PowerPlans.First(p => p.PowerMode == PowerMode.Balanced);
             SetPowerPlan(balanced);
         }
 
@@ -331,14 +413,7 @@ namespace TaskbarTray.Views
                 return;
             }
 
-            var high_performance = new PowerScheme
-            {
-                Name = "High Performance",
-                Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
-                IsActive = false,
-                PowerMode = PowerMode.High
-            };
-
+            var high_performance = PowerPlans.First(p => p.PowerMode == PowerMode.High);
             SetPowerPlan(high_performance);
         }
 

@@ -37,6 +37,9 @@
         <FontIcon Foreground="Green" Glyph="&#f62d;" />
 
         RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
+    
+            ToolTipService.ToolTip="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+
 
     -->
 
@@ -90,7 +93,13 @@
 
             <MenuFlyout x:Name="MyMenuFlyout" AreOpenCloseAnimationsEnabled="False">
 
-                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+                <!--<RadioMenuFlyoutItem Text="Options 1" />
+                <RadioMenuFlyoutItem Text="Options 2" />
+                <RadioMenuFlyoutItem Text="Options 3" />
+
+                <MenuFlyoutSeparator />-->
+
+                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <MenuFlyoutSeparator />
 
@@ -121,6 +130,10 @@
                     Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="False"
                     Text="Hide Main Window"
                     Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
+
+                <MenuFlyoutSeparator />
+
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
 
             </MenuFlyout>
 

@@ -14,7 +14,7 @@ namespace TaskbarTray
         public string DisplayName => IsActive ? $"{Name} (Active)" : Name;
         public bool IsActive { get; set; }
         public PowerMode PowerMode { get; set; }
-        public string IconFileName { get; set; }
-
+        public string IconPath_WhiteFG { get; set; } = string.Empty;
+        public string IconPath_DarkFG { get; set; } = string.Empty;
     }
 }
