@@ -134,7 +134,9 @@ namespace TaskbarTray.Views
             PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
             PowerManager.PowerSupplyStatusChanged += OnPowerSupplyStatusChanged;
           
-            //GetBatteryPercentage();
+            // WHAT DO YOU WANT TO DO WHEN ONE OF THESE EVENTS IS TRIGGERED????
+            //
+            // change Power mode? not keen on this but could be a v2 feature
         }
 
         private async void OnBatteryStatusChanged(object sender, object e)
