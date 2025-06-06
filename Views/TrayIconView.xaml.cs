@@ -24,13 +24,7 @@ public sealed partial class TrayIconView : UserControl
     {
         InitializeComponent();
 
-        //// Fix for CS0311: Replace 'object' with a type that implements IEquatable<T>, such as 'string'
-        //App.Messenger.Register<TrayIconView, Msg_CloseMainWin, string>(this, null, (r, msg) =>
-        //{
-        //    Debug.WriteLine($"Msg_CloseMainWin Rx...");
-        //    ViewModel.IsWindowVisible = false;
-        //});
-
+        ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
         //MyMenuFlyout.ShowMode = FlyoutShowMode.TransientWithDismissOnPointerMoveAway;
 

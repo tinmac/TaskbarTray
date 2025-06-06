@@ -28,6 +28,8 @@ public sealed partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
+        //ConvertSvgToIco();
+
         MainWindow = new WindowEx
         {
             Width = 400,
@@ -36,13 +38,13 @@ public sealed partial class App : Application
             {
                 Content = new MainView(),
             },
-        };       
+        };
 
         MainWindow.Closed += (sender, args) =>
         {
             //Messenger.Send(new Msg_CloseMainWin { CloseMainWin = true });
-            WeakReferenceMessenger.Default.Send(new MyMessage("Hello from Messenger!"));
-         
+            WeakReferenceMessenger.Default.Send(new MyMessage { CloseMainWin = true });
+
             if (HandleClosedEvents)
             {
                 args.Handled = true;
@@ -50,9 +52,26 @@ public sealed partial class App : Application
             }
         };
 
+
         MainWindow.Hide();// Hide by default at startup, as this is a tray app
 
-        //ConvertSvgToIco();
+        // Theme watcher
+        //
+        // Initial check
+        bool isLight = WindowsModeDetector.IsSystemInLightMode();
+        Debug.WriteLine($"System (Windows Mode) is {(isLight ? "Light" : "Dark")}");
+
+        // Start watching for changes
+        WindowsModeDetector.SystemThemeChanged += isLightMode =>
+        {
+            Debug.WriteLine($"\nSystem theme changed to: {(isLightMode ? "Light" : "Dark")}");
+          
+            // Update tray icons, Rx'd in TrayIconVM 
+            //
+            WeakReferenceMessenger.Default.Send(new MyMessage { ThemeChanged_Light = isLightMode });
+        };
+
+        WindowsModeDetector.StartMonitoring();
     }
 
     private void ConvertSvgToIco()

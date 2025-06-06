@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using TaskbarTray.stuff;
 using Windows.Devices.Power;
 using Windows.Security.Isolation;
+using Windows.System.Power;
 
 namespace TaskbarTray.Views
 {
@@ -67,14 +68,40 @@ namespace TaskbarTray.Views
 
         List<PowerScheme> PowerPlans = new();
 
+        public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
 
+
+        // Constructor
         public TrayIconVM()
         {
+            // Detect theme change by user
 
             WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) =>
             {
-                Debug.WriteLine($"Rx CloseMainWin: {message.Content}");
-                Show_OpenWindowMenuItem = true;
+                Debug.WriteLine($"Rx MyMessage...");
+
+                if (message.CloseMainWin)
+                    Show_OpenWindowMenuItem = true;
+
+                TheDispatcher.TryEnqueue(() =>
+                {
+                    if (SelectedImage == null)
+                        return;
+
+                    if (message.ThemeChanged_Light)
+                    {
+                        // we need white foreground on Dark themem bg
+                        SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
+                        Debug.WriteLine($"  Icon = Dark");
+                    }
+                    else
+                    {
+                        // we need dark foreground on Light theme bg
+                        SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
+                        Debug.WriteLine($"  Icon = White");
+                    }
+                });
+
             });
 
             #region old Messenger code
@@ -103,15 +130,38 @@ namespace TaskbarTray.Views
 
             Show_OpenWindowMenuItem = true; // Initially show the menu item to open the main window
 
+            // Subscribe to changes
+            PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
+            PowerManager.PowerSupplyStatusChanged += OnPowerSupplyStatusChanged;
+          
             //GetBatteryPercentage();
         }
 
+        private async void OnBatteryStatusChanged(object sender, object e)
+        {
+            Debug.WriteLine($"OnBatteryStatusChanged");
+
+            TheDispatcher.TryEnqueue(() =>
+            {
+                GetBatteryPercentage();
+            });
+        }
+
+        private async void OnPowerSupplyStatusChanged(object sender, object e)
+        {
+            Debug.WriteLine($"OnPowerSupplyStatusChanged");
+            TheDispatcher.TryEnqueue(() =>
+            {
+                GetBatteryPercentage();
+            });
+        }
 
         // NEXT: Detect when user changes theme and change Icon to dark/wh
         // get battery level on opening context menu
         // other features?
         // package into MSIX
         //
+
 
         public void Init()
         {
@@ -192,7 +242,7 @@ namespace TaskbarTray.Views
             {
                 var active_plan_guid = await Task.Run(() => PowerSchemeManager.GetActivePlanGuid());
 
-                ActiveScheme = PowerPlans.First(p=> p.Guid == active_plan_guid);
+                ActiveScheme = PowerPlans.First(p => p.Guid == active_plan_guid);
 
 
                 Debug.WriteLine($"\nInitial Plan: {ActiveScheme?.Name}");
@@ -292,14 +342,20 @@ namespace TaskbarTray.Views
             var remaining = report.RemainingCapacityInMilliwattHours;
             var full = report.FullChargeCapacityInMilliwattHours;
 
-            var left = report.Status;
+            // Status:
+            // - Not Present
+            // - Discharging
+            // - Idle
+            // - Charging
+            var status = report.Status;
 
-            Debug.WriteLine($"status {left}");
+            // 
+            Debug.WriteLine($"status {status}");
 
             if (remaining.HasValue && full.HasValue && full != 0)
             {
                 int percentage = (int)((remaining.Value / (double)full.Value) * 100);
-                BatteryPercentage = $"Battery: {percentage}%";
+                BatteryPercentage = $"Battery: {percentage}% ({status})";
             }
             else
             {
@@ -466,6 +522,13 @@ namespace TaskbarTray.Views
                 Show_OpenWindowMenuItem = true;
             }
 
+        }
+
+
+        [RelayCommand]
+        public void OpenContextMenu()
+        {
+            GetBatteryPercentage();
         }
 
     }

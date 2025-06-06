@@ -8,12 +8,16 @@ namespace TaskbarTray
 {
     public class MyMessage
     {
-        public string Content { get; }
+        public string Content { get; set; }
+        public bool CloseMainWin { get; set; }
+        public bool ThemeChanged_Light { get; set; }
+       // public bool ThemeChanged_Dark { get; set; }
 
-        public MyMessage(string content)
-        {
-            Content = content;
-        }
+
+        //public MyMessage(string content)
+        //{
+        //    Content = content;
+        //}
     }
 
     public class Msg_CloseMainWin

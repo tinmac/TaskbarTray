@@ -37,7 +37,7 @@
         <FontIcon Foreground="Green" Glyph="&#f62d;" />
 
         RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
-    
+
             ToolTipService.ToolTip="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
 
 
@@ -50,7 +50,8 @@
         IconSource="{x:Bind ViewModel.SelectedImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
         IsRightTapEnabled="True"
         LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
-        NoLeftClickDelay="True">
+        NoLeftClickDelay="True"
+        RightClickCommand="{x:Bind ViewModel.OpenContextMenuCommand}">
 
         <!--<tb:TaskbarIcon.IconSource>
             <tb:GeneratedIconSource
@@ -122,12 +123,14 @@
                 <MenuFlyoutSeparator />
 
                 <MenuFlyoutItem
-                    Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="True"
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}"
+                    CommandParameter="True"
                     Text="Show Main Window"
                     Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <MenuFlyoutItem
-                    Command="{x:Bind ViewModel.ShowHideWindowCommand}" CommandParameter="False"
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}"
+                    CommandParameter="False"
                     Text="Hide Main Window"
                     Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
 
