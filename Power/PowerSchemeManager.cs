@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using TaskbarTray.Views;
 
 
-namespace TaskbarTray
+namespace TaskbarTray.Power
 {
 
     public class PowerSchemeManager
@@ -23,61 +23,61 @@ namespace TaskbarTray
         //
         // AC CPU % Management
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerReadACValueIndex(IntPtr RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
+        private static extern uint PowerReadACValueIndex(nint RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid, out uint AcValueIndex);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerWriteACValueIndex(IntPtr RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
+        private static extern uint PowerWriteACValueIndex(nint RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid, uint AcValueIndex);
 
         // DC CPU % Management
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerReadDCValueIndex(IntPtr RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
+        private static extern uint PowerReadDCValueIndex(nint RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid, out uint DcValueIndex);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerWriteDCValueIndex(IntPtr RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
+        private static extern uint PowerWriteDCValueIndex(nint RootPowerKey, ref Guid SchemeGuid, ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid, uint DcValueIndex);
 
 
         // Power Plan Management
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerSetActiveScheme(IntPtr UserRootPowerKey, ref Guid SchemeGuid);
+        private static extern uint PowerSetActiveScheme(nint UserRootPowerKey, ref Guid SchemeGuid);
 
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerEnumerate(IntPtr RootPowerKey, IntPtr SchemeGuid, IntPtr SubGroupOfPowerSettingsGuid,
-            uint AccessFlags, uint Index, IntPtr Buffer, ref uint BufferSize);
+        private static extern uint PowerEnumerate(nint RootPowerKey, nint SchemeGuid, nint SubGroupOfPowerSettingsGuid,
+            uint AccessFlags, uint Index, nint Buffer, ref uint BufferSize);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerReadFriendlyName(IntPtr RootPowerKey, ref Guid SchemeGuid, IntPtr SubGroupOfPowerSettingsGuid,
-            IntPtr PowerSettingGuid, byte[] Buffer, ref uint BufferSize);
+        private static extern uint PowerReadFriendlyName(nint RootPowerKey, ref Guid SchemeGuid, nint SubGroupOfPowerSettingsGuid,
+            nint PowerSettingGuid, byte[] Buffer, ref uint BufferSize);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        private static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, out IntPtr ActivePolicyGuid);
+        private static extern uint PowerGetActiveScheme(nint UserRootPowerKey, out nint ActivePolicyGuid);
 
 
         [DllImport("kernel32.dll")]
-        private static extern void LocalFree(IntPtr ptr);
+        private static extern void LocalFree(nint ptr);
 
         #endregion
 
 
         #region Power Schemes
 
-        public static List<PowerScheme> LoadPowerSchemes()
+        public static List<PowerPlan> LoadPowerSchemes()
         {
-            var plans = new List<PowerScheme>();
+            var plans = new List<PowerPlan>();
             Guid activeGuid = GetActivePlanGuid();
 
             uint index = 0;
-            IntPtr guidPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Guid)));
+            nint guidPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Guid)));
             uint bufferSize;
 
             while (true)
             {
                 bufferSize = (uint)Marshal.SizeOf(typeof(Guid));
-                if (PowerEnumerate(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, ACCESS_SCHEME, index, guidPtr, ref bufferSize) != 0)
+                if (PowerEnumerate(nint.Zero, nint.Zero, nint.Zero, ACCESS_SCHEME, index, guidPtr, ref bufferSize) != 0)
                     break;
 
                 Guid planGuid = (Guid)Marshal.PtrToStructure(guidPtr, typeof(Guid));
@@ -85,7 +85,7 @@ namespace TaskbarTray
                 uint nameSize = 1024;
                 byte[] nameBuffer = new byte[nameSize];
                 string name = "(Unnamed)";
-                if (PowerReadFriendlyName(IntPtr.Zero, ref planGuid, IntPtr.Zero, IntPtr.Zero, nameBuffer, ref nameSize) == 0)
+                if (PowerReadFriendlyName(nint.Zero, ref planGuid, nint.Zero, nint.Zero, nameBuffer, ref nameSize) == 0)
                     name = Encoding.Unicode.GetString(nameBuffer, 0, (int)nameSize - 2);
 
 
@@ -118,7 +118,7 @@ namespace TaskbarTray
 
                 //Debug.WriteLine($"Power Mode [{pm}]");
 
-                plans.Add(new PowerScheme
+                plans.Add(new PowerPlan
                 {
                     Guid = planGuid,
                     Name = name,
@@ -135,7 +135,7 @@ namespace TaskbarTray
 
         public static Guid GetActivePlanGuid()
         {
-            PowerGetActiveScheme(IntPtr.Zero, out IntPtr ptr);
+            PowerGetActiveScheme(nint.Zero, out nint ptr);
             Guid guid = (Guid)Marshal.PtrToStructure(ptr, typeof(Guid));
             LocalFree(ptr);
             return guid;
@@ -143,7 +143,7 @@ namespace TaskbarTray
 
         public static bool SetActivePowerPlan(Guid planGuid)
         {
-            return PowerSetActiveScheme(IntPtr.Zero, ref planGuid) == 0;
+            return PowerSetActiveScheme(nint.Zero, ref planGuid) == 0;
         }
 
         #endregion
@@ -160,7 +160,7 @@ namespace TaskbarTray
             Guid subProcessor = SUB_PROCESSOR;
             Guid processorMax = PROCESSOR_MAX;
 
-            var res = PowerReadACValueIndex(IntPtr.Zero, ref schemeGuid, ref subProcessor, ref processorMax, out value);
+            var res = PowerReadACValueIndex(nint.Zero, ref schemeGuid, ref subProcessor, ref processorMax, out value);
             if (res != 0)
             {
                 Debug.WriteLine($"AC Unable to read CPU max percent");
@@ -184,14 +184,14 @@ namespace TaskbarTray
             Guid subProcessor = SUB_PROCESSOR;
             Guid processorMax = PROCESSOR_MAX;
 
-            var res = PowerWriteACValueIndex(IntPtr.Zero, ref schemeGuid, ref subProcessor, ref processorMax, val);
+            var res = PowerWriteACValueIndex(nint.Zero, ref schemeGuid, ref subProcessor, ref processorMax, val);
             if (res != 0)
             {
                 Debug.WriteLine($"Failed to write AC CPU max percent.");
                 return false;
             }
             // Apply changes by re-setting active scheme
-            PowerSetActiveScheme(IntPtr.Zero, ref schemeGuid);
+            PowerSetActiveScheme(nint.Zero, ref schemeGuid);
 
             return true;
         }
@@ -205,7 +205,7 @@ namespace TaskbarTray
             Guid subProcessor = SUB_PROCESSOR;
             Guid processorMax = PROCESSOR_MAX;
 
-            var res = PowerReadDCValueIndex(IntPtr.Zero, ref schemeGuid, ref subProcessor, ref processorMax, out value);
+            var res = PowerReadDCValueIndex(nint.Zero, ref schemeGuid, ref subProcessor, ref processorMax, out value);
             if (res != 0)
             {
                 Debug.WriteLine($"DC Unable to read CPU max percent");
@@ -225,18 +225,18 @@ namespace TaskbarTray
         public static bool SetCpuMax_DC(Guid schemeGuid, uint percent)
         {
             Debug.WriteLine($"\nSet DC Cpu Max to {percent}%...");
-            uint val = (uint)Math.Clamp(percent, 0, 100);
+            uint val = Math.Clamp(percent, 0, 100);
             Guid subProcessor = SUB_PROCESSOR;
             Guid processorMax = PROCESSOR_MAX;
 
-            var res = PowerWriteDCValueIndex(IntPtr.Zero, ref schemeGuid, ref subProcessor, ref processorMax, val);
+            var res = PowerWriteDCValueIndex(nint.Zero, ref schemeGuid, ref subProcessor, ref processorMax, val);
             if (res != 0)
             {
                 Debug.WriteLine($"Failed to write DC CPU max percent.");
                 return false;
             }
             // Apply changes by re-setting active scheme
-            PowerSetActiveScheme(IntPtr.Zero, ref schemeGuid);
+            PowerSetActiveScheme(nint.Zero, ref schemeGuid);
 
             return true;
         }

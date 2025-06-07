@@ -8,7 +8,7 @@ namespace TaskbarTray.stuff
 {
     using Microsoft.Win32;
 
-    public static class WindowsModeDetector
+    public static class WindowsThemeChangedDetector
     {
         private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
         private const string RegistryValueName = "SystemUsesLightTheme";

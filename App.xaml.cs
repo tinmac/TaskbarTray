@@ -58,11 +58,11 @@ public sealed partial class App : Application
         // Theme watcher
         //
         // Initial check
-        bool isLight = WindowsModeDetector.IsSystemInLightMode();
+        bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
         Debug.WriteLine($"System (Windows Mode) is {(isLight ? "Light" : "Dark")}");
 
         // Start watching for changes
-        WindowsModeDetector.SystemThemeChanged += isLightMode =>
+        WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
         {
             Debug.WriteLine($"\nSystem theme changed to: {(isLightMode ? "Light" : "Dark")}");
           
@@ -71,7 +71,7 @@ public sealed partial class App : Application
             WeakReferenceMessenger.Default.Send(new MyMessage { ThemeChanged_Light = isLightMode });
         };
 
-        WindowsModeDetector.StartMonitoring();
+        WindowsThemeChangedDetector.StartMonitoring();
     }
 
     private void ConvertSvgToIco()

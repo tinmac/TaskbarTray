@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TaskbarTray.Views;
 
-namespace TaskbarTray
+namespace TaskbarTray.Power
 {
-    public class PowerScheme
+    public class PowerPlan
     {
         public Guid Guid { get; set; }
         public string Name { get; set; }
@@ -17,4 +17,5 @@ namespace TaskbarTray
         public string IconPath_WhiteFG { get; set; } = string.Empty;
         public string IconPath_DarkFG { get; set; } = string.Empty;
     }
+
 }

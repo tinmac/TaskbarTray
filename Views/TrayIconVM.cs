@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.UI.Xaml.Media.Imaging;
-using PowerPlanSwitcher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.Power;
 using TaskbarTray.stuff;
 using Windows.Devices.Power;
 using Windows.Security.Isolation;
@@ -48,7 +48,7 @@ namespace TaskbarTray.Views
         private bool _show_OpenWindowMenuItem;
 
         [ObservableProperty]
-        private PowerScheme _activeScheme;
+        private PowerPlan _activeScheme;
 
 
 
@@ -66,7 +66,7 @@ namespace TaskbarTray.Views
         private string _batteryPercentage;
 
 
-        List<PowerScheme> PowerPlans = new();
+        List<PowerPlan> PowerPlans = new();
 
         public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
 
@@ -158,12 +158,6 @@ namespace TaskbarTray.Views
             });
         }
 
-        // NEXT: Detect when user changes theme and change Icon to dark/wh
-        // get battery level on opening context menu
-        // other features?
-        // package into MSIX
-        //
-
 
         public void Init()
         {
@@ -171,12 +165,12 @@ namespace TaskbarTray.Views
 
             LoadPlansAsync();
 
-            GetBatteryPercentage();
+            GetBatteryPercentage();  
         }
 
         private void CreatePlans()
         {
-            var power_saver = new PowerScheme
+            var power_saver = new PowerPlan
             {
                 Name = "Power Saver",
                 Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
@@ -186,7 +180,7 @@ namespace TaskbarTray.Views
                 IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-min-wh.ico"
             };
 
-            var balanced = new PowerScheme
+            var balanced = new PowerPlan
             {
                 Name = "Balanced",
                 Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
@@ -197,7 +191,7 @@ namespace TaskbarTray.Views
             };
 
 
-            var high_performance = new PowerScheme
+            var high_performance = new PowerPlan
             {
                 Name = "High Performance",
                 Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
@@ -213,7 +207,7 @@ namespace TaskbarTray.Views
         }
 
 
-        private BitmapImage ConvertEnumToImage(PowerScheme Schene)
+        private BitmapImage ConvertEnumToImage(PowerPlan Schene)
         {
             var PowerMode = Schene.PowerMode;
 
@@ -258,7 +252,7 @@ namespace TaskbarTray.Views
         }
 
 
-        public async void SetPowerPlan(PowerScheme Scheme)
+        public async void SetPowerPlan(PowerPlan Scheme)
         {
             #region Notes
 
