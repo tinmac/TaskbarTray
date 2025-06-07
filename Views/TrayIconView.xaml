@@ -11,16 +11,13 @@
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <!--<converters:BoolToImageSourceConverter
-            x:Key="BoolToImageSourceConverter"
-            FalseImage="ms-appx:///Assets/Inactive.ico"
-            TrueImage="ms-appx:///Assets/Red.ico" />-->
+        <converters:PowerModeToVisibilityConverter x:Key="PowerModeToVisibilityConverter" />
 
         <converters:BoolToImageSourceConverter
             x:Key="BoolToImageSourceConverter"
             FalseImage="/Assets/gauge_low.ico"
             TrueImage="/Assets/gauge_high.ico" />
-        
+
     </UserControl.Resources>
 
 
@@ -39,6 +36,10 @@
         Guage Full ie fast
         <FontIcon Foreground="Green" Glyph="&#f62d;" />
 
+        RightClickCommand="{x:Bind RebuildMenuFlyoutCommand}"
+
+            ToolTipService.ToolTip="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+
 
     -->
 
@@ -46,9 +47,11 @@
         x:Name="TrayIcon"
         x:FieldModifier="public"
         ContextMenuMode="SecondWindow"
-        IconSource="{x:Bind IsBalanced, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToImageSourceConverter}}"
-        LeftClickCommand="{x:Bind ToggleSpeedCommand}"
-        NoLeftClickDelay="True">
+        IconSource="{x:Bind ViewModel.SelectedImage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        IsRightTapEnabled="True"
+        LeftClickCommand="{x:Bind ViewModel.ToggleSpeedCommand}"
+        NoLeftClickDelay="True"
+        RightClickCommand="{x:Bind ViewModel.OpenContextMenuCommand}">
 
         <!--<tb:TaskbarIcon.IconSource>
             <tb:GeneratedIconSource
@@ -89,34 +92,51 @@
 
         <tb:TaskbarIcon.ContextFlyout>
 
-            <MenuFlyout
-                x:Name="MyMenuFlyout"
-                AreOpenCloseAnimationsEnabled="False"
-                Closing="MyMenuFlyout_Closing">
+            <MenuFlyout x:Name="MyMenuFlyout" AreOpenCloseAnimationsEnabled="False">
 
-                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
+                <!--<RadioMenuFlyoutItem Text="Options 1" />
+                <RadioMenuFlyoutItem Text="Options 2" />
+                <RadioMenuFlyoutItem Text="Options 3" />
+
+                <MenuFlyoutSeparator />-->
+
+                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
                 <MenuFlyoutSeparator />
 
                 <ToggleMenuFlyoutItem
-                    Command="{x:Bind HighPerformanceCommand}"
-                    IsChecked="{x:Bind IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Command="{x:Bind ViewModel.Set_HighPerformanceCommand}"
+                    IsChecked="{x:Bind ViewModel.IsHighChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Text="High Performance" />
 
                 <ToggleMenuFlyoutItem
-                    Command="{x:Bind BalancedCommand}"
-                    IsChecked="{x:Bind IsBalancedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Command="{x:Bind ViewModel.Set_BalancedCommand}"
+                    IsChecked="{x:Bind ViewModel.IsBalancedChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Text="Balanced" />
 
                 <ToggleMenuFlyoutItem
-                    Command="{x:Bind PowerSaverCommand}"
-                    IsChecked="{x:Bind IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Command="{x:Bind ViewModel.Set_PowerSaverCommand}"
+                    IsChecked="{x:Bind ViewModel.IsSaverChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Text="Power Saver" />
+
 
                 <MenuFlyoutSeparator />
 
-                <MenuFlyoutItem Command="{x:Bind ShowHideWindowCommand}" Text="Show/Hide Window" />
+                <MenuFlyoutItem
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}"
+                    CommandParameter="True"
+                    Text="Show Main Window"
+                    Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverter}}" />
 
+                <MenuFlyoutItem
+                    Command="{x:Bind ViewModel.ShowHideWindowCommand}"
+                    CommandParameter="False"
+                    Text="Hide Main Window"
+                    Visibility="{x:Bind ViewModel.Show_OpenWindowMenuItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
+
+                <MenuFlyoutSeparator />
+
+                <MenuFlyoutItem Command="{x:Bind ExitApplicationCommand}" Text="Exit" />
 
             </MenuFlyout>
 

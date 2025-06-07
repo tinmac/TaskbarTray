@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
@@ -24,8 +24,18 @@
   <ItemGroup>
     <None Remove="Assets\gauge-high.ico" />
     <None Remove="Assets\gauge.ico" />
-    <None Remove="Assets\gauge_high.ico" />
-    <None Remove="Assets\gauge_low.ico" />
+    <None Remove="Assets\ico\gauge-max-wh.ico" />
+    <None Remove="Assets\ico\gauge-max.ico" />
+    <None Remove="Assets\ico\gauge-min-wh.ico" />
+    <None Remove="Assets\ico\gauge-min.ico" />
+    <None Remove="Assets\ico\gauge-wh.ico" />
+    <None Remove="Assets\ico\gauge.ico" />
+    <None Remove="Assets\svg\gauge-high.svg" />
+    <None Remove="Assets\svg\gauge-low.svg" />
+    <None Remove="Assets\svg\gauge-max.svg" />
+    <None Remove="Assets\svg\gauge-min.svg" />
+    <None Remove="Assets\svg\gauge.svg" />
+    <None Remove="Views\TestWindow1.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,10 +62,19 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+    <PackageReference Include="SkiaSharp" Version="3.119.0" />
+    <PackageReference Include="Svg.Skia" Version="3.0.3" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
     <PackageReference Include="WinUIEx" Version="2.5.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\TestWindow1.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <!--

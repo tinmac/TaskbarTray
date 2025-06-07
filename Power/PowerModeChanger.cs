@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace TaskbarTray
+namespace TaskbarTray.Power
 {
 
     public static class PowerModeChanger
@@ -14,19 +14,19 @@ namespace TaskbarTray
         static readonly Guid GUID_PROCESSOR_PERF_PREFERENCE_POLICY = new("36687f9e-e3a5-4dbf-b1dc-15eb381c6863");
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        static extern uint PowerGetActiveScheme(IntPtr UserRootPowerKey, out IntPtr ActivePolicyGuid);
+        static extern uint PowerGetActiveScheme(nint UserRootPowerKey, out nint ActivePolicyGuid);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        static extern uint PowerSetActiveScheme(IntPtr UserRootPowerKey, IntPtr SchemeGuid);
+        static extern uint PowerSetActiveScheme(nint UserRootPowerKey, nint SchemeGuid);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        static extern uint PowerWriteACValueIndex(IntPtr RootPowerKey, IntPtr SchemeGuid,
+        static extern uint PowerWriteACValueIndex(nint RootPowerKey, nint SchemeGuid,
             ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid,
             uint AcValueIndex);
 
         [DllImport("powrprof.dll", SetLastError = true)]
-        static extern uint PowerWriteDCValueIndex(IntPtr RootPowerKey, IntPtr SchemeGuid,
+        static extern uint PowerWriteDCValueIndex(nint RootPowerKey, nint SchemeGuid,
             ref Guid SubGroupOfPowerSettingsGuid,
             ref Guid PowerSettingGuid,
             uint DcValueIndex);
@@ -34,8 +34,8 @@ namespace TaskbarTray
 
         public static void SetPowerModeToBestEfficiency()
         {
-            IntPtr activeSchemePtr;
-            uint result = PowerGetActiveScheme(IntPtr.Zero, out activeSchemePtr);
+            nint activeSchemePtr;
+            uint result = PowerGetActiveScheme(nint.Zero, out activeSchemePtr);
             if (result != 0)
             {
                 Console.WriteLine("Failed to get active power scheme.");
@@ -46,10 +46,10 @@ namespace TaskbarTray
             Guid setting = GUID_PROCESSOR_PERF_PREFERENCE_POLICY;
             uint value = 3; // 0 = Best performance, 3 = Best power efficiency
 
-            PowerWriteACValueIndex(IntPtr.Zero, activeSchemePtr, ref subGroup, ref setting, value);
-            PowerWriteDCValueIndex(IntPtr.Zero, activeSchemePtr, ref subGroup, ref setting, value);
+            PowerWriteACValueIndex(nint.Zero, activeSchemePtr, ref subGroup, ref setting, value);
+            PowerWriteDCValueIndex(nint.Zero, activeSchemePtr, ref subGroup, ref setting, value);
 
-            PowerSetActiveScheme(IntPtr.Zero, activeSchemePtr);
+            PowerSetActiveScheme(nint.Zero, activeSchemePtr);
 
             Console.WriteLine("Power mode set to Best Power Efficiency.");
         }

@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TaskbarTray.stuff;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -25,6 +26,7 @@ namespace TaskbarTray.Views
             InitializeComponent();
 
             NavigationView.ItemInvoked += NavigationView_ItemInvoked;
+
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
