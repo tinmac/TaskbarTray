@@ -8,6 +8,18 @@ namespace TaskbarTray.Power
 
     public static class PowerPlanManager
     {
+        // This class provides methods to manage power plans in Windows.
+        //
+        // Docs:
+        // https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/configure-power-settings
+        //
+        // Win32 Api - powrprof.h
+        // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/
+        //
+        // Attributes: 
+        // https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
+
+
         private static readonly Guid SUB_PROCESSOR = new Guid("54533251-82be-4824-96c1-47b60b740d00");
         private static readonly Guid PROCESSOR_MAX = new Guid("bc5038f7-23e0-4960-96da-33abaf5935ec");
         private const uint ACCESS_SCHEME = 16;
@@ -101,7 +113,7 @@ namespace TaskbarTray.Power
             return PowerSetActiveScheme(nint.Zero, ref planGuid) == 0;
         }
 
-        // Fix for CS0199: Create local variables to hold the values of static readonly fields
+
         public static int GetCpuMaxPercentage(Guid planGuid)
         {
             uint value;

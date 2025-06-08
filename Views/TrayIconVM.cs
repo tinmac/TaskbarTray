@@ -236,7 +236,7 @@ namespace TaskbarTray.Views
         {
             try
             {
-                var active_plan_guid = await Task.Run(() => PowerSchemeManager.GetActivePlanGuid());
+                var active_plan_guid = await Task.Run(() => PowerPlanManager.GetActivePlanGuid());
 
                 ActiveScheme = PowerPlans.First(p => p.Guid == active_plan_guid);
 

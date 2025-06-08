@@ -1,0 +1,26 @@
+﻿Notes ✓ ∴ 
+=====
+
+
+Todo
+----
+- Add try/catch & loging
+
+
+
+
+
+
+Links
+-----
+
+Docs:
+https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/configure-power-settings
+
+Win32 Api - powrprof.h
+https://learn.microsoft.com/en-us/windows/win32/api/powrprof/
+
+Attributes: 
+https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
+
+
