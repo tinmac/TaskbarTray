@@ -1,7 +1,7 @@
 ﻿Notes ✓ ∴ 
 =====
 
-redid master
+redid master branch to be more readable and usable
 
 Todo
 ----
