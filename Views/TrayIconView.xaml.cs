@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskbarTray.ViewModels;
 
 namespace TaskbarTray.Views;
 
@@ -40,7 +41,7 @@ public sealed partial class TrayIconView : UserControl
         
         // We have to build the Context Flyout Menu in code behind because there is no way to have the MenuFlyoutItems Check mark change using binding
         // see the ChatGPT chat -> Enum Image Source Selection
-        // ChatGPT's Conclusion was: It’s likely MenuFlyout caching
+        // ChatGPT's Conclusion was: Itï¿½s likely MenuFlyout caching
 
         #endregion
 

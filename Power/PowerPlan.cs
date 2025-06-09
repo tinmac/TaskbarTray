@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.ViewModels;
 using TaskbarTray.Views;
 
 namespace TaskbarTray.Power

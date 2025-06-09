@@ -16,7 +16,7 @@ using Windows.Devices.Power;
 using Windows.Security.Isolation;
 using Windows.System.Power;
 
-namespace TaskbarTray.Views
+namespace TaskbarTray.ViewModels
 {
     public enum PowerMode
     {
