@@ -1,10 +1,10 @@
 ﻿Notes ✓ ∴ 
 =====
 
-redid master branch to be more readable and usable, more...
 
 Todo
 ----
+- Why isnt WindowEx persisting window size?
 - Add try/catch & loging
 
 
