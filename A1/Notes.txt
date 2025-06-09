@@ -1,7 +1,7 @@
 ﻿Notes ✓ ∴ 
 =====
 
-redid master branch to be more readable and usable
+redid master branch to be more readable and usable, more...
 
 Todo
 ----
