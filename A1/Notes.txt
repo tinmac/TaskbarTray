@@ -2,6 +2,9 @@
 =====
 
 
+More notes...
+
+
 Todo
 ----
 - Why isnt WindowEx persisting window size?
