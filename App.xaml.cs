@@ -20,7 +20,7 @@ public sealed partial class App : Application
 
     //public static WindowEx? MainWindow { get; set; }
 
-    public static MainWindow MainWindow { get; set; } = new MainWindow();
+    public static WindowEx MainWindow { get; set; } = new MainWindow();
 
     public static bool HandleClosedEvents { get; set; } = true;
 
