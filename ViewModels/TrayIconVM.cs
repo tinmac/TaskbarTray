@@ -495,7 +495,7 @@ namespace TaskbarTray.ViewModels
 
             // MyMenuFlyout.ShowAt(TrayIcon);
 
-            var window = App.MainWindow;
+            var window = App.Main_Window;
             if (window == null)
             {
                 return;

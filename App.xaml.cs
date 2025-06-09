@@ -20,7 +20,7 @@ public sealed partial class App : Application
 
     //public static WindowEx? MainWindow { get; set; }
 
-    public static WindowEx MainWindow { get; set; } = new MainWindow();
+    public static WindowEx Main_Window { get; set; }
 
     public static bool HandleClosedEvents { get; set; } = true;
 
@@ -40,7 +40,9 @@ public sealed partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-       // MainWindow.Hide();
+        Main_Window = new MainWindow();
+
+        Main_Window.Hide();
 
         #region Original MainWIndow - created in code behind
 

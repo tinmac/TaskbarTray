@@ -90,7 +90,7 @@ public sealed partial class TrayIconView : UserControl
         }
 
 
-        flyout.XamlRoot = App.MainWindow?.Content.XamlRoot ?? this.XamlRoot; // Set the XamlRoot for the flyout to ensure it displays correctly in the context of the current view
+        flyout.XamlRoot = App.Main_Window?.Content.XamlRoot ?? this.XamlRoot; // Set the XamlRoot for the flyout to ensure it displays correctly in the context of the current view
         flyout.XamlRoot = TrayIcon.XamlRoot;
         //TrayIcon.XamlRoot = this.XamlRoot; // Set the XamlRoot for the flyout to ensure it displays correctly in the context of the current view
 
@@ -106,7 +106,7 @@ public sealed partial class TrayIconView : UserControl
         WeakReferenceMessenger.Default.UnregisterAll(this); // Unregister all messages for this view
         App.HandleClosedEvents = false;
         TrayIcon.Dispose();
-        App.MainWindow?.Close();
+        App.Main_Window?.Close();
     }
 
 
