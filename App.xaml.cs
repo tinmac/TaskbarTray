@@ -80,12 +80,12 @@ public sealed partial class App : Application
         //
         // Initial check
         bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
-        Debug.WriteLine($"System (Windows Mode) is {(isLight ? "Light" : "Dark")}");
+        Debug.WriteLine($"Loaded System theme (Windows Mode not App) is {(isLight ? "Light" : "Dark")}");
 
         // Start watching for changes
         WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
         {
-            Debug.WriteLine($"\nSystem theme changed to: {(isLightMode ? "Light" : "Dark")}");
+            Debug.WriteLine($"\nSystem theme ie Taskbar & TitleBar (not the app theme) changed to: {(isLightMode ? "Light" : "Dark")}");
           
             // Update tray icons, Rx'd in TrayIconVM 
             //

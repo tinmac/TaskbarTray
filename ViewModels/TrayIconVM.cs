@@ -104,13 +104,13 @@ namespace TaskbarTray.ViewModels
                     {
                         // we need white foreground on Dark themem bg
                         SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
-                        Debug.WriteLine($"  Icon = Dark");
+                        //Debug.WriteLine($"  Icon = Dark");
                     }
                     else
                     {
                         // we need dark foreground on Light theme bg
                         SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
-                        Debug.WriteLine($"  Icon = White");
+                        //Debug.WriteLine($"  Icon = White");
                     }
                 });
 
@@ -153,69 +153,98 @@ namespace TaskbarTray.ViewModels
 
         private async void OnBatteryStatusChanged(object sender, object e)
         {
-            Debug.WriteLine($"OnBatteryStatusChanged");
-
-            TheDispatcher.TryEnqueue(() =>
+            try
             {
-                GetBatteryPercentage();
-            });
+                _logr.LogInformation("Battery status changed");
+
+                TheDispatcher.TryEnqueue(() =>
+                {
+                    GetBatteryPercentage();
+                });
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Error handling battery status change");
+            }
         }
 
         private async void OnPowerSupplyStatusChanged(object sender, object e)
         {
-            Debug.WriteLine($"OnPowerSupplyStatusChanged");
-            TheDispatcher.TryEnqueue(() =>
+            try
             {
-                GetBatteryPercentage();
-            });
+                _logr.LogInformation("Power supply status changed");
+                TheDispatcher.TryEnqueue(() =>
+                {
+                    GetBatteryPercentage();
+                });
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Error handling power supply status change");
+            }
         }
 
 
         public void Init()
         {
-            CreatePlans();
-
-            LoadPlansAsync();
-
-            GetBatteryPercentage();  
+            try
+            {
+                _logr.LogInformation("Initializing TrayIconVM");
+                CreatePlans();
+                LoadPlansAsync();
+                GetBatteryPercentage();
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Error during TrayIconVM initialization");
+            }
         }
 
         private void CreatePlans()
         {
-            var power_saver = new PowerPlan
+            try
             {
-                Name = "Power Saver",
-                Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
-                IsActive = true,
-                PowerMode = PowerMode.Eco,
-                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-min.ico",
-                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-min-wh.ico"
-            };
+                _logr.LogInformation("Creating power plans");
+                var power_saver = new PowerPlan
+                {
+                    Name = "Power Saver",
+                    Guid = Guid.Parse("a1841308-3541-4fab-bc81-f71556f20b4a"),
+                    IsActive = true,
+                    PowerMode = PowerMode.Eco,
+                    IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-min.ico",
+                    IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-min-wh.ico"
+                };
 
-            var balanced = new PowerPlan
+                var balanced = new PowerPlan
+                {
+                    Name = "Balanced",
+                    Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
+                    IsActive = true, // Assume this is the active plan for demonstration
+                    PowerMode = PowerMode.Balanced,
+                    IconPath_DarkFG = "ms-appx:///Assets/ico/gauge.ico",
+                    IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-wh.ico"
+                };
+
+
+                var high_performance = new PowerPlan
+                {
+                    Name = "High Performance",
+                    Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
+                    IsActive = false,
+                    PowerMode = PowerMode.High,
+                    IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-max.ico",
+                    IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-max-wh.ico"
+                };
+
+                PowerPlans.Add(power_saver);
+                PowerPlans.Add(balanced);
+                PowerPlans.Add(high_performance);
+            }
+            catch (Exception ex)
             {
-                Name = "Balanced",
-                Guid = Guid.Parse("381b4222-f694-41f0-9685-ff5bb260df2e"),
-                IsActive = true, // Assume this is the active plan for demonstration
-                PowerMode = PowerMode.Balanced,
-                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge.ico",
-                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-wh.ico"
-            };
-
-
-            var high_performance = new PowerPlan
-            {
-                Name = "High Performance",
-                Guid = Guid.Parse("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"),
-                IsActive = false,
-                PowerMode = PowerMode.High,
-                IconPath_DarkFG = "ms-appx:///Assets/ico/gauge-max.ico",
-                IconPath_WhiteFG = "ms-appx:///Assets/ico/gauge-max-wh.ico"
-            };
-
-            PowerPlans.Add(power_saver);
-            PowerPlans.Add(balanced);
-            PowerPlans.Add(high_performance);
+                _logr.LogError(ex, "Error creating power plans");
+                throw; // Re-throw as this is a critical initialization step
+            }
         }
 
 
@@ -248,18 +277,16 @@ namespace TaskbarTray.ViewModels
         {
             try
             {
+                _logr.LogInformation("Loading power plans");
                 var active_plan_guid = await Task.Run(() => PowerPlanManager.GetActivePlanGuid());
-
                 ActiveScheme = PowerPlans.First(p => p.Guid == active_plan_guid);
-
-
-                Debug.WriteLine($"\nInitial Plan: {ActiveScheme?.Name}");
-
+                _logr.LogInformation($"Initial Plan: {ActiveScheme?.Name}");
                 UpdateUi();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading power plans: {ex.Message}");
+                _logr.LogError(ex, "Error loading power plans");
+                _logr.LogError($"Error loading power plans: {ex.Message}");
             }
         }
 
@@ -305,27 +332,28 @@ namespace TaskbarTray.ViewModels
 
             #endregion
 
-
-            ActiveScheme = Scheme;
-
             try
             {
+                _logr.LogInformation("Setting power plan to {PlanName}", Scheme.Name);
+                ActiveScheme = Scheme;
+
                 bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(Scheme.Guid));
 
                 if (success)
                 {
                     UpdateUi();
-
-                    Debug.WriteLine($"\nSwitched to: {Scheme.Name}");
+                    _logr.LogInformation($"Switched to: {Scheme.Name}");
                 }
                 else
                 {
-                    Debug.WriteLine("Failed to set power plan.");
+                    _logr.LogWarning("Failed to set power plan to {PlanName}", Scheme.Name);
+                    _logr.LogWarning($"Failed to set power plan.");
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Exception while switching plans: {ex.Message}");
+                _logr.LogError(ex, "Error setting power plan to {PlanName}", Scheme.Name);
+                _logr.LogError($"Exception while switching plans: {ex.Message}");
             }
         }
 
@@ -346,95 +374,94 @@ namespace TaskbarTray.ViewModels
 
         private void GetBatteryPercentage()
         {
-            var report = Battery.AggregateBattery.GetReport();
-            var remaining = report.RemainingCapacityInMilliwattHours;
-            var full = report.FullChargeCapacityInMilliwattHours;
-
-            // Status:
-            // - Not Present
-            // - Discharging
-            // - Idle
-            // - Charging
-            var status = report.Status;
-
-            // 
-            Debug.WriteLine($"status {status}");
-
-            if (remaining.HasValue && full.HasValue && full != 0)
+            try
             {
-                int percentage = (int)((remaining.Value / (double)full.Value) * 100);
-                BatteryPercentage = $"Battery: {percentage}% ({status})";
+                var report = Battery.AggregateBattery.GetReport();
+                var remaining = report.RemainingCapacityInMilliwattHours;
+                var full = report.FullChargeCapacityInMilliwattHours;
+                var status = report.Status;
+
+                _logr.LogInformation($"Battery status: {status}");
+
+                if (remaining.HasValue && full.HasValue && full != 0)
+                {
+                    int percentage = (int)((remaining.Value / (double)full.Value) * 100);
+                    BatteryPercentage = $"Battery: {percentage}% ({status})";
+                }
+                else
+                {
+                    BatteryPercentage = "Battery info not available.";
+                }
+
+                _logr.LogInformation($"{BatteryPercentage}");
             }
-            else
+            catch (Exception ex)
             {
-                BatteryPercentage = "Battery info not available.";
+                _logr.LogError(ex, "Error getting battery percentage");
+                BatteryPercentage = "Error getting battery info";
             }
-
-
-            Debug.WriteLine($"{BatteryPercentage}");
         }
 
         private void UpdateUi()
         {
-            // There are two settings App Dark & Windows Dark
-            //
-            // To discover if the Task Bar is Dark/Light for .ico Tray Icons use ThemeHelper.IsWindowsInDarkMode();
-
-            var isWinDark = ThemeHelper.IsWindowsInDarkMode();// Use to work out if we use Light/Dark Tray icons
-
-            Debug.WriteLine($"Win Dark {isWinDark}");
-
-            if (isWinDark)
+            try
             {
-                var img = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
+                var isWinDark = ThemeHelper.IsWindowsInDarkMode();
+                //_logr.LogInformation($"Windows dark mode: {isWinDark}");
 
-                SelectedImage = img;
+                if (isWinDark)
+                {
+                    var img = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
+                    SelectedImage = img;
+                }
+                else
+                {
+                    var img = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
+                    SelectedImage = img;
+                }
+
+                if (ActiveScheme.PowerMode == PowerMode.Eco)
+                {
+                    IsSaverChecked = true;
+                    IsBalancedChecked = false;
+                    IsHighChecked = false;
+                }
+                else if (ActiveScheme.PowerMode == PowerMode.Balanced)
+                {
+                    IsSaverChecked = false;
+                    IsBalancedChecked = true;
+                    IsHighChecked = false;
+                }
+                else if (ActiveScheme.PowerMode == PowerMode.High)
+                {
+                    IsSaverChecked = false;
+                    IsBalancedChecked = false;
+                    IsHighChecked = true;
+                }
+                else if (ActiveScheme.PowerMode == PowerMode.None)
+                {
+                    //IsBalanced = false;
+
+                    IsSaverChecked = false;
+                    IsBalancedChecked = false;
+                    IsHighChecked = false;
+                }
+                else
+                {
+                    //IsBalanced = false;
+                    IsSaverChecked = false;
+                    IsBalancedChecked = false;
+                    IsHighChecked = false; // No known plan is active
+
+                    Debug.WriteLine($"No known plan!");
+                }
+
+                GetBatteryPercentage();
             }
-            else
+            catch (Exception ex)
             {
-                var img = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
-
-                SelectedImage = img;
+                _logr.LogError(ex, "Error updating UI");
             }
-
-            if (ActiveScheme.PowerMode == PowerMode.Eco)
-            {
-                IsSaverChecked = true;
-                IsBalancedChecked = false;
-                IsHighChecked = false;
-            }
-            else if (ActiveScheme.PowerMode == PowerMode.Balanced)
-            {
-                IsSaverChecked = false;
-                IsBalancedChecked = true;
-                IsHighChecked = false;
-            }
-            else if (ActiveScheme.PowerMode == PowerMode.High)
-            {
-                IsSaverChecked = false;
-                IsBalancedChecked = false;
-                IsHighChecked = true;
-            }
-            else if (ActiveScheme.PowerMode == PowerMode.None)
-            {
-                //IsBalanced = false;
-
-                IsSaverChecked = false;
-                IsBalancedChecked = false;
-                IsHighChecked = false;
-            }
-            else
-            {
-                //IsBalanced = false;
-                IsSaverChecked = false;
-                IsBalancedChecked = false;
-                IsHighChecked = false; // No known plan is active
-
-                Debug.WriteLine($"No known plan!");
-            }
-
-            GetBatteryPercentage();
-
         }
 
 
@@ -504,22 +531,31 @@ namespace TaskbarTray.ViewModels
         [RelayCommand]
         public void ShowHideWindow(string show)
         {
-            if (show == "True")
+            try
             {
-                Debug.WriteLine($"Show Main Window...");
-                
-                if (App.Main_Window == null)
+                if (show == "True")
                 {
-                    App.Main_Window = new MainWindow();
+                    _logr.LogInformation("Showing main window");
+                    _logr.LogInformation($"Show Main Window...");
+                    
+                    if (App.Main_Window == null)
+                    {
+                        App.Main_Window = new MainWindow();
+                    }
+                    App.Main_Window.Show();
+                    Show_OpenWindowMenuItem = false;
                 }
-                App.Main_Window.Show();
-                Show_OpenWindowMenuItem = false;
+                else
+                {
+                    _logr.LogInformation("Hiding main window");
+                    _logr.LogInformation($"Hide Main Window...");
+                    App.Main_Window?.Close();
+                    Show_OpenWindowMenuItem = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.WriteLine($"Hide Main Window...");
-                App.Main_Window?.Close();
-                Show_OpenWindowMenuItem = true;
+                _logr.LogError(ex, "Error showing/hiding window");
             }
         }
 
