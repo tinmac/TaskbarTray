@@ -18,6 +18,7 @@ namespace TaskbarTray;
 
 public sealed partial class App : Application
 {
+    private readonly ILogger<App> _logr;
 
     //public static WindowEx? MainWindow { get; set; }
 
@@ -36,7 +37,7 @@ public sealed partial class App : Application
 
         ServiceProvider = ConfigureServices();
         Ioc.Default.ConfigureServices(ServiceProvider);
-
+        _logr = ServiceProvider.GetRequiredService<ILogger<App>>();
     }
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
@@ -79,13 +80,15 @@ public sealed partial class App : Application
         // Theme watcher
         //
         // Initial check
+        //
+        // We need to know the `System Theme` (not app theme) at startup so we can set the tray icon accordingly
         bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
-        Debug.WriteLine($"Loaded System theme (Windows Mode not App) is {(isLight ? "Light" : "Dark")}");
+        _logr.LogInformation($"Loaded System theme ie Taskbar & TitleBar (not the app theme) is {(isLight ? "Light" : "Dark")}");
 
         // Start watching for changes
         WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
         {
-            Debug.WriteLine($"\nSystem theme ie Taskbar & TitleBar (not the app theme) changed to: {(isLightMode ? "Light" : "Dark")}");
+            _logr.LogInformation($"System theme ie Taskbar & TitleBar (not the app theme) changed to: {(isLightMode ? "Light" : "Dark")}");
           
             // Update tray icons, Rx'd in TrayIconVM 
             //
@@ -161,7 +164,7 @@ public sealed partial class App : Application
         //var DbPath = ApplicationData.Current.LocalFolder.Path;
 
         string appFolderPath = AppContext.BaseDirectory;
-        Debug.WriteLine($"appFolderPath {appFolderPath}");
+        _logr.LogInformation($"App folder path: {appFolderPath}");
 
         // White Foreground
         ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge.svg", "c:/assets/ico/gauge-wh.ico", 24, 24, SKColors.White);
