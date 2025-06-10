@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace TaskbarTray.Views;
 
 public sealed partial class TrayIconView : UserControl
 {
+    private readonly ILogger<TrayIconView> _logr;
+
     // Bind ViewModel to the View
     public TrayIconVM ViewModel { get; }// = new TrayIconVM();
 
@@ -21,6 +24,9 @@ public sealed partial class TrayIconView : UserControl
     public TrayIconView()
     {
         InitializeComponent();
+
+        _logr = Ioc.Default.GetRequiredService<ILogger<TrayIconView>>();
+
 
         ViewModel = Ioc.Default.GetService<TrayIconVM>()!;// ! means null forgiving, as we know this will not be null
 
