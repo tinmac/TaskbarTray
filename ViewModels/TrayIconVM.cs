@@ -40,7 +40,7 @@ namespace TaskbarTray.ViewModels
         private readonly ILogger<TrayIconVM> _logr;
 
         // to avoid warning `MVVMTK0045` use Communitty Toolkit 8.3.2 as 8.4.0 gives the warning  see https://stackoverflow.com/a/79302048/425357
-       
+
         //[ObservableProperty]
         //public partial BitmapImage SelectedImage { get; set; }
 
@@ -85,15 +85,19 @@ namespace TaskbarTray.ViewModels
         {
             _logr = Ioc.Default.GetRequiredService<ILogger<TrayIconVM>>();
 
+            SelectedImage = new BitmapImage(new Uri("ms-appx:///Assets/ico/gauge.ico")); // Default icon
+            ActiveScheme = new PowerPlan();
+            SelectedPowerMode = PowerMode.None;
+            Show_OpenWindowMenuItem = false; // Initially hide the menu item to open the main window
+            BatteryPercentage = string.Empty;
+
 
             WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) =>
             {
-                Debug.WriteLine($"Rx MyMessage...");
-
                 if (message.CloseMainWin)
                     Show_OpenWindowMenuItem = true;
 
-                TheDispatcher!.TryEnqueue(() =>
+                TheDispatcher.TryEnqueue(() =>
                 {
                     if (SelectedImage == null)
                         return;
@@ -104,13 +108,13 @@ namespace TaskbarTray.ViewModels
                     {
                         // we need white foreground on Dark themem bg
                         SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
-                        //Debug.WriteLine($"  Icon = Dark");
+                        _logr.LogInformation($" Switched to dark foreground icons");
                     }
                     else
                     {
                         // we need dark foreground on Light theme bg
                         SelectedImage = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
-                        //Debug.WriteLine($"  Icon = White");
+                        _logr.LogInformation($" Switched to light foreground icons");
                     }
                 });
 
@@ -145,7 +149,7 @@ namespace TaskbarTray.ViewModels
             // Subscribe to changes
             PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
             PowerManager.PowerSupplyStatusChanged += OnPowerSupplyStatusChanged;
-          
+
             // WHAT DO YOU WANT TO DO WHEN ONE OF THESE EVENTS IS TRIGGERED????
             //
             // change Power mode? not keen on this but could be a v2 feature
@@ -164,7 +168,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error handling battery status change");
+                _logr.LogError(ex, "Exception handling battery status change");
             }
         }
 
@@ -180,7 +184,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error handling power supply status change");
+                _logr.LogError(ex, "Exception handling power supply status change");
             }
         }
 
@@ -189,14 +193,13 @@ namespace TaskbarTray.ViewModels
         {
             try
             {
-                _logr.LogInformation("Initializing TrayIconVM");
                 CreatePlans();
                 LoadPlansAsync();
-                GetBatteryPercentage();
+                //GetBatteryPercentage();
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error during TrayIconVM initialization");
+                _logr.LogError(ex, "Exception during TrayIconVM initialization");
             }
         }
 
@@ -242,7 +245,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error creating power plans");
+                _logr.LogError(ex, "Exception creating power plans");
                 throw; // Re-throw as this is a critical initialization step
             }
         }
@@ -277,16 +280,15 @@ namespace TaskbarTray.ViewModels
         {
             try
             {
-                _logr.LogInformation("Loading power plans");
                 var active_plan_guid = await Task.Run(() => PowerPlanManager.GetActivePlanGuid());
                 ActiveScheme = PowerPlans.First(p => p.Guid == active_plan_guid);
-                _logr.LogInformation($"Initial Plan: {ActiveScheme?.Name}");
+                _logr.LogInformation($"Loaded Plan: {ActiveScheme?.Name}");
                 UpdateUi();
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error loading power plans");
-                _logr.LogError($"Error loading power plans: {ex.Message}");
+                _logr.LogError(ex, "Exception loading power plans");
+                _logr.LogError($"Exception loading power plans: {ex.Message}");
             }
         }
 
@@ -334,7 +336,6 @@ namespace TaskbarTray.ViewModels
 
             try
             {
-                _logr.LogInformation("Setting power plan to {PlanName}", Scheme.Name);
                 ActiveScheme = Scheme;
 
                 bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(Scheme.Guid));
@@ -352,7 +353,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error setting power plan to {PlanName}", Scheme.Name);
+                _logr.LogError(ex, "Exception setting power plan to {PlanName}", Scheme.Name);
                 _logr.LogError($"Exception while switching plans: {ex.Message}");
             }
         }
@@ -381,8 +382,6 @@ namespace TaskbarTray.ViewModels
                 var full = report.FullChargeCapacityInMilliwattHours;
                 var status = report.Status;
 
-                _logr.LogInformation($"Battery status: {status}");
-
                 if (remaining.HasValue && full.HasValue && full != 0)
                 {
                     int percentage = (int)((remaining.Value / (double)full.Value) * 100);
@@ -397,8 +396,8 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error getting battery percentage");
-                BatteryPercentage = "Error getting battery info";
+                _logr.LogError(ex, "Exception getting battery percentage");
+                BatteryPercentage = "Exception getting battery info";
             }
         }
 
@@ -460,7 +459,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error updating UI");
+                _logr.LogError(ex, "Exception updating UI");
             }
         }
 
@@ -537,7 +536,7 @@ namespace TaskbarTray.ViewModels
                 {
                     _logr.LogInformation("Showing main window");
                     _logr.LogInformation($"Show Main Window...");
-                    
+
                     if (App.Main_Window == null)
                     {
                         App.Main_Window = new MainWindow();
@@ -555,7 +554,7 @@ namespace TaskbarTray.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Error showing/hiding window");
+                _logr.LogError(ex, "Exception showing/hiding window");
             }
         }
 

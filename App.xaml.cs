@@ -82,13 +82,15 @@ public sealed partial class App : Application
         // Initial check
         //
         // We need to know the `System Theme` (not app theme) at startup so we can set the tray icon accordingly
+        // Loaded System theme ie Taskbar & TitleBar (not the app theme)
+        //
         bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
-        _logr.LogInformation($"Loaded System theme ie Taskbar & TitleBar (not the app theme) is {(isLight ? "Light" : "Dark")}");
+        _logr.LogInformation($"Loaded TaskBar theme:  {(isLight ? "Light" : "Dark")}");
 
         // Start watching for changes
         WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
         {
-            _logr.LogInformation($"System theme ie Taskbar & TitleBar (not the app theme) changed to: {(isLightMode ? "Light" : "Dark")}");
+            _logr.LogInformation($"Changed TaskBar theme:  {(isLightMode ? "Light" : "Dark")}");
           
             // Update tray icons, Rx'd in TrayIconVM 
             //
@@ -104,6 +106,7 @@ public sealed partial class App : Application
         var services = new ServiceCollection();
 
         services.AddTransient<TrayIconVM>(); // ViewModel for the tray icon
+
 
         #region SERILOG
 

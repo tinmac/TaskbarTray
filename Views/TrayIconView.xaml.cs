@@ -32,16 +32,11 @@ public sealed partial class TrayIconView : UserControl
 
         ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 
-        
-
         //MyMenuFlyout.ShowMode = FlyoutShowMode.TransientWithDismissOnPointerMoveAway;
 
         TrayIcon.PopupActivation = PopupActivationMode.LeftClick;
 
         ViewModel.Init();
-
-        //var currnet_plan = ViewModel.LoadPlansAsync();
-
     }
 
     [RelayCommand]
