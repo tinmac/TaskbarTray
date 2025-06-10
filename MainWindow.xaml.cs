@@ -44,12 +44,8 @@ namespace TaskbarTray
                 WeakReferenceMessenger.Default.Send(new MyMessage { CloseMainWin = true });
                 if (App.HandleClosedEvents)
                 {
-                    //// Save the window state or perform any cleanup here
-                    //App.MainWindow = null; // Clear the reference to the main window
-
                     args.Handled = true;
-                    this.Hide();
-
+                    App.Main_Window.Hide();
                 }
             };
         }

@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
@@ -35,8 +37,15 @@ namespace TaskbarTray.ViewModels
 
     public partial class TrayIconVM : ObservableObject
     {
+        private readonly ILogger<TrayIconVM> _logr;
+
+        // to avoid warning `MVVMTK0045` use Communitty Toolkit 8.3.2 as 8.4.0 gives the warning  see https://stackoverflow.com/a/79302048/425357
+       
+        //[ObservableProperty]
+        //public partial BitmapImage SelectedImage { get; set; }
+
         [ObservableProperty]
-        public BitmapImage _selectedImage;// => ConvertEnumToImage(ActiveScheme);
+        private BitmapImage _selectedImage;
 
 
         [ObservableProperty]
@@ -74,7 +83,8 @@ namespace TaskbarTray.ViewModels
         // Constructor
         public TrayIconVM()
         {
-            // Detect theme change by user
+            _logr = Ioc.Default.GetRequiredService<ILogger<TrayIconVM>>();
+
 
             WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) =>
             {
@@ -83,11 +93,13 @@ namespace TaskbarTray.ViewModels
                 if (message.CloseMainWin)
                     Show_OpenWindowMenuItem = true;
 
-                TheDispatcher.TryEnqueue(() =>
+                TheDispatcher!.TryEnqueue(() =>
                 {
                     if (SelectedImage == null)
                         return;
 
+                    // Detect theme change by user
+                    //
                     if (message.ThemeChanged_Light)
                     {
                         // we need white foreground on Dark themem bg
@@ -492,32 +504,23 @@ namespace TaskbarTray.ViewModels
         [RelayCommand]
         public void ShowHideWindow(string show)
         {
-
-            // MyMenuFlyout.ShowAt(TrayIcon);
-
-            var window = App.Main_Window;
-            if (window == null)
-            {
-                return;
-            }
-
             if (show == "True")
             {
                 Debug.WriteLine($"Show Main Window...");
-
-                window.Show();
-
+                
+                if (App.Main_Window == null)
+                {
+                    App.Main_Window = new MainWindow();
+                }
+                App.Main_Window.Show();
                 Show_OpenWindowMenuItem = false;
             }
             else
             {
                 Debug.WriteLine($"Hide Main Window...");
-
-                window.Hide();
-
+                App.Main_Window?.Close();
                 Show_OpenWindowMenuItem = true;
             }
-
         }
 
 

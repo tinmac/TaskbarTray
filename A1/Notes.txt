@@ -7,10 +7,8 @@ More notes...
 
 Todo
 ----
-- Why isnt WindowEx persisting window size?
+- Why isnt WindowEx persisting window size? No idea :-/
 - Add try/catch & loging
-
-
 
 
 

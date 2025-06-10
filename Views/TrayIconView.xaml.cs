@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using System;
@@ -10,11 +11,10 @@ using TaskbarTray.ViewModels;
 namespace TaskbarTray.Views;
 
 
-[ObservableObject]
 public sealed partial class TrayIconView : UserControl
 {
     // Bind ViewModel to the View
-    public TrayIconVM ViewModel { get; } = new TrayIconVM();
+    public TrayIconVM ViewModel { get; }// = new TrayIconVM();
 
 
     // Constructor
@@ -22,7 +22,11 @@ public sealed partial class TrayIconView : UserControl
     {
         InitializeComponent();
 
+        ViewModel = Ioc.Default.GetService<TrayIconVM>()!;// ! means null forgiving, as we know this will not be null
+
         ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        
 
         //MyMenuFlyout.ShowMode = FlyoutShowMode.TransientWithDismissOnPointerMoveAway;
 
