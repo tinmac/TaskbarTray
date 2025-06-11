@@ -1,4 +1,6 @@
-﻿using SkiaSharp;
+﻿#nullable enable
+
+using SkiaSharp;
 using Svg.Skia;
 using System;
 using System.Diagnostics;

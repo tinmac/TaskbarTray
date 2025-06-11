@@ -6,10 +6,10 @@ namespace TaskbarTray.Converters;
 
 public class BoolToImageSourceConverter : IValueConverter
 {
-    public ImageSource? TrueImage { get; set; }
-    public ImageSource? FalseImage { get; set; }
+    public ImageSource TrueImage { get; set; }
+    public ImageSource FalseImage { get; set; }
     
-    public object? Convert(object? value, Type targetType, object? parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is true)
         {

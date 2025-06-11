@@ -8,7 +8,67 @@ More notes...
 Todo
 ----
 - Why isnt WindowEx persisting window size? No idea :-/
-- Add try/catch & loging
+
+
+Extra Features
+--------------
+
+Can you create a WinUI page (c# & xaml ui) that does the following:
+
+The top of the page show readonly sytem sensors for:  
+- Temperature sensor levels (CPU etc...)
+- Any fans and their speed
+
+Next create c#/ui where the user can select and edit Windows 11 power plans (power saver, balanced and high performance) and also create a new custom power plan. 
+
+Instead of Powershell can you use Win32 api's for example PowerReadDCValueIndex PowerWriteDCValueIndex 
+
+The attributes to edit/create are:
+
+Battery:
+Critical Battery Level: On Battery (Percent)
+Critical Battery Level: Plugged In (Percent)
+Critical Battery Notification: On Battery (On/Off)
+Critical Battery Notification: Plugged In (On/Off)
+Critical Battery Action: On Battery (Sleep, Hibernate, Shutdown)
+Critical Battery Action: Plugged In (Sleep, Hibernate, Shutdown)
+
+And duplicate for `Low Battery Level`
+
+Reserve Battery Level
+On Battery (Percent)
+Plugged In (Percent)
+
+Display:
+Turn off display: On Battey (mins)
+Turn off disply: Plugged In (mins)
+
+Sleep:
+Sleep after: On Battery (mins) 
+Sleep after: Plugged In (mins)
+Hibernate after: On Battery (mins) 
+Hibernate after: Plugged In (mins)
+
+Processor Power Management:
+Minimum Processor state: On Battery (percent) 
+Minimum Processor state: Plugged In (percent)
+Maximum Processor state: On Battery (percent)
+Minimum Processor state: Plugged In (percent)
+ 
+Processor Specific optional settings:
+Detect if Users Machine has AMD, if yes show these settings:
+AMD Graphics Powerplay Settings:
+On Battery (Optemise Battery)
+Plugged In (Optemise Performance)
+
+AMD Power Slider Overlay:
+On Battery (Battery Aver, Better Battery, Better Performance, Best Performance) 
+Plugged In (Battery Aver, Better Battery, Better Performance, Best Performance)
+
+Show any other AMD sepcific settings that can be read/written
+
+Likewise Detect if Users Machine has Intel, if yes show Intel specific settings whatever they are
+
 
 
 
