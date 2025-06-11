@@ -7,6 +7,7 @@ More notes...
 
 Todo
 ----
+- ADD: If user changes the power plan, then the app should update the current plan to reflect the changes.
 - Why isnt WindowEx persisting window size? No idea :-/
 
 
