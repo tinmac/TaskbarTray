@@ -40,8 +40,8 @@
                 <Setter Property="FontFamily" Value="{StaticResource FA6_Thin}" />
             </Style>
 
-            
-            
+
+
             <!--
                 CONVERTERS
             -->

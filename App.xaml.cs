@@ -45,7 +45,7 @@ public sealed partial class App : Application
     {
         Main_Window = new MainWindow();
 
-        Main_Window.Hide();
+        Main_Window.Show();
 
         #region Original MainWIndow - created in code behind
 

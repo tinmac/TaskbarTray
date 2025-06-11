@@ -10,9 +10,25 @@
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
-        <NavigationView x:Name="NavigationView" Grid.Row="1">
+
+        <NavigationView
+            x:Name="NavigationView"
+            IsBackButtonVisible="Collapsed"
+            IsBackEnabled="False"
+            IsPaneOpen="False">
 
             <NavigationView.MenuItems>
+
+                <NavigationViewItem
+                    Content="Sensors"
+                    SelectsOnInvoked="True"
+                    Tag="Sensors">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xf2c9;" />
+                    </NavigationViewItem.Icon>
+
+                </NavigationViewItem>
+
 
                 <NavigationViewItem
                     Content="Notifications"

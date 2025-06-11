@@ -10,19 +10,27 @@
     <PublishProfile>win-$(Platform).pubxml</PublishProfile>
     <UseWinUI>true</UseWinUI>
    
-	  <!--<Nullable>enable</Nullable>-->
+	<!--<Nullable>enable</Nullable>-->
 	  
     <EnableMsixTooling>true</EnableMsixTooling>
-	  
-	  
-	  <WindowsPackageType>None</WindowsPackageType>
-	  <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 
-	  <LangVersion>preview</LangVersion>
+	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
+	<!--<LangVersion>preview</LangVersion>-->
+	  
+	  
+	<!-- 
+	    Create Unpackaged App
+		
+		I believe this is required to run the app without MSIX packaging.
+	    
+		Also dont forget to choose "Unpackaged App" in the project properties (top of VS with green play icon)
+	-->
+	<WindowsPackageType>None</WindowsPackageType>
+	  
+	  
 	  
   </PropertyGroup>
-
-
 
   <ItemGroup>
     <None Remove="Assets\gauge-high.ico" />
@@ -38,6 +46,7 @@
     <None Remove="Assets\svg\gauge-max.svg" />
     <None Remove="Assets\svg\gauge-min.svg" />
     <None Remove="Assets\svg\gauge.svg" />
+    <None Remove="Views\Sensors.xaml" />
     <None Remove="Views\TestWindow1.xaml" />
   </ItemGroup>
 
@@ -93,6 +102,11 @@
       <HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Sensors.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainWindow.xaml">

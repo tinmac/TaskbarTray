@@ -26,18 +26,21 @@ namespace TaskbarTray
     /// </summary>
     public sealed partial class MainWindow : WindowEx
     {
-        private const string win_name = "main_win";
-
         public MainWindow()
         {
             InitializeComponent();
 
+            // PersistenceId Wont work if App is Unpackaged
+            //
+            var manager = WinUIEx.WindowManager.Get(this);
+            manager.PersistenceId = "MainWindowPersistanceId";
+            manager.MinWidth = 400; // Set the minimum width of the window
+            manager.MinHeight = 300; // Set the minimum height of the window
+
+
             Title = "Taskbar Tray App"; // Set the title of the window
             //Icon = new BitmapImage(new Uri("ms-appx:///Assets/Icons/app_icon.ico")) // Set the icon if needed
-            PersistenceId = win_name;
-            MinWidth = 400;
-            MinHeight = 300;
-            Content = new MainView();
+           // Content = new MainView();
 
             Closed += (sender, args) =>
             {
