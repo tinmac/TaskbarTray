@@ -10,6 +10,7 @@ using System.Diagnostics;
 using TaskbarTray.stuff;
 using TaskbarTray.ViewModels;
 using TaskbarTray.Views;
+using TaskbarTray.Services;
 using Windows.Storage;
 using WinUIEx;
 
@@ -106,7 +107,7 @@ public sealed partial class App : Application
         var services = new ServiceCollection();
 
         services.AddTransient<TrayIconVM>(); // ViewModel for the tray icon
-
+        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
 
         #region SERILOG
 

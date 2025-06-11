@@ -70,7 +70,7 @@
 	  
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
-    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <!--<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />-->
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
@@ -91,6 +91,7 @@
   <ItemGroup>
     <Reference Include="LibreHardwareMonitorLib">
       <HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
