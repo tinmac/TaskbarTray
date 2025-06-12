@@ -8,14 +8,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
     Title="MainWindow1"
-    Width="300" Height="200"
+    Width="700"
+    Height="500"
     mc:Ignorable="d">
 
-    <!--<Window.SystemBackdrop>
+    <Window.SystemBackdrop>
         <MicaBackdrop />
-    </Window.SystemBackdrop>-->
+    </Window.SystemBackdrop>
 
-    <StackPanel Margin="20">
+    <!--<StackPanel Margin="20">
         <TextBlock Style="{ThemeResource TitleLargeTextBlockStyle}" Text="Main Window" />
-    </StackPanel>
+    </StackPanel>-->
 </winex:WindowEx>

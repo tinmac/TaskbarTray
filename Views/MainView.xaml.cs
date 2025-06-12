@@ -27,10 +27,24 @@ namespace TaskbarTray.Views
 
             NavigationView.ItemInvoked += NavigationView_ItemInvoked;
 
-            // Navigate to the default page on app startup
-            NavigationViewFrame.Navigate(typeof(Sensors));
+
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Navigate to the default page on app startup
+            NavigationViewFrame.Navigate(typeof(Sensors));
+
+            // Highlight Selectd Page in the left nav menu (must do both)
+            var item = NavigationView.MenuItems
+                .OfType<NavigationViewItem>()
+                .FirstOrDefault(x => (string)x.Tag == nameof(Sensors));
+
+            if (item != null)
+            {
+                NavigationView.SelectedItem = item;
+            }
+        }
 
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -48,14 +62,21 @@ namespace TaskbarTray.Views
             {
                 case "Sensors":
                     _ = NavigationViewFrame.NavigateToType(typeof(Sensors), null, options);
-                   // ((Sensors)NavigationViewFrame.Content).TrayIcon = TrayIconView.TrayIcon;
+                    ((Sensors)NavigationViewFrame.Content).TrayIcon = TrayIconView.TrayIcon;
                     break;
 
                 case "Notifications":
                     _ = NavigationViewFrame.NavigateToType(typeof(NotificationView), null, options);
                     ((NotificationView)NavigationViewFrame.Content).TrayIcon = TrayIconView.TrayIcon;
                     break;
+
+                case "Settings":
+                    _ = NavigationViewFrame.NavigateToType(typeof(Settings), null, options);
+                    ((Settings)NavigationViewFrame.Content).TrayIcon = TrayIconView.TrayIcon;
+                    break;
+
             }
         }
+
     }
 }

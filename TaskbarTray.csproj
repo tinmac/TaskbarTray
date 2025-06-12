@@ -47,6 +47,7 @@
     <None Remove="Assets\svg\gauge-min.svg" />
     <None Remove="Assets\svg\gauge.svg" />
     <None Remove="Views\Sensors.xaml" />
+    <None Remove="Views\Settings.xaml" />
     <None Remove="Views\TestWindow1.xaml" />
   </ItemGroup>
 
@@ -82,6 +83,7 @@
     <!--<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />-->
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="SkiaSharp" Version="3.119.0" />
     <PackageReference Include="Svg.Skia" Version="3.0.3" />
@@ -96,12 +98,18 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Editor\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="LibreHardwareMonitorLib">
       <HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
       <Private>True</Private>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\Sensors.xaml">

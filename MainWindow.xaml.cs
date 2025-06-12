@@ -30,17 +30,17 @@ namespace TaskbarTray
         {
             InitializeComponent();
 
-            // PersistenceId Wont work if App is Unpackaged
+            // PersistenceId - WONT WORK if App is Unpackaged
             //
             var manager = WinUIEx.WindowManager.Get(this);
             manager.PersistenceId = "MainWindowPersistanceId";
-            manager.MinWidth = 400; // Set the minimum width of the window
-            manager.MinHeight = 300; // Set the minimum height of the window
+            manager.MinWidth = 700; // Set the minimum width of the window
+            manager.MinHeight = 500; // Set the minimum height of the window
 
 
             Title = "Taskbar Tray App"; // Set the title of the window
             //Icon = new BitmapImage(new Uri("ms-appx:///Assets/Icons/app_icon.ico")) // Set the icon if needed
-           // Content = new MainView();
+            Content = new MainView();
 
             Closed += (sender, args) =>
             {

@@ -7,6 +7,7 @@
     xmlns:local="using:TaskbarTray.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:TaskbarTray.Views"
+    Loaded="Page_Loaded"
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
@@ -15,7 +16,8 @@
             x:Name="NavigationView"
             IsBackButtonVisible="Collapsed"
             IsBackEnabled="False"
-            IsPaneOpen="False">
+            IsPaneOpen="False"
+            IsSettingsVisible="False">
 
             <NavigationView.MenuItems>
 
@@ -35,6 +37,13 @@
                     Icon="Send"
                     SelectsOnInvoked="True"
                     Tag="Notifications" />
+
+
+                <NavigationViewItem
+                    Content="Settings"
+                    Icon="Setting"
+                    SelectsOnInvoked="True"
+                    Tag="Settings" />
 
             </NavigationView.MenuItems>
 

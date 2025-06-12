@@ -5,7 +5,7 @@ namespace TaskbarTray.Views
 
     public sealed partial class NotificationView
     {
-        public TaskbarIcon? TrayIcon { get; set; }
+        public TaskbarIcon TrayIcon { get; set; }
 
         public NotificationView()
         {

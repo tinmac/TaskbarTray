@@ -13,6 +13,7 @@ using TaskbarTray.Views;
 using TaskbarTray.Services;
 using Windows.Storage;
 using WinUIEx;
+using TaskbarTray.Persistance;
 
 
 namespace TaskbarTray;
@@ -106,9 +107,7 @@ public sealed partial class App : Application
         // Register your services, viewmodels and pages here
         var services = new ServiceCollection();
 
-        services.AddTransient<TrayIconVM>(); // ViewModel for the tray icon
-        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
-
+       
         #region SERILOG
 
         // Serilog   : Verbose  Debug  Information  Warning  Error  Fatal
@@ -140,7 +139,6 @@ public sealed partial class App : Application
            .WriteTo.Debug(outputTemplate: tmpl_1)// was tmpl_3
            .CreateLogger();
 
-        #endregion
 
 
         // Now you're set to inject ILogger<TService> into any constructor you need.
@@ -151,8 +149,22 @@ public sealed partial class App : Application
 
         // Static classes
         // so we can use Log.LogInformation("bla"); in static classes (or any where)
-        Log.Logger = lgr; 
-       
+        Log.Logger = lgr;
+
+        #endregion
+
+        services.AddTransient<TrayIconVM>(); // ViewModel for the tray icon
+        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
+
+        services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
+        services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
+        services.AddSingleton<IFileService, FileService>();
+
+
+        // Views and ViewModels
+        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<Settings>();
+
         var svcs = services.BuildServiceProvider();
 
         return svcs;
