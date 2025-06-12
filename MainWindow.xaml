@@ -17,5 +17,5 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="main_grid" Loaded="main_grid_Loaded" />
-    
+
 </winex:WindowEx>

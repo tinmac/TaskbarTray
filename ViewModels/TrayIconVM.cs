@@ -28,12 +28,6 @@ namespace TaskbarTray.ViewModels
         High
     }
 
-    public enum ImageSourceType
-    {
-        PowerSaver_Icon,
-        Balanced_Icon,
-        High_Icon
-    }
 
     public partial class TrayIconVM : ObservableObject
     {

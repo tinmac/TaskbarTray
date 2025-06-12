@@ -109,6 +109,9 @@ public sealed partial class App : Application
         // Views and ViewModels
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<Settings>();
+        services.AddTransient<SensorsViewModel>();
+        services.AddTransient<Sensors>();
+
 
         var svcs = services.BuildServiceProvider();
 

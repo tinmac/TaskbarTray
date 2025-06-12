@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TaskbarTray.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -23,11 +26,21 @@ namespace TaskbarTray.Views
     /// </summary>
     public sealed partial class Sensors : Page
     {
+        private readonly ILogger<Sensors> _logr;
+
         public TaskbarIcon TrayIcon { get; set; }
+
+        public SensorsViewModel ViewModel { get; }// = new TrayIconVM();
+
 
         public Sensors()
         {
             InitializeComponent();
+
+            _logr = Ioc.Default.GetRequiredService<ILogger<Sensors>>();
+
+            ViewModel = Ioc.Default.GetRequiredService<SensorsViewModel>();
+
         }
     }
 }
