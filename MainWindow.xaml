@@ -8,8 +8,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
     Title="MainWindow1"
-    Width="700"
-    Height="500"
+    MinWidth="700"
+    MinHeight="500"
     mc:Ignorable="d">
 
     <Window.SystemBackdrop>

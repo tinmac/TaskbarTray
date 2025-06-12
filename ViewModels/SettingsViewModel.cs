@@ -14,7 +14,7 @@ namespace TaskbarTray.ViewModels;
 
 public partial class SettingsViewModel : ObservableRecipient
 {
-    private readonly IThemeSelectorService _themeSelectorService;
+    private readonly ISettingsService _themeSelectorService;
 
     [ObservableProperty]
     private ElementTheme _elementTheme;
@@ -27,7 +27,7 @@ public partial class SettingsViewModel : ObservableRecipient
         get;
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    public SettingsViewModel(ISettingsService themeSelectorService)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;

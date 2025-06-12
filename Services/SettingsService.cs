@@ -5,20 +5,34 @@ using TaskbarTray.Persistance;
 
 namespace TaskbarTray.Services;
 
-public class ThemeSelectorService : IThemeSelectorService
+public class WindowsData
 {
-    private const string SettingsKey = "AppBackgroundRequestedTheme";
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+}
+
+public class SettingsService : ISettingsService
+{
+    private const string BgThemeKey = "AppBackgroundRequestedTheme";
+
+    private const string WindowSizePosKey = "AppWindowData";
+
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
 
+    public WindowsData WindowsData { get; set; }
+
+
     private readonly ILocalSettingsService _localSettingsService;
 
-    public ThemeSelectorService(ILocalSettingsService localSettingsService)
+    public SettingsService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
     }
 
-    public async Task InitializeAsync()
+    public async Task GetThemeAsync()
     {
         Theme = await LoadThemeFromSettingsAsync();
         await Task.CompletedTask;
@@ -38,7 +52,7 @@ public class ThemeSelectorService : IThemeSelectorService
         {
             rootElement.RequestedTheme = Theme;
 
-          //  TitleBarHelper.UpdateTitleBar(Theme);// Doesnt have one (yet)
+            //  TitleBarHelper.UpdateTitleBar(Theme);// Doesnt have one (yet)
         }
 
         await Task.CompletedTask;
@@ -46,7 +60,7 @@ public class ThemeSelectorService : IThemeSelectorService
 
     private async Task<ElementTheme> LoadThemeFromSettingsAsync()
     {
-        var themeName = await _localSettingsService.ReadSettingAsync<string>(SettingsKey);
+        var themeName = await _localSettingsService.ReadSettingAsync<string>(BgThemeKey);
 
         if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
         {
@@ -58,6 +72,24 @@ public class ThemeSelectorService : IThemeSelectorService
 
     private async Task SaveThemeInSettingsAsync(ElementTheme theme)
     {
-        await _localSettingsService.SaveSettingAsync(SettingsKey, theme.ToString());
+        await _localSettingsService.SaveSettingAsync(BgThemeKey, theme.ToString());
     }
+
+
+
+    // Window Size & Position
+    //
+    public async Task<WindowsData> GetWindowDataAsync()
+    {
+        var windowsData = await _localSettingsService.ReadSettingAsync<WindowsData>(WindowSizePosKey);
+
+        return windowsData;
+    }
+
+    public async Task SetWindowDataAsync(WindowsData windowsData)
+    {
+        await _localSettingsService.SaveSettingAsync(WindowSizePosKey, windowsData);
+    }
+
+
 }

@@ -3,16 +3,25 @@ using System.Threading.Tasks;
 
 namespace TaskbarTray.Services;
 
-public interface IThemeSelectorService
+public interface ISettingsService
 {
+    // Theme
+    //
     ElementTheme Theme
     {
         get;
     }
 
-    Task InitializeAsync();
+    Task GetThemeAsync();
 
     Task SetThemeAsync(ElementTheme theme);
 
     Task SetRequestedThemeAsync();
+
+
+    // Windows Data - Size & Position 
+    //
+    Task<WindowsData> GetWindowDataAsync();
+
+    Task SetWindowDataAsync(WindowsData windowsData);
 }

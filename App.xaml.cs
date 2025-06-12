@@ -14,6 +14,7 @@ using TaskbarTray.Services;
 using Windows.Storage;
 using WinUIEx;
 using TaskbarTray.Persistance;
+using System.Threading.Tasks;
 
 
 namespace TaskbarTray;
@@ -31,6 +32,9 @@ public sealed partial class App : Application
     public static IServiceProvider ServiceProvider { get; private set; }
 
 
+    //private IThemeSelectorService _themeSelectorService;
+
+
     //public static WeakReferenceMessenger Messenger { get; } = new WeakReferenceMessenger();
 
     public App()
@@ -40,74 +44,16 @@ public sealed partial class App : Application
         ServiceProvider = ConfigureServices();
         Ioc.Default.ConfigureServices(ServiceProvider);
         _logr = ServiceProvider.GetRequiredService<ILogger<App>>();
-    }
 
-    protected override void OnLaunched(LaunchActivatedEventArgs args)
-    {
-        Main_Window = new MainWindow();
-
-        Main_Window.Show();
-
-        #region Original MainWIndow - created in code behind
-
-        //MainWindow = new WindowEx
-        //{
-        //    MinWidth = 400,
-        //    MinHeight = 300,
-        //    PersistenceId = win_name, // This is used to persist the window size and position across app restarts
-        //    Content = new Frame
-        //    {
-        //        Content = new MainView(),
-        //    },
-        //};
-
-        //MainWindow.Closed += (sender, args) =>
-        //{
-        //    //Messenger.Send(new Msg_CloseMainWin { CloseMainWin = true });
-        //    WeakReferenceMessenger.Default.Send(new MyMessage { CloseMainWin = true });
-
-        //    if (HandleClosedEvents)
-        //    {
-        //        args.Handled = true;
-        //        MainWindow.Hide();
-        //    }
-        //};
-
-
-        //MainWindow.Hide();// Hide by default at startup, as this is a tray app
-
-        #endregion
-
-
-        // Theme watcher
-        //
-        // Initial check
-        //
-        // We need to know the `System Theme` (not app theme) at startup so we can set the tray icon accordingly
-        // Loaded System theme ie Taskbar & TitleBar (not the app theme)
-        //
-        bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
-        _logr.LogInformation($"Loaded TaskBar theme:  {(isLight ? "Light" : "Dark")}");
-
-        // Start watching for changes
-        WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
-        {
-            _logr.LogInformation($"Changed TaskBar theme:  {(isLightMode ? "Light" : "Dark")}");
-          
-            // Update tray icons, Rx'd in TrayIconVM 
-            //
-            WeakReferenceMessenger.Default.Send(new MyMessage { ThemeChanged_Light = isLightMode });
-        };
-
-        WindowsThemeChangedDetector.StartMonitoring();
     }
 
     private IServiceProvider ConfigureServices()
     {
         // Register your services, viewmodels and pages here
         var services = new ServiceCollection();
+        services.AddSingleton<ISettingsService, SettingsService>();
 
-       
+
         #region SERILOG
 
         // Serilog   : Verbose  Debug  Information  Warning  Error  Fatal
@@ -157,7 +103,6 @@ public sealed partial class App : Application
         services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
 
         services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-        services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
         services.AddSingleton<IFileService, FileService>();
 
 
@@ -170,6 +115,89 @@ public sealed partial class App : Application
         return svcs;
 
     }
+
+    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        try
+        {
+            var _themeSelectorService = ServiceProvider.GetRequiredService<ISettingsService>();
+
+            // Execute tasks before activation.
+            // Get Theme
+            await _themeSelectorService.GetThemeAsync();
+
+
+
+            Main_Window = new MainWindow();
+
+            Main_Window.Activate();
+
+            #region Original MainWIndow - created in code behind
+
+            //MainWindow = new WindowEx
+            //{
+            //    MinWidth = 400,
+            //    MinHeight = 300,
+            //    PersistenceId = win_name, // This is used to persist the window size and position across app restarts
+            //    Content = new Frame
+            //    {
+            //        Content = new MainView(),
+            //    },
+            //};
+
+            //MainWindow.Closed += (sender, args) =>
+            //{
+            //    //Messenger.Send(new Msg_CloseMainWin { CloseMainWin = true });
+            //    WeakReferenceMessenger.Default.Send(new MyMessage { CloseMainWin = true });
+
+            //    if (HandleClosedEvents)
+            //    {
+            //        args.Handled = true;
+            //        MainWindow.Hide();
+            //    }
+            //};
+
+
+            //MainWindow.Hide();// Hide by default at startup, as this is a tray app
+
+            #endregion
+
+
+            // Theme watcher
+            //
+            // Initial check
+            //
+            // We need to know the `System Theme` (not app theme) at startup so we can set the tray icon accordingly
+            // Loaded System theme ie Taskbar & TitleBar (not the app theme)
+            //
+            bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
+            _logr.LogInformation($"Loaded TaskBar theme:  {(isLight ? "Light" : "Dark")}");
+
+            // Start watching for changes
+            WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
+            {
+                _logr.LogInformation($"Changed TaskBar theme:  {(isLightMode ? "Light" : "Dark")}");
+
+                // Update tray icons, Rx'd in TrayIconVM 
+                //
+                WeakReferenceMessenger.Default.Send(new MyMessage { ThemeChanged_Light = isLightMode });
+            };
+
+            WindowsThemeChangedDetector.StartMonitoring();
+
+            // Set Theme 
+            await _themeSelectorService.SetRequestedThemeAsync();
+            await Task.CompletedTask;
+        
+        }
+        catch (Exception ex)
+        {
+            _logr.LogError(ex, $"Exception in App.xaml.cs -> OnLaunched: {ex}");
+            throw;
+        }
+
+    }
+
 
     private void ConvertSvgToIco()
     {
@@ -193,6 +221,18 @@ public sealed partial class App : Application
         ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge-max.svg", "c:/assets/ico/gauge-max.ico", 24, 24);
 
     }
+
+    //private async Task InitializeAsync()
+    //{
+    //    await _themeSelectorService.InitializeAsync().ConfigureAwait(false);
+    //    await Task.CompletedTask;
+    //}
+
+    //private async Task StartupAsync()
+    //{
+    //    await _themeSelectorService.SetRequestedThemeAsync();
+    //    await Task.CompletedTask;
+    //}
 
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
