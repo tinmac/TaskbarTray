@@ -130,7 +130,7 @@ public sealed partial class App : Application
 
             Main_Window = new MainWindow();
 
-            Main_Window.Activate();
+            Main_Window.Hide();
 
             #region Original MainWIndow - created in code behind
 

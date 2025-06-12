@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -10,7 +11,7 @@ namespace TaskbarTray.Persistance;
 
 public class LocalSettingsService : ILocalSettingsService
 {
-    private const string _defaultApplicationDataFolder = "T10_demo/ApplicationData";
+    private const string _defaultApplicationDataFolder = "PowerSwitch/ApplicationData";
     private const string _defaultLocalSettingsFile = "LocalSettings.json";
 
     private readonly IFileService _fileService;
@@ -47,24 +48,44 @@ public class LocalSettingsService : ILocalSettingsService
 
     public async Task<T?> ReadSettingAsync<T>(string key)
     {
-        if (RuntimeHelper.IsMSIX)
+        try
         {
-            if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
+            if (RuntimeHelper.IsMSIX)
             {
-                return await Json.ToObjectAsync<T>((string)obj);
+                if (ApplicationData.Current.LocalSettings.Values.TryGetValue(key, out var obj))
+                {
+                    return await Json.ToObjectAsync<T>((string)obj);
+                }
             }
+            else
+            {
+                await InitializeAsync();
+
+                if (_settings != null && _settings.TryGetValue(key, out var obj))
+                {
+                    var strObj = (string)obj;
+                    Debug.WriteLine($"\nkey {key}  out {strObj}");
+
+                    var ret = await Json.ToObjectAsync<T>(strObj);
+
+                    Debug.WriteLine($"ret {ret.ToString()}");
+
+                    return ret;
+                }
+                else
+                {
+                    Debug.WriteLine($"Failed to get Key {key}");
+                }
+            }
+
+            return default;
         }
-        else
+        catch (Exception ex)
         {
-            await InitializeAsync();
-
-            if (_settings != null && _settings.TryGetValue(key, out var obj))
-            {
-                return await Json.ToObjectAsync<T>((string)obj);
-            }
+            Debug.WriteLine($"exception: {ex}");
+            throw;
         }
 
-        return default;
     }
 
     public async Task SaveSettingAsync<T>(string key, T value)

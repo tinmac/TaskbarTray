@@ -16,7 +16,6 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <!--<StackPanel Margin="20">
-        <TextBlock Style="{ThemeResource TitleLargeTextBlockStyle}" Text="Main Window" />
-    </StackPanel>-->
+    <Grid x:Name="main_grid" Loaded="main_grid_Loaded" />
+    
 </winex:WindowEx>

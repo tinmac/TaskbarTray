@@ -76,6 +76,7 @@ namespace TaskbarTray.Views
                     break;
 
             }
+
         }
 
     }
