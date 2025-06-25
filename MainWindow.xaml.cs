@@ -116,10 +116,9 @@ namespace TaskbarTray
         {
             try
             {
-
                 // PersistenceId - WONT WORK if App is Unpackaged
                 //
-                // so we use T10's FIleService which saves for Packaged or Unpackaged
+                // so we use T10's FileService which saves for Packaged or Unpackaged
                 //
                 var winData = await _settingsService.GetWindowDataAsync();
 

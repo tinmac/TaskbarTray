@@ -2,15 +2,24 @@
 =====
 
 
-More notes...
+More notes....
 
 
 Todo
 ----
-- Save position and size
+Service wont start manuallly
+Settins Start Service button doens not work - maybe because of the above error??
 
-- ADD: If user changes the power plan, then the app should update the current plan to reflect the changes.
-- Why isnt WindowEx persisting window size? No idea :-/
+- Startup
+  - Add Menu options - use top of this chat to do it: https://chatgpt.com/c/684bbc8b-f040-800e-b905-d61d02c3d439
+	- Add to startup
+	- Remove from startup
+
+- Add Sensor Service, do it via the app so that it can be started/stopped via the app.
+
+
+- ADD: Ask ChatGPT: If user changes the power plan in Windows control panel, then the app should update the current plan to reflect the changes.
+
 
 
 Extra Features
@@ -89,3 +98,30 @@ Attributes:
 https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
 
 
+
+
+Instlling the Service
+=====================
+Installing from PowerScript
+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+
+Get-Service -Name SensorService_Labs
+Start-Service -Name SensorService_Labs
+Stop-Service -Name SensorService_Labs
+sc.exe delete "SensorService_Labs"
+
+
+
+sc.exe config SensorService_Labs obj= LocalSystem
+Restart-Service -Name SensorService_Labs
+
+
+
+Install manually in PS 
+- Open PS as Admin in the folde where install-service.ps1 is located
+- type: .\install-service.ps1
+
+
+CURRENTLY
+- Getting the worker to outout to the log file AND listen for the pipe connection, see ChatGPT

@@ -12,26 +12,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using TaskbarTray.ViewModels;
+using TaskbarTray.Sensor;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace TaskbarTray.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class Sensors : Page
     {
         private readonly ILogger<Sensors> _logr;
 
         public TaskbarIcon TrayIcon { get; set; }
 
-        public SensorsViewModel ViewModel { get; }// = new TrayIconVM();
-
+        public SensorsViewModel ViewModel { get; }
 
         public Sensors()
         {
@@ -41,6 +35,7 @@ namespace TaskbarTray.Views
 
             ViewModel = Ioc.Default.GetRequiredService<SensorsViewModel>();
 
+            ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         }
     }
 }

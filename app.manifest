@@ -2,6 +2,25 @@
 <assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
   <assemblyIdentity version="1.0.0.0" name="TaskbarTray.app"/>
 
+	<!-- 
+	
+		Added with ChatGPT's help to run as Admin so Libre Hardware Dll can access Sensors 
+	
+		This method isnt the best though as you cant put an app that needs admin in the Startup Folder
+		
+		So a beeter way is to start the app as usual and then prompt user to raise to Admin when they access Sensors page
+		
+		Its not ideal - Is there a btter way? 
+		- Can we get Sensors info without Admin rights?
+	-->
+	<!--<trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+		<security>
+			<requestedPrivileges>
+				<requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
+			</requestedPrivileges>
+		</security>
+	</trustInfo>-->
+
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
       <!-- The ID below informs the system that this application is compatible with OS features first introduced in Windows 10. 

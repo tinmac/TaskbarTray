@@ -3,8 +3,8 @@
     x:Class="TaskbarTray.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:TaskbarTray"
-    xmlns:ms_cv="using:CommunityToolkit.WinUI.Converters">
+    xmlns:ms_cv="using:CommunityToolkit.WinUI.Converters"
+    xmlns:my_cv="using:TaskbarTray.Converters">
     <Application.Resources>
         <ResourceDictionary>
 
@@ -58,7 +58,7 @@
                 FalseValue="Visible"
                 TrueValue="Collapsed" />
 
-
+            <!--<my_cv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />-->
 
 
         </ResourceDictionary>

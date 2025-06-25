@@ -30,7 +30,7 @@
             <!--<TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}" />-->
 
             <StackPanel Margin="10">
-                <TextBlock />
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Theme" />
 
                 <StackPanel>
                     <RadioButton
@@ -64,7 +64,26 @@
                         </RadioButton.CommandParameter>
                     </RadioButton>
                 </StackPanel>
+
             </StackPanel>
+
+            <StackPanel Margin="10">
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Sensors Service" />
+
+                <Button
+                    Command="{x:Bind ViewModel.StartSensorServiceCommand}"
+                    Content="Start Sensor Service"
+                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
+
+                <Button
+                    Command="{x:Bind ViewModel.StopSensorServiceCommand}"
+                    Content="Stop Sensor Service"
+                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                <TextBlock Margin="4" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
+
+            </StackPanel>
+
 
             <TextBlock
                 Margin="10"

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36121.58
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskbarTray", "TaskbarTray.csproj", "{B474C0D9-3AEB-4802-A1A4-C589BEBCE034}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SensorsWorkerService", "..\SensorsWorkerService\SensorsWorkerService.csproj", "{458546FC-3BC3-45C5-8F90-D349008E2AB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -33,6 +35,18 @@ Global
 		{B474C0D9-3AEB-4802-A1A4-C589BEBCE034}.Release|x86.ActiveCfg = Release|x86
 		{B474C0D9-3AEB-4802-A1A4-C589BEBCE034}.Release|x86.Build.0 = Release|x86
 		{B474C0D9-3AEB-4802-A1A4-C589BEBCE034}.Release|x86.Deploy.0 = Release|x86
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|x64.Build.0 = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|ARM64.Build.0 = Release|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|x64.ActiveCfg = Release|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|x64.Build.0 = Release|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{458546FC-3BC3-45C5-8F90-D349008E2AB8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

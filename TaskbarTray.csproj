@@ -1,141 +1,228 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>TaskbarTray</RootNamespace>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Platforms>x86;x64;ARM64</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
-    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
-    <UseWinUI>true</UseWinUI>
-   
-	<!--<Nullable>enable</Nullable>-->
-	  
-    <EnableMsixTooling>true</EnableMsixTooling>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>TaskbarTray</RootNamespace>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<Platforms>x86;x64;ARM64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
+		<UseWinUI>true</UseWinUI>
 
-	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<!--<Nullable>enable</Nullable>-->
 
-	<!--<LangVersion>preview</LangVersion>-->
-	  
-	  
-	<!-- 
+		<EnableMsixTooling>true</EnableMsixTooling>
+
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+
+		<!--<LangVersion>preview</LangVersion>-->
+
+
+		<!-- 
 	    Create Unpackaged App
 		
 		I believe this is required to run the app without MSIX packaging.
 	    
 		Also dont forget to choose "Unpackaged App" in the project properties (top of VS with green play icon)
 	-->
-	<WindowsPackageType>None</WindowsPackageType>
-	  
-	  
-	  
-  </PropertyGroup>
+		<WindowsPackageType>None</WindowsPackageType>
 
-  <ItemGroup>
-    <None Remove="Assets\gauge-high.ico" />
-    <None Remove="Assets\gauge.ico" />
-    <None Remove="Assets\ico\gauge-max-wh.ico" />
-    <None Remove="Assets\ico\gauge-max.ico" />
-    <None Remove="Assets\ico\gauge-min-wh.ico" />
-    <None Remove="Assets\ico\gauge-min.ico" />
-    <None Remove="Assets\ico\gauge-wh.ico" />
-    <None Remove="Assets\ico\gauge.ico" />
-    <None Remove="Assets\svg\gauge-high.svg" />
-    <None Remove="Assets\svg\gauge-low.svg" />
-    <None Remove="Assets\svg\gauge-max.svg" />
-    <None Remove="Assets\svg\gauge-min.svg" />
-    <None Remove="Assets\svg\gauge.svg" />
-    <None Remove="Views\Sensors.xaml" />
-    <None Remove="Views\Settings.xaml" />
-    <None Remove="Views\TestWindow1.xaml" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <Manifest Include="$(ApplicationManifest)" />
-  </ItemGroup>
+	</PropertyGroup>
 
-  <!--
-    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
-    Tools extension to be activated for this project even if the Windows App SDK Nuget
-    package has not yet been restored.
-  -->
-  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <ProjectCapability Include="Msix" />
-  </ItemGroup>
-  <ItemGroup>
-	  
-	  <!--using v8.3.2 (not 8.4.0) fixes MVVM Toolkit warning MVVMTK0045 -->
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-	  
-    <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
-    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
-    <!--<PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />-->
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="SkiaSharp" Version="3.119.0" />
-    <PackageReference Include="Svg.Skia" Version="3.0.3" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
-    <PackageReference Include="WinUIEx" Version="2.5.1" />
+	<ItemGroup>
+		<None Remove="Assets\gauge-high.ico" />
+		<None Remove="Assets\gauge.ico" />
+		<None Remove="Assets\ico\gauge-max-wh.ico" />
+		<None Remove="Assets\ico\gauge-max.ico" />
+		<None Remove="Assets\ico\gauge-min-wh.ico" />
+		<None Remove="Assets\ico\gauge-min.ico" />
+		<None Remove="Assets\ico\gauge-wh.ico" />
+		<None Remove="Assets\ico\gauge.ico" />
+		<None Remove="Assets\svg\gauge-high.svg" />
+		<None Remove="Assets\svg\gauge-low.svg" />
+		<None Remove="Assets\svg\gauge-max.svg" />
+		<None Remove="Assets\svg\gauge-min.svg" />
+		<None Remove="Assets\svg\gauge.svg" />
+		<None Remove="Sensor\SensorsPipeView.xaml" />
+		<None Remove="Views\Sensors.xaml" />
+		<None Remove="Views\Settings.xaml" />
+		<None Remove="Views\TestWindow1.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<COMReference Include="IWshRuntimeLibrary">
+			<WrapperTool>tlbimp</WrapperTool>
+			<VersionMinor>0</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\SplashScreen.scale-200.png" />
+		<Content Include="Assets\LockScreenLogo.scale-200.png" />
+		<Content Include="Assets\Square150x150Logo.scale-200.png" />
+		<Content Include="Assets\Square44x44Logo.scale-200.png" />
+		<Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+		<Content Include="Assets\StoreLogo.png" />
+		<Content Include="Assets\Wide310x150Logo.scale-200.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<!--
+		The BUG:
+		All those files & Dll's you had to make sure were in SensorsWorkerService output folder 
+		You also need to make sure they are also in the TaskbarTray output folder as thats were the Winui app installs from
+	-->
+
+	<!--<ItemGroup>
+
+		--><!-- 
+			Copy SensorsWorkerService.exe to TaskbarTray output,  
+		--><!--
+		<Content Include="..\SensorsWorkerService\bin\$(Configuration)\net8.0\SensorsWorkerService.exe">
+			<Link>SensorsWorkerService.exe</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+		--><!-- 
+			Copy install-service.ps1 from scripts folder to TaskbarTray output
+		--><!--
+		<Content Include="scripts\install-service.ps1">
+			<Link>install-service.ps1</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
+	</ItemGroup>-->
+
+	<!-- 	
+		Add this to also copy install-service.ps1 to the SensorsWorkerService output folder
+	-->
+	<!--<Target Name="CopyInstallScriptToServiceBin" AfterTargets="Build">
+		<Copy SourceFiles="scripts\install-service.ps1" DestinationFolder="..\SensorsWorkerService\bin\$(Configuration)\net8.0" SkipUnchangedFiles="true" />
+	</Target>-->
+
+
+
+	<!--
+		Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+		Tools extension to be activated for this project even if the Windows App SDK Nuget
+		package has not yet been restored.
+	 -->
+	<ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<ProjectCapability Include="Msix" />
+	</ItemGroup>
 	
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\TestWindow1.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Editor\" />
-    <Folder Include="Models\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="LibreHardwareMonitorLib">
-      <HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Settings.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="Views\Sensors.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
 
-  <!--
+		<!--using v8.3.2 (not 8.4.0) fixes MVVM Toolkit warning MVVMTK0045 -->
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+
+		<PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.2.250402" />
+		<PackageReference Include="H.NotifyIcon.WinUI" Version="2.3.0" />
+
+		<PackageReference Include="LiveChartsCore.SkiaSharpView.WinUI" Version="2.0.0-rc5.3" />
+		
+		<!--Not sure about these two, will leave here for now until I get service installing vai Winui app-->
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4188" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250513003" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="SkiaSharp" Version="3.119.0" />
+		<PackageReference Include="Svg.Skia" Version="3.0.3" />
+		<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
+		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
+		<PackageReference Include="WinUIEx" Version="2.5.1" />
+
+		<!-- 
+			Needed for LibreHardwareMonitorLib service to work properly
+		-->
+		<!--<PackageReference Include="System.Management" Version="8.0.0" />
+		<PackageReference Include="System.IO.Ports" Version="8.0.0" />
+		<PackageReference Include="HidSharp" Version="2.1.0" />-->
+
+	</ItemGroup>
+
+	
+	<ItemGroup>
+		<!-- 1. Copy the entire SensorsWorkerService debug output into a 'Service' folder -->
+		<None Include="..\SensorsWorkerService\bin\Debug\net8.0\**\*">
+			<Link>Service\%(RecursiveDir)%(Filename)%(Extension)</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+
+		<!-- 2. Copy install-service.ps1 from the root of TaskbarTray into the output -->		
+		<Content Include="install-service.ps1">
+			<Link>install-service.ps1</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<Page Update="Views\TestWindow1.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="LibreHardwareMonitorLib">
+			<HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
+			<Private>True</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="install-service.ps1">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Sensor\SensorsPipeView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Views\Settings.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="Views\Sensors.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+	<ItemGroup>
+		<Page Update="MainWindow.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<!--
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
     Explorer "Package and Publish" context menu entry to be enabled for this project even if
     the Windows App SDK Nuget package has not yet been restored.
   -->
-  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
-    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+		<HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+	</PropertyGroup>
 
-  <!-- Publish Properties -->
-  <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-  </PropertyGroup>
+	<!-- Publish Properties -->
+	<PropertyGroup>
+		<PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+		<PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
+		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+	</PropertyGroup>
 </Project>

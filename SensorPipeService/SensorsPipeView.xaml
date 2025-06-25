@@ -1,0 +1,56 @@
+<Page
+    x:Class="TaskbarTray.SensorPipeService.SensorsPipeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"
+    x:Name="PageRoot">
+
+    <Grid Padding="20" RowSpacing="12">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+
+
+        
+        <!--  CPU Temperatures Header  -->
+        <TextBlock
+            Grid.Row="1"
+            FontSize="24"
+            FontWeight="Bold"
+            Text="CPU Temperatures" />
+
+        <!--  CPU Temperatures Bar Chart  -->
+        <lvc:CartesianChart
+            Grid.Row="1"
+            Margin="0 30 0 0"
+            DrawMarginFrame="{x:Bind ViewModel.DrawMarginFrame, Mode=OneWay}"
+            LegendPosition="Right"
+            Series="{x:Bind ViewModel.TemperatureSeries, Mode=OneWay}"
+            XAxes="{x:Bind ViewModel.XAxes, Mode=OneWay}"
+            YAxes="{x:Bind ViewModel.YAxes, Mode=OneWay}"
+            ZoomMode="None" />
+
+        <!--  Fan Speeds Header  -->
+        <TextBlock
+            Grid.Row="2"
+            Margin="0 20 0 0"
+            FontSize="24"
+            FontWeight="Bold"
+            Text="Fan Speeds (RPM)" />
+
+        <!--  Fan Speeds Bar Chart  -->
+        <!--<lvc:CartesianChart
+            Grid.Row="3"
+            DrawMarginFrame="{x:Bind ViewModel.DrawMarginFrame, Mode=OneWay}"
+            LegendPosition="Right"
+            Series="{x:Bind ViewModel.FanSeries, Mode=OneWay}"
+            XAxes="{x:Bind ViewModel.FanXAxes, Mode=OneWay}"
+            YAxes="{x:Bind ViewModel.FanYAxes, Mode=OneWay}"
+            ZoomMode="None" />-->
+
+    </Grid>
+</Page>

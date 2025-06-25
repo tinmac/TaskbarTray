@@ -15,6 +15,8 @@ using Windows.Storage;
 using WinUIEx;
 using TaskbarTray.Persistance;
 using System.Threading.Tasks;
+using TaskbarTray.Sensor;
+using TaskbarTray.SensorPipeService;
 
 
 namespace TaskbarTray;
@@ -109,8 +111,12 @@ public sealed partial class App : Application
         // Views and ViewModels
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<Settings>();
+     
         services.AddTransient<SensorsViewModel>();
         services.AddTransient<Sensors>();
+
+        services.AddTransient<SensorsPipeViewModel>();
+        services.AddTransient<SensorsPipeView>();
 
 
         var svcs = services.BuildServiceProvider();
@@ -128,6 +134,10 @@ public sealed partial class App : Application
             // Execute tasks before activation.
             // Get Theme
             await _themeSelectorService.GetThemeAsync();
+
+
+            // Pipe Service Worker Check
+            await ServiceInstallerHelper.RunInstallScriptIfNeededAsync();
 
 
 
@@ -191,7 +201,9 @@ public sealed partial class App : Application
             // Set Theme 
             await _themeSelectorService.SetRequestedThemeAsync();
             await Task.CompletedTask;
-        
+
+
+
         }
         catch (Exception ex)
         {
