@@ -49,7 +49,7 @@ namespace TaskbarTray.Sensor
         {
             Task.Run(async () =>
             {
-                Debug.WriteLine($"Cpu Temp monitoring begun...");
+                _logr.LogInformation($"Cpu Temp monitoring begun...");
                 while (true)
                 {
                     try
@@ -58,7 +58,7 @@ namespace TaskbarTray.Sensor
 
                         if (temp == null)
                         {
-                            Debug.WriteLine($"temp is null");
+                            _logr.LogInformation($"temp is null");
                         }
 
                         if (temp.HasValue && TheDispatcher != null)
@@ -66,7 +66,7 @@ namespace TaskbarTray.Sensor
                             TheDispatcher.TryEnqueue(() =>
                             {
                                 TempCpu = $"{temp.Value:F1} °C";
-                                Debug.WriteLine($"Temp {temp.Value:F1} °C");
+                                _logr.LogInformation($"Temp {temp.Value:F1} °C");
                             });
                         }
                     }

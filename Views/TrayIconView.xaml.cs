@@ -50,7 +50,7 @@ public sealed partial class TrayIconView : UserControl
 
         #endregion
 
-        Debug.WriteLine($"Right Tapped called...");
+        _logr.LogInformation($"Right Tapped called...");
 
         var flyout = new MenuFlyout();
 
@@ -118,7 +118,7 @@ public sealed partial class TrayIconView : UserControl
     //[RelayCommand]
     private void MyMenuFlyout_Closing(FlyoutBase sender, FlyoutBaseClosingEventArgs args)
     {
-        Debug.WriteLine($"Flyout Closing called..."); // this is not beoing called when the flyout is closed!
+        _logr.LogInformation($"Flyout Closing called..."); // this is not beoing called when the flyout is closed!
 
         args.Cancel = true; // Can we prevent the flyout from closing?
     }

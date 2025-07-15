@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,7 +36,7 @@ public static class ElevationHelper
         catch (System.ComponentModel.Win32Exception ex)
         {
             // User canceled UAC prompt
-            Debug.WriteLine("User canceled admin prompt: " + ex.Message);
+            Log.Warning("User canceled admin prompt: " + ex.Message);
         }
     }
 }

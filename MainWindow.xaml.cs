@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -59,7 +60,7 @@ namespace TaskbarTray
 
                     WindowsData saveWinData = new WindowsData { Width = this.Width, Height = this.Height, X = position.X, Y = position.Y };
 
-                    Debug.WriteLine($"Saving X [{saveWinData.X}]  Y [{saveWinData.Y}]  W [{saveWinData.Width}]  H [{saveWinData.Height}]");
+                    Log.Information($"Saving X [{saveWinData.X}]  Y [{saveWinData.Y}]  W [{saveWinData.Width}]  H [{saveWinData.Height}]");
 
 
 
@@ -78,7 +79,7 @@ namespace TaskbarTray
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error in MainWindow ctor: {ex}");
+                Log.Error($"❌ Error in MainWindow ctor: {ex}");
                 throw;
             }
 
@@ -96,7 +97,7 @@ namespace TaskbarTray
             {
                 var winData = await _settingsService.GetWindowDataAsync();
 
-                Debug.WriteLine($"Window loaded: {winData.Width}x{winData.Height} at ({winData.X},{winData.Y})");
+                Log.Information($"Window loaded: {winData.Width}x{winData.Height} at ({winData.X},{winData.Y})");
 
                 // Optionally set size/position
                 this.MoveAndResize(winData.X, winData.Y, winData.Width, winData.Height);
@@ -107,7 +108,7 @@ namespace TaskbarTray
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"❌ Error restoring window position: {ex}");
+                Log.Error($"❌ Error restoring window position: {ex}");
                 throw;
             }
         }
@@ -126,12 +127,12 @@ namespace TaskbarTray
                 {
                     // Not saved so eithe rfirst run or data deleted, so window will use defaults
 
-                    Debug.WriteLine($"winData NULL");
+                    Log.Information($"winData NULL");
                 }
                 else
                 {
                     // Apply  
-                    Debug.WriteLine($"Window loaded: {winData.Width}x{winData.Height} at ({winData.X},{winData.Y})");
+                    Log.Information($"Window loaded: {winData.Width}x{winData.Height} at ({winData.X},{winData.Y})");
                     this.MoveAndResize(winData.X, winData.Y, winData.Width, winData.Height);
                 }
 
@@ -146,7 +147,7 @@ namespace TaskbarTray
 
             catch (Exception ex)
             {
-                Debug.WriteLine($"exception: {ex}");
+                Log.Error($"exception: {ex}");
                 throw;
             }
         }

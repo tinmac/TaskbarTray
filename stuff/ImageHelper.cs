@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using Serilog;
 using SkiaSharp;
 using Svg.Skia;
 using System;
@@ -11,22 +12,6 @@ using System.IO;
 
 namespace TaskbarTray.stuff;
 
-//{
-//  Debug.WriteLine($"SVG file not found:  {svgPath}");
-//  throw new FileNotFoundException("SVG file not found.", svgPath);
-//}
-
-//   Debug.WriteLine($"\nConverting svg to ico... {svgPath}");
-
-//   Debug.WriteLine($"saving ico... {icoOutputPath}");
-
-//            }
-//            catch (Exception ex)
-//            {
-//                Debug.WriteLine($"exception: {ex}");
-//throw;
-//            }
-
 
 public static class ImageHelper
 {
@@ -34,11 +19,11 @@ public static class ImageHelper
     {
         if (!File.Exists(svgPath))
         {
-            Debug.WriteLine($"SVG file not found:  {svgPath}");
+            Log.Error($"SVG file not found:  {svgPath}");
             throw new FileNotFoundException("SVG file not found.", svgPath);
         }
 
-        Debug.WriteLine($"\nConverting svg to ico... {svgPath}");
+        Log.Information($"\nConverting svg to ico... {svgPath}");
 
         var svg = new SKSvg();
         using var svgStream = File.OpenRead(svgPath);
@@ -72,7 +57,7 @@ public static class ImageHelper
         using var ms = new MemoryStream(data.ToArray());
         using var bmp = new Bitmap(ms);
 
-        Debug.WriteLine($"saving ico... {icoOutputPath}");
+        Log.Information($"saving ico... {icoOutputPath}");
         SaveBitmapAsIco(bmp, icoOutputPath);
     }
 

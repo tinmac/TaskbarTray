@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Threading;
@@ -7,8 +8,9 @@ using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
+using Microsoft.Win32;
 using TaskbarTray.Persistance;
 using TaskbarTray.Services;
 using TaskbarTray.stuff;
@@ -18,6 +20,8 @@ namespace TaskbarTray.ViewModels;
 
 public partial class SettingsViewModel : ObservableRecipient
 {
+    private readonly ILogger<SettingsViewModel> _logr;
+
     [ObservableProperty] private bool serviceIsRunning;
     private const string ServiceName = "SensorService_Labs";
 
@@ -34,21 +38,55 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public ICommand SwitchThemeCommand { get; }
 
-    public SettingsViewModel(ISettingsService themeSelectorService)
+
+    // Detect if app is MSIX packaged
+    private static bool IsPackaged;
+
+
+
+    // For start/stop when Windows starts
+    private const string AppName = "LLabsPowerSwitch"; // For registry value
+    private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    private const string StartupTaskId = "StartMyApp"; // For MSIX manifest
+
+    private bool _startWithWindows;
+    public bool StartWithWindows
     {
+        get => _startWithWindows;
+        set
+        {
+            if (SetProperty(ref _startWithWindows, value))
+            {
+                _ = ApplyStartupSettingAsync(value);
+            }
+        }
+    }
+
+    public SettingsViewModel(ISettingsService themeSelectorService, ILogger<SettingsViewModel> logr)
+    {
+        _logr = logr;
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
+
+        _logr.LogInformation("SettingsViewModel initialized. Theme: {Theme}, Version: {Version}", _elementTheme, _versionDescription);
+
+        IsPackaged = Package.Current?.Id?.Name != null;
+        _logr.LogInformation($"IsPackaged: {IsPackaged}");
 
         SwitchThemeCommand = new RelayCommand<ElementTheme>(
             async (param) =>
             {
                 if (ElementTheme != param)
                 {
+                    _logr.LogInformation("SwitchThemeCommand invoked. Changing theme from {OldTheme} to {NewTheme}", ElementTheme, param);
                     ElementTheme = param;
                     await _themeSelectorService.SetThemeAsync(param);
+                    _logr.LogInformation("Theme changed to {Theme}", param);
                 }
             });
+
+        _ = LoadStartupStateAsync();
 
         UpdateServiceStatus();
     }
@@ -56,27 +94,39 @@ public partial class SettingsViewModel : ObservableRecipient
     [RelayCommand]
     private void StartSensorService()
     {
+        _logr.LogInformation("Attempting to start service: {ServiceName}", ServiceName);
         using var sc = new ServiceController(ServiceName);
         if (sc.Status != ServiceControllerStatus.Running)
         {
             sc.Start();
             sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
+            _logr.LogInformation("Service {ServiceName} started.", ServiceName);
+        }
+        else
+        {
+            _logr.LogInformation("Service {ServiceName} was already running.", ServiceName);
         }
         ServiceIsRunning = true;
-        ServiceStatusText = "Sensor service is running.";
+        ServiceStatusText = "Running";
     }
 
     [RelayCommand]
     private void StopSensorService()
     {
+        _logr.LogInformation("Attempting to stop service: {ServiceName}", ServiceName);
         using var sc = new ServiceController(ServiceName);
         if (sc.Status == ServiceControllerStatus.Running)
         {
             sc.Stop();
             sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+            _logr.LogInformation("Service {ServiceName} stopped.", ServiceName);
+        }
+        else
+        {
+            _logr.LogInformation("Service {ServiceName} was already stopped.", ServiceName);
         }
         ServiceIsRunning = false;
-        ServiceStatusText = "Sensor service is stopped.";
+        ServiceStatusText = "Stopped";
     }
 
     private static string GetVersionDescription()
@@ -105,16 +155,119 @@ public partial class SettingsViewModel : ObservableRecipient
             {
                 using var sc = new ServiceController(ServiceName);
                 ServiceIsRunning = sc.Status == ServiceControllerStatus.Running;
-                ServiceStatusText = ServiceIsRunning ? "Sensor service is running." : "Sensor service is stopped.";
+                ServiceStatusText = ServiceIsRunning ? "Running" : "Stopped";
+                _logr.LogInformation("Checked service status: {Status}", ServiceStatusText);
                 return;
             }
-            catch
+            catch (Exception ex)
             {
+                _logr.LogWarning(ex, "Failed to check service status on attempt {Attempt}", attempt + 1);
                 await Task.Delay(1000); // wait and retry
             }
         }
 
         ServiceIsRunning = false;
-        ServiceStatusText = "Sensor service not installed.";
+        ServiceStatusText = "Not installed.";
+        _logr.LogError("Service {ServiceName} not installed or could not be queried after {MaxAttempts} attempts.", ServiceName, maxAttempts);
+    }
+
+
+
+    private async Task LoadStartupStateAsync()
+    {
+        if (IsPackaged)
+        {
+            _logr.LogInformation("IsPackaged: true, using StartupTask API.");
+
+            try
+            {
+                var task = await StartupTask.GetAsync(StartupTaskId);
+                StartWithWindows = task.State == StartupTaskState.Enabled;
+                _logr.LogInformation("Startup task state: {State}", task.State);
+            }
+            catch (Exception ex)
+            {
+                StartWithWindows = false;
+                _logr.LogError(ex, "Failed to retrieve startup task state.");
+            }
+        }
+        else
+        {
+            _logr.LogInformation("IsPackaged: false, using registry method.");
+
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RunKey);
+                var exePath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
+                var currentValue = key?.GetValue(AppName) as string;
+                StartWithWindows = string.Equals(currentValue, exePath, StringComparison.OrdinalIgnoreCase);
+                _logr.LogInformation("Registry startup value: {Value}, StartWithWindows: {StartWithWindows}", currentValue, StartWithWindows);
+            }
+            catch (Exception ex)
+            {
+                StartWithWindows = false;
+                _logr.LogError(ex, "Failed to check registry for startup value.");
+            }
+        }
+    }
+
+    private async Task ApplyStartupSettingAsync(bool enable)
+    {
+        if (IsPackaged)
+        {
+            try
+            {
+                var task = await StartupTask.GetAsync(StartupTaskId);
+
+                if (enable)
+                {
+                    if (task.State == StartupTaskState.Disabled)
+                    {
+                        var result = await task.RequestEnableAsync();
+                        StartWithWindows = result == StartupTaskState.Enabled;
+                        _logr.LogInformation("Requested enable startup task. Result: {Result}", result);
+                    }
+                }
+                else
+                {
+                    if (task.State == StartupTaskState.Enabled ||
+                        task.State == StartupTaskState.DisabledByUser)
+                    {
+                        task.Disable(); // No prompt, effective immediately
+                        StartWithWindows = false;
+                        _logr.LogInformation("Startup task disabled.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Failed to set startup task state for MSIX packaged app (StartupTask API)");
+            }
+        }
+        else
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+                var exePath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
+
+                if (enable)
+                {
+                    key.SetValue(AppName, exePath);
+                    _logr.LogInformation("Set registry value for startup: {ExePath}", exePath);
+                }
+                else
+                {
+                    key.DeleteValue(AppName, false);
+                    _logr.LogInformation("Removed registry value for startup.");
+                }
+
+                StartWithWindows = enable;
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Failed to set startup task state for non-MSIX packaged app (Registry method)");
+            }
+        }
     }
 }

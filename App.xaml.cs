@@ -129,11 +129,11 @@ public sealed partial class App : Application
     {
         try
         {
-            var _themeSelectorService = ServiceProvider.GetRequiredService<ISettingsService>();
+            var _settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
 
             // Execute tasks before activation.
             // Get Theme
-            await _themeSelectorService.GetThemeAsync();
+            await _settingsService.GetThemeAsync();
 
 
             // Pipe Service Worker Check
@@ -186,6 +186,11 @@ public sealed partial class App : Application
             bool isLight = WindowsThemeChangedDetector.IsSystemInLightMode();
             _logr.LogInformation($"Loaded TaskBar theme:  {(isLight ? "Light" : "Dark")}");
 
+            // Initially set tray icons colour detected at startup 
+            //
+            WeakReferenceMessenger.Default.Send(new MyMessage { ThemeChanged_Light = isLight });
+
+
             // Start watching for changes
             WindowsThemeChangedDetector.SystemThemeChanged += isLightMode =>
             {
@@ -199,7 +204,7 @@ public sealed partial class App : Application
             WindowsThemeChangedDetector.StartMonitoring();
 
             // Set Theme 
-            await _themeSelectorService.SetRequestedThemeAsync();
+            await _settingsService.SetRequestedThemeAsync();
             await Task.CompletedTask;
 
 

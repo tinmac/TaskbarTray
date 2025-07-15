@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -13,7 +14,6 @@ public static class Json
         {
             try
             {
-                Debug.WriteLine($"ToObjectAsync {value}");
                 var ret = JsonConvert.DeserializeObject<T>(value);
 
                 if(ret != null) 
@@ -23,8 +23,8 @@ public static class Json
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Json Deserialization error: {ex.Message}");
-                Debug.WriteLine(value);
+                Log.Error(ex, $"Json Deserialization error on value [{value}]: ", ex.Message);
+
                 throw;
             }
         });

@@ -17,6 +17,8 @@ using TaskbarTray.Models;
 
 using LiveChartsCore.Kernel;
 using TaskbarTray;
+using System.Diagnostics;
+using ExCSS;
 
 
 public partial class SensorsPipeViewModel : ObservableObject
@@ -38,7 +40,7 @@ public partial class SensorsPipeViewModel : ObservableObject
     private readonly float[] _packageTempValues = new float[1];
     private readonly float[] _fanSpeedValues = new float[1];
 
-    public float TemperatureMax { get; } = 120f;
+    public float TemperatureMax { get; } = 110f;
 
     public SensorsPipeViewModel()
     {
@@ -106,6 +108,7 @@ public partial class SensorsPipeViewModel : ObservableObject
 
     private async Task ReceiveSensorUpdates()
     {
+        bool output_shown_once = false;
         while (true)
         {
             try
@@ -124,12 +127,23 @@ public partial class SensorsPipeViewModel : ObservableObject
 
                     App.Main_Window.DispatcherQueue.TryEnqueue(() =>
                     {
+                        if(output_shown_once == false)
+                            Debug.WriteLine($"\nReadings...");
+                        
                         foreach (var r in readings)
                         {
                             var list = _sensorHistory.GetOrAdd(r.Name, _ => new());
                             list.Add((r.Timestamp, r.Value));
                             if (list.Count > 50) list.RemoveAt(0);
+
+                            if (output_shown_once == false)
+                            {
+                                string line = $"\n{r.Timestamp:HH:mm:ss} [{r.Category}] {r.Name}: {r.Value}";
+                                Debug.WriteLine($"{line}");
+                            }
                         }
+
+                        output_shown_once = true;
 
                         UpdateChartData();
                     });

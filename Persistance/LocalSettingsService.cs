@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -64,17 +65,16 @@ public class LocalSettingsService : ILocalSettingsService
                 if (_settings != null && _settings.TryGetValue(key, out var obj))
                 {
                     var strObj = (string)obj;
-                    Debug.WriteLine($"\nkey {key}  out {strObj}");
 
                     var ret = await Json.ToObjectAsync<T>(strObj);
-
-                    Debug.WriteLine($"ret {ret.ToString()}");
 
                     return ret;
                 }
                 else
                 {
-                    Debug.WriteLine($"Failed to get Key {key}");
+                    Log.Warning($"Failed to get Key {key} from LocalSettingsService. Settings: {Json.StringifyAsync(_settings)}");
+
+                    return default;
                 }
             }
 
@@ -82,7 +82,7 @@ public class LocalSettingsService : ILocalSettingsService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"exception: {ex}");
+            Log.Error($"exception: {ex}");
             throw;
         }
 

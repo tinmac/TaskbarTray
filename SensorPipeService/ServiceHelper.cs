@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.ServiceProcess;
 using System.Diagnostics;
 using System.IO;
+using Serilog;
 
 namespace TaskbarTray.SensorPipeService;
 
@@ -22,14 +23,14 @@ public static class ServiceInstallerHelper
 
         if (isInstalled)
         {
-            Debug.WriteLine($"{ServiceName} is already installed.");
+            Log.Information($"{ServiceName} is already installed.");
             return;  
         }
 
         string scriptPath = Path.Combine(AppContext.BaseDirectory, "install-service.ps1");
         if (!File.Exists(scriptPath))
         {
-            Debug.WriteLine($"❌ install-service.ps1 not found at: {scriptPath}");
+            Log.Error($"❌ install-service.ps1 not found at: {scriptPath}");
             return;
         }
 
@@ -44,22 +45,22 @@ public static class ServiceInstallerHelper
         try
         {
             Process.Start(psi);
-            Debug.WriteLine("ℹ️ install-service.ps1 launched, waiting for service to be installed...");
+            Log.Information("ℹ️ install-service.ps1 launched, waiting for service to be installed...");
 
             bool appeared = await WaitForServiceInstallationAsync(ServiceName, WaitForInstallTimeoutSeconds);
             if (appeared)
             {
                 var sc = new ServiceController(ServiceName);
-                Debug.WriteLine($"✅ {ServiceName} installed, status: {sc.Status}");
+                Log.Information($"✅ {ServiceName} installed, status: {sc.Status}");
             }
             else
             {
-                Debug.WriteLine($"⚠️ Timeout: {ServiceName} not detected after {WaitForInstallTimeoutSeconds} seconds.");
+                Log.Error($"⚠️ Timeout: {ServiceName} not detected after {WaitForInstallTimeoutSeconds} seconds.");
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"❌ Failed to run install-service.ps1: {ex.Message}");
+            Log.Error($"❌ Failed to run install-service.ps1: {ex.Message}");
         }
     }
 

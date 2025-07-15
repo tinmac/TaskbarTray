@@ -37,7 +37,7 @@ namespace TaskbarTray.Views
 
         private void OnThemeChanged(ElementTheme theme)
         {
-            Debug.WriteLine($"Theme changed to: {theme}");
+            Serilog.Log.Information($"Theme changed to: {theme}");
             // Apply theme-specific logic here
         }
     }

@@ -2,21 +2,12 @@
 =====
 
 
-More notes....
-
-
 Todo
 ----
-Service wont start manuallly
-Settins Start Service button doens not work - maybe because of the above error??
 
 - Startup
   - Add Menu options - use top of this chat to do it: https://chatgpt.com/c/684bbc8b-f040-800e-b905-d61d02c3d439
-	- Add to startup
-	- Remove from startup
-
-- Add Sensor Service, do it via the app so that it can be started/stopped via the app.
-
+	- Startup when windows starts On/Off
 
 - ADD: Ask ChatGPT: If user changes the power plan in Windows control panel, then the app should update the current plan to reflect the changes.
 

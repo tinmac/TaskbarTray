@@ -24,11 +24,9 @@ public class BoolToImageSourceConverter : IValueConverter
         if (value is BitmapImage)
         {
             var ret = value == TrueImage ? true : false;
-           // Debug.WriteLine($"TrueImage {ret}");
             return ret;
         }
 
-       // Debug.WriteLine($"Not a bitmap");
         return false;
 
         //throw new NotImplementedException();

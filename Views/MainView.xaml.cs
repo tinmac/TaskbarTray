@@ -57,7 +57,6 @@ namespace TaskbarTray.Views
 
 
             var invokedItem = (string)args.InvokedItem;
-            Debug.WriteLine($"Invoked {invokedItem}");
 
             switch (invokedItem)
             {

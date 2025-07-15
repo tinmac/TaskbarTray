@@ -1,6 +1,8 @@
 ﻿global using H.NotifyIcon;
 global using H.NotifyIcon.Core;
 
+//global using Serilog;
+
 global using Microsoft.UI.Xaml;
 global using Microsoft.UI.Xaml.Controls;
 global using Microsoft.UI.Xaml.Controls.Primitives;

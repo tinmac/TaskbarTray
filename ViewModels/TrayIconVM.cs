@@ -75,9 +75,11 @@ namespace TaskbarTray.ViewModels
 
 
         // Constructor
-        public TrayIconVM()
+        public TrayIconVM(ILogger<TrayIconVM> logr)
         {
-            _logr = Ioc.Default.GetRequiredService<ILogger<TrayIconVM>>();
+            _logr = logr;
+
+            //_logr = Ioc.Default.GetRequiredService<ILogger<TrayIconVM>>();
 
             SelectedImage = new BitmapImage(new Uri("ms-appx:///Assets/ico/gauge.ico")); // Default icon
             ActiveScheme = new PowerPlan();
@@ -123,7 +125,7 @@ namespace TaskbarTray.ViewModels
 
             //App.Messenger.Register<TrayIconVM, MyMessage, string>(this, "MyToken", (recipient, message) =>
             //{
-            //    Debug.WriteLine($"Rx CloseMainWin: {message.Content}");
+            //    Log.Information($"Rx CloseMainWin: {message.Content}");
 
             //    Show_OpenWindowMenuItem = true;
             //});
@@ -131,7 +133,7 @@ namespace TaskbarTray.ViewModels
             //App.Messenger.Register<TrayIconVM, Msg_CloseMainWin, string>(this, string.Empty, (recipient, message) =>
             //{
             //    // Handle the message  
-            //    Debug.WriteLine($"Rx CloseMainWin: {message.CloseMainWin}");
+            //    Log.Information($"Rx CloseMainWin: {message.CloseMainWin}");
 
             //    Show_OpenWindowMenuItem = true;
             //});
@@ -249,11 +251,11 @@ namespace TaskbarTray.ViewModels
         {
             var PowerMode = Schene.PowerMode;
 
-            Debug.WriteLine($"Active PowerMode {PowerMode}");
+            _logr.LogInformation($"Active PowerMode {PowerMode}");
 
             if (PowerMode == PowerMode.None)
             {
-                Debug.WriteLine($"PowerMode is None, returning null image.");
+                _logr.LogInformation($"PowerMode is None, returning null image.");
                 return null; // No image for None mode
             }
 
@@ -446,7 +448,7 @@ namespace TaskbarTray.ViewModels
                     IsBalancedChecked = false;
                     IsHighChecked = false; // No known plan is active
 
-                    Debug.WriteLine($"No known plan!");
+                    _logr.LogInformation($"No known plan!");
                 }
 
                 GetBatteryPercentage();

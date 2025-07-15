@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace TaskbarTray.Converters
 
             var ret = selected == target ? Visibility.Visible : Visibility.Collapsed;
 
-            Debug.WriteLine($"value {value}  target {target}  return {ret}");
+            //Log.Information($"value {value}  target {target}  return {ret}");
             
             return ret;
         }

@@ -48,4 +48,15 @@
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
+
+	
+	<Extensions>
+		<Extension Category="windows.startupTask">
+			<StartupTask
+			  TaskId="StartMyApp"
+			  Enabled="false"
+			  DisplayName="Start My App with Windows" />
+		</Extension>
+	</Extensions>
+
 </Package>
