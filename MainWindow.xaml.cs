@@ -16,16 +16,16 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using TaskbarTray.Services;
-using TaskbarTray.stuff;
-using TaskbarTray.Views;
+using PowerSwitch.Services;
+using PowerSwitch.stuff;
+using PowerSwitch.Views;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using WinUIEx;
 
 
 
-namespace TaskbarTray
+namespace PowerSwitch
 {
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.

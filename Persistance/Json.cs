@@ -4,7 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public static class Json
 {

@@ -1,5 +1,5 @@
 <Page
-    x:Class="TaskbarTray.SensorPipeService.SensorsPipeView"
+    x:Class="PowerSwitch.SensorPipeService.SensorsPipeView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:lvc="using:LiveChartsCore.SkiaSharpView.WinUI"

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TaskbarTray.Converters;
+namespace PowerSwitch.Converters;
 
 public class EnumToBooleanConverter : IValueConverter
 {

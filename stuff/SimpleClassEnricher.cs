@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskbarTray.stuff
+namespace PowerSwitch.stuff
 {
     public class SimpleClassEnricher : ILogEventEnricher
     {

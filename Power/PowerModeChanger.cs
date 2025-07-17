@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace TaskbarTray.Power
+namespace PowerSwitch.Power
 {
 
     public static class PowerModeChanger

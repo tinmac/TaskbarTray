@@ -13,15 +13,14 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TaskbarTray.Models;
+using PowerSwitch.Models;
 
 using LiveChartsCore.Kernel;
-using TaskbarTray;
 using System.Diagnostics;
 using ExCSS;
 using CommunityToolkit.Mvvm.Messaging;
-using TaskbarTray.stuff;
-
+using PowerSwitch.stuff;
+using PowerSwitch; 
 
 public partial class SensorsPipeViewModel : ObservableObject
 {

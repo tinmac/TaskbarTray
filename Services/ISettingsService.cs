@@ -1,7 +1,7 @@
 ﻿//using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 
-namespace TaskbarTray.Services;
+namespace PowerSwitch.Services;
 
 public interface ISettingsService
 {

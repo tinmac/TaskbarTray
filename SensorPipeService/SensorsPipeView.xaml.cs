@@ -13,11 +13,11 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using TaskbarTray.SensorPipeService;
+using PowerSwitch.SensorPipeService;
 
 
 
-namespace TaskbarTray.SensorPipeService;
+namespace PowerSwitch.SensorPipeService;
 
 
 public sealed partial class SensorsPipeView : Page

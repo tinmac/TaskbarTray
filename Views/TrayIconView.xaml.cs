@@ -7,9 +7,9 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using TaskbarTray.ViewModels;
+using PowerSwitch.ViewModels;
 
-namespace TaskbarTray.Views;
+namespace PowerSwitch.Views;
 
 
 public sealed partial class TrayIconView : UserControl

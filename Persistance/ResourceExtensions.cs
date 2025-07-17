@@ -1,6 +1,6 @@
 ﻿using Microsoft.Windows.ApplicationModel.Resources;
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public static class ResourceExtensions
 {

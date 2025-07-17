@@ -10,7 +10,7 @@ using System.Drawing.Imaging;
 using System.IO;
 
 
-namespace TaskbarTray.stuff;
+namespace PowerSwitch.stuff;
 
 
 public static class ImageHelper

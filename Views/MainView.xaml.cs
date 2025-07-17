@@ -11,13 +11,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using TaskbarTray.SensorPipeService;
-using TaskbarTray.stuff;
+using PowerSwitch.SensorPipeService;
+using PowerSwitch.stuff;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 
-namespace TaskbarTray.Views
+namespace PowerSwitch.Views
 {
 
     public sealed partial class MainView// : Page

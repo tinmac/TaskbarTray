@@ -1,4 +1,4 @@
-﻿namespace TaskbarTray.Persistance;
+﻿namespace PowerSwitch.Persistance;
 
 public interface IFileService
 {

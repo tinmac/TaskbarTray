@@ -12,14 +12,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using TaskbarTray.Persistance;
-using TaskbarTray.Power;
-using TaskbarTray.stuff;
+using PowerSwitch.Persistance;
+using PowerSwitch.Power;
+using PowerSwitch.stuff;
 using Windows.Devices.Power;
 using Windows.Security.Isolation;
 using Windows.System.Power;
 
-namespace TaskbarTray.ViewModels
+namespace PowerSwitch.ViewModels
 {
     public enum PowerMode
     {

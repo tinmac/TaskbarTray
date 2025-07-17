@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskbarTray.Models;
+using PowerSwitch.Models;
 
-namespace TaskbarTray.stuff
+namespace PowerSwitch.stuff
 {
     public class MyMessage
     {

@@ -12,12 +12,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using TaskbarTray.Sensor;
+using PowerSwitch.Sensor;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 
-namespace TaskbarTray.Views
+namespace PowerSwitch.Views
 {
     public sealed partial class Sensors : Page
     {

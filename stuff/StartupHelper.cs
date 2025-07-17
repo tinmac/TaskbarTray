@@ -1,21 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-
-// To fix the CS0246 error, you need to add a COM reference to the "Windows Script Host Object Model" in your project.  
-// Follow these steps:  
-// 1. In Visual Studio, right-click on your project in the Solution Explorer and select "Add" -> "Reference".  
-// 2. In the Reference Manager, go to "COM" -> "Type Libraries".  
-// 3. Find and select "Windows Script Host Object Model" and click "OK".  
-
-// After adding the reference, the error should be resolved. Ensure the following using directive remains in your code:  
-
 using IWshRuntimeLibrary; // Add COM Reference to Windows Script Host Object Model
 
-namespace TaskbarTray.stuff;
+namespace PowerSwitch.stuff;
 
 public static class StartupHelper
 {

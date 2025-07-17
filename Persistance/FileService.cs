@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public class FileService : IFileService
 {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.UI.Xaml;
 using System;
 using System.Threading.Tasks;
-using TaskbarTray.Persistance;
+using PowerSwitch.Persistance;
 
-namespace TaskbarTray.Services;
+namespace PowerSwitch.Services;
 
 public class WindowsData
 {

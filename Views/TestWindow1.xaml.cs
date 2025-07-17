@@ -15,7 +15,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 
-namespace TaskbarTray.Views
+namespace PowerSwitch.Views
 {
     public sealed partial class TestWindow1 : Window
     {

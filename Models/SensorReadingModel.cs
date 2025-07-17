@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaskbarTray.Models
+namespace PowerSwitch.Models
 {
     public class SensorReading
     {

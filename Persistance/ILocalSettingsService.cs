@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public interface ILocalSettingsService
 {

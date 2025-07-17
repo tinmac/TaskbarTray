@@ -5,10 +5,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskbarTray.ViewModels;
-using TaskbarTray.Views;
+using PowerSwitch.ViewModels;
+using PowerSwitch.Views;
 
-namespace TaskbarTray.Converters
+namespace PowerSwitch.Converters
 {
 
     public class PowerModeToVisibilityConverter : IValueConverter

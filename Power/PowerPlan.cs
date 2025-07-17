@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TaskbarTray.ViewModels;
-using TaskbarTray.Views;
+using PowerSwitch.ViewModels;
+using PowerSwitch.Views;
 
-namespace TaskbarTray.Power
+namespace PowerSwitch.Power
 {
     public class PowerPlan
     {

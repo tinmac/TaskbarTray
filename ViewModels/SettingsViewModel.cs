@@ -11,12 +11,12 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.Win32;
-using TaskbarTray.Persistance;
-using TaskbarTray.Services;
-using TaskbarTray.stuff;
+using PowerSwitch.Persistance;
+using PowerSwitch.Services;
+using PowerSwitch.stuff;
 using Windows.ApplicationModel;
 
-namespace TaskbarTray.ViewModels;
+namespace PowerSwitch.ViewModels;
 
 public partial class SettingsViewModel : ObservableRecipient
 {

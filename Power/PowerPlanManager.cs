@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace TaskbarTray.Power
+namespace PowerSwitch.Power
 {
 
     public static class PowerPlanManager

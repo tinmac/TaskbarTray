@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using LibreHardwareMonitor.Hardware;
 
-namespace TaskbarTray.Services;
+namespace PowerSwitch.Services;
 
 public interface IHardwareMonitorService
 {

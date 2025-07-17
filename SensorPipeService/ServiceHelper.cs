@@ -9,7 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using Serilog;
 
-namespace TaskbarTray.SensorPipeService;
+namespace PowerSwitch.SensorPipeService;
 
 public static class ServiceInstallerHelper
 {

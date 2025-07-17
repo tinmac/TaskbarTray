@@ -7,11 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using LibreHardwareMonitor.Hardware;
 using System.Diagnostics;
-using TaskbarTray.stuff;
+using PowerSwitch.stuff;
 using CommunityToolkit.Mvvm.Input;
 
 
-namespace TaskbarTray.Sensor
+namespace PowerSwitch.Sensor
 {
     public partial class SensorsViewModel : ObservableObject
     {

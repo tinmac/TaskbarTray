@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Diagnostics;
 
-namespace TaskbarTray.Converters;
+namespace PowerSwitch.Converters;
 
 public class BoolToImageSourceConverter : IValueConverter
 {

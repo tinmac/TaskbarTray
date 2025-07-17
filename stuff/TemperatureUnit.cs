@@ -1,4 +1,4 @@
-namespace TaskbarTray.stuff
+namespace PowerSwitch.stuff
 {
     public enum TemperatureUnit
     {

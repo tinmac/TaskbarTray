@@ -1,6 +1,6 @@
 
 
-namespace TaskbarTray.Views
+namespace PowerSwitch.Views
 {
 
     public sealed partial class NotificationView

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public class LocalSettingsService : ILocalSettingsService
 {

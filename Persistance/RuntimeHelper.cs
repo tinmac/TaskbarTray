@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace TaskbarTray.Persistance;
+namespace PowerSwitch.Persistance;
 
 public class RuntimeHelper
 {

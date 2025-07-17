@@ -11,14 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using TaskbarTray.ViewModels;
+using PowerSwitch.ViewModels;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace TaskbarTray.Views
+namespace PowerSwitch.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.

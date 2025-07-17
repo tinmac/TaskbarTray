@@ -7,7 +7,7 @@ using System.ServiceProcess;
 using System.Diagnostics;
 using System.IO;
 
-namespace TaskbarTray.stuff;
+namespace PowerSwitch.stuff;
 
 
 //public static class ServiceHelper

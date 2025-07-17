@@ -7,19 +7,19 @@ using Serilog.Events;
 using SkiaSharp;
 using System;
 using System.Diagnostics;
-using TaskbarTray.stuff;
-using TaskbarTray.ViewModels;
-using TaskbarTray.Views;
-using TaskbarTray.Services;
+using PowerSwitch.stuff;
+using PowerSwitch.ViewModels;
+using PowerSwitch.Views;
+using PowerSwitch.Services;
 using Windows.Storage;
 using WinUIEx;
-using TaskbarTray.Persistance;
+using PowerSwitch.Persistance;
 using System.Threading.Tasks;
-using TaskbarTray.Sensor;
-using TaskbarTray.SensorPipeService;
+using PowerSwitch.Sensor;
+using PowerSwitch.SensorPipeService;
 
 
-namespace TaskbarTray;
+namespace PowerSwitch;
 
 public sealed partial class App : Application
 {
