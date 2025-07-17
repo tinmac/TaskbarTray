@@ -144,23 +144,17 @@
 		<PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.1" />
 		<PackageReference Include="WinUIEx" Version="2.5.1" />
 
-		<!-- 
-			Needed for LibreHardwareMonitorLib service to work properly
-		-->
-		<!--<PackageReference Include="System.Management" Version="8.0.0" />
-		<PackageReference Include="System.IO.Ports" Version="8.0.0" />
-		<PackageReference Include="HidSharp" Version="2.1.0" />-->
 
 	</ItemGroup>
 
 	
 	<ItemGroup>
 		<!-- 1. Copy the entire SensorsWorkerService debug output into a 'Service' folder -->
-		<None Include="..\SensorsWorkerService\bin\Debug\net8.0\**\*">
+		<None Include="..\PowerSwitchService\bin\Debug\net8.0\**\*">
 			<Link>Service\%(RecursiveDir)%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-
+		
 		<!-- 2. Copy install-service.ps1 from the root of TaskbarTray into the output -->		
 		<Content Include="install-service.ps1">
 			<Link>install-service.ps1</Link>

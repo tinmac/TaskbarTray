@@ -1,15 +1,15 @@
 ﻿# =============================
-# Install SensorService_Labs
+# Install PowerSwitchService
 # =============================
 
-$ServiceName = "SensorService_Labs"
-$DisplayName = "Sensor Monitor Service - Labs"
+$ServiceName = "PowerSwitchService"
+$DisplayName = "Power Switch Service - CPU Temperature Monitor Service - Labs"
 
 # The service EXE now lives under a 'Service' subfolder in the WinUI output
-$ExePath = Join-Path $PSScriptRoot "Service\SensorsWorkerService.exe"
+$ExePath = Join-Path $PSScriptRoot "Service\PowerSwitchService.exe"
 
 # Setup logging
-$LogDir  = "$env:ProgramData\A1_SensorService"
+$LogDir  = "$env:ProgramData\A1_PowerSwitchService"
 $LogFile = Join-Path $LogDir "install_log.txt"
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir -Force | Out-Null

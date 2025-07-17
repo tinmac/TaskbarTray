@@ -13,7 +13,7 @@ namespace PowerSwitch.SensorPipeService;
 
 public static class ServiceInstallerHelper
 {
-    private const string ServiceName = "SensorService_Labs";
+    private const string ServiceName = "PowerSwitchService";
     private const int WaitForInstallTimeoutSeconds = 15;
 
     public static async Task RunInstallScriptIfNeededAsync()

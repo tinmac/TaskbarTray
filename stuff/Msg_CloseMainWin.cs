@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using PowerSwitch.Models;
+using Common.Models;
 
 namespace PowerSwitch.stuff
 {
@@ -13,22 +13,18 @@ namespace PowerSwitch.stuff
         public bool CloseMainWin { get; set; }
         public bool ThemeChanged_Light { get; set; }
        // public bool ThemeChanged_Dark { get; set; }
-
-
-        //public MyMessage(string content)
-        //{
-        //    Content = content;
-        //}
     }
 
+    // Updated Msg_Readings to include ActivePlanGuid
     public class Msg_Readings
     {
         public List<SensorReading> SensorReadings { get; set; }
+        public Guid ActivePlanGuid { get; set; } // NEW
     }
-
 
     public class Msg_CloseMainWin
     {
         public bool CloseMainWin { get; set; }
     }
+    // SensorPipePayload and SensorReading moved to Common.Models
 }

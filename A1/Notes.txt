@@ -5,11 +5,10 @@
 Todo
 ----
 
-- Startup
-  - Add Menu options - use top of this chat to do it: https://chatgpt.com/c/684bbc8b-f040-800e-b905-d61d02c3d439
-	- Startup when windows starts On/Off
+Simplify the MainWindow to only show settings page by default, and remove/hide the page navigation ui 
 
-- ADD: Ask ChatGPT: If user changes the power plan in Windows control panel, then the app should update the current plan to reflect the changes.
+At the mo you are creating the three system plans (Power Saver, Balanced, High Performance) but
+what if the user creates a new power plan in Windows control panel, the app should add it to the plans List & show it in the context Ui for user to select.
 
 
 
@@ -97,15 +96,15 @@ Installing from PowerScript
 
 Set-ExecutionPolicy Bypass -Scope Process -Force
 
-Get-Service -Name SensorService_Labs
-Start-Service -Name SensorService_Labs
-Stop-Service -Name SensorService_Labs
-sc.exe delete "SensorService_Labs"
+Get-Service -Name PowerSwitchService
+Start-Service -Name PowerSwitchService
+Stop-Service -Name PowerSwitchService
+sc.exe delete "PowerSwitchService"
 
 
 
-sc.exe config SensorService_Labs obj= LocalSystem
-Restart-Service -Name SensorService_Labs
+sc.exe config PowerSwitchService obj= LocalSystem
+Restart-Service -Name PowerSwitchService
 
 
 

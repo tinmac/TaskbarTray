@@ -18,6 +18,7 @@ using PowerSwitch.stuff;
 using Windows.Devices.Power;
 using Windows.Security.Isolation;
 using Windows.System.Power;
+using Common.Models;
 
 namespace PowerSwitch.ViewModels
 {
@@ -139,32 +140,19 @@ namespace PowerSwitch.ViewModels
                     LatestCpuTemp = temp.Value;
                     _logr.LogInformation($"Received CPU Temp: {LatestCpuTemp}");
                 }
+
+
+                // NEW: Use ActivePlanGuid to get the PowerPlan object and call SetPowerPlan
+                if (msg.ActivePlanGuid != Guid.Empty)
+                {
+                    var plan = PowerPlans.FirstOrDefault(p => p.Guid == msg.ActivePlanGuid);
+                    if (plan != null)
+                    {
+                        SetPowerPlan(plan);
+                    }
+                }
             });
 
-
-            #region old Messenger code
-
-            //App.Messenger.Register<MyMessage>(this, (recipient, message) =>
-            //{
-            //    Console.WriteLine($"Received message: {message.Content}");
-            //});
-
-            //App.Messenger.Register<TrayIconVM, MyMessage, string>(this, "MyToken", (recipient, message) =>
-            //{
-            //    Log.Information($"Rx CloseMainWin: {message.Content}");
-
-            //    Show_OpenWindowMenuItem = true;
-            //});
-
-            //App.Messenger.Register<TrayIconVM, Msg_CloseMainWin, string>(this, string.Empty, (recipient, message) =>
-            //{
-            //    // Handle the message  
-            //    Log.Information($"Rx CloseMainWin: {message.CloseMainWin}");
-
-            //    Show_OpenWindowMenuItem = true;
-            //});
-
-            #endregion
 
             Show_OpenWindowMenuItem = true; // Initially show the menu item to open the main window
 
@@ -172,9 +160,6 @@ namespace PowerSwitch.ViewModels
             PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
             PowerManager.PowerSupplyStatusChanged += OnPowerSupplyStatusChanged;
 
-            // WHAT DO YOU WANT TO DO WHEN ONE OF THESE EVENTS IS TRIGGERED????
-            //
-            // change Power mode? not keen on this but could be a v2 feature
         }
 
         private async void OnBatteryStatusChanged(object sender, object e)

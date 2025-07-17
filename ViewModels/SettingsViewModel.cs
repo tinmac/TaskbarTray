@@ -23,7 +23,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private readonly ILogger<SettingsViewModel> _logr;
 
     [ObservableProperty] private bool serviceIsRunning;
-    private const string ServiceName = "SensorService_Labs";
+    private const string ServiceName = "PowerSwitchService";
 
     private readonly ISettingsService _themeSelectorService;
     private readonly ILocalSettingsService _localSettingsService;

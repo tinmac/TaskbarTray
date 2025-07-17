@@ -6,11 +6,5 @@ using System.Threading.Tasks;
 
 namespace PowerSwitch.Models
 {
-    public class SensorReading
-    {
-        public string Name { get; set; } = string.Empty;
-        public float Value { get; set; }
-        public string Category { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-    }
+    // Removed SensorReading from here, now in Common.Models
 }

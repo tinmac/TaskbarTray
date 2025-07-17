@@ -13,14 +13,14 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using PowerSwitch.Models;
-
+using Common.Models;
 using LiveChartsCore.Kernel;
 using System.Diagnostics;
 using ExCSS;
 using CommunityToolkit.Mvvm.Messaging;
 using PowerSwitch.stuff;
-using PowerSwitch; 
+using PowerSwitch;
+using Serilog;
 
 public partial class SensorsPipeViewModel : ObservableObject
 {
@@ -123,14 +123,25 @@ public partial class SensorsPipeViewModel : ObservableObject
                     var line = await reader.ReadLineAsync();
                     if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    var readings = JsonSerializer.Deserialize<List<SensorReading>>(line);
-                    if (readings == null) continue;
+                    // Deserialize as SensorPipePayload from Common.Models
+                    SensorPipePayload payload = null;
+                    try
+                    {
+                        payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
+                    }
+                    catch { }
+                    if (payload == null || payload.Sensors == null) continue;
+
+                    var readings = payload.Sensors;
+                    var activePlanGuid = payload.ActivePlanGuid;
+
+                    Log.Information($"Plan: {activePlanGuid}");
 
                     App.Main_Window.DispatcherQueue.TryEnqueue(() =>
                     {
-                        if(output_shown_once == false)
+                        if (output_shown_once == false)
                             Debug.WriteLine($"\nReadings...");
-                        
+
                         foreach (var r in readings)
                         {
                             var list = _sensorHistory.GetOrAdd(r.Name, _ => new());
@@ -148,9 +159,9 @@ public partial class SensorsPipeViewModel : ObservableObject
 
                         UpdateChartData();
 
-                        // Send to TrayIconVM to use in the popup
-                        WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings});
 
+                        // Send to TrayIconVM to use in the popup
+                        WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings, ActivePlanGuid = activePlanGuid });
                     });
                 }
             }
