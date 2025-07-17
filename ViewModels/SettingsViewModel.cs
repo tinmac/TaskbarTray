@@ -26,6 +26,8 @@ public partial class SettingsViewModel : ObservableRecipient
     private const string ServiceName = "SensorService_Labs";
 
     private readonly ISettingsService _themeSelectorService;
+    private readonly ILocalSettingsService _localSettingsService;
+    private const string TemperatureUnitKey = "TemperatureUnit";
 
     [ObservableProperty]
     private string serviceStatusText = "Checking sensor service...";
@@ -35,6 +37,22 @@ public partial class SettingsViewModel : ObservableRecipient
 
     [ObservableProperty]
     private string _versionDescription;
+
+    private TemperatureUnit temperatureUnit = TemperatureUnit.Celsius;
+    public TemperatureUnit TemperatureUnit
+    {
+        get => temperatureUnit;
+        set
+        {
+            if (SetProperty(ref temperatureUnit, value))
+            {
+                // Persist the value
+                _ = _localSettingsService.SaveSettingAsync(TemperatureUnitKey, temperatureUnit);
+
+                _logr.LogInformation("Persisted Unit {TemperatureUnit}", temperatureUnit);
+            }
+        }
+    }
 
     public ICommand SwitchThemeCommand { get; }
 
@@ -55,6 +73,7 @@ public partial class SettingsViewModel : ObservableRecipient
         get => _startWithWindows;
         set
         {
+            _logr.LogInformation("StartWithWindows toggled...");
             if (SetProperty(ref _startWithWindows, value))
             {
                 _ = ApplyStartupSettingAsync(value);
@@ -62,16 +81,29 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-    public SettingsViewModel(ISettingsService themeSelectorService, ILogger<SettingsViewModel> logr)
+    public SettingsViewModel(ISettingsService themeSelectorService, ILogger<SettingsViewModel> logr, ILocalSettingsService localSettingsService)
     {
         _logr = logr;
         _themeSelectorService = themeSelectorService;
+        _localSettingsService = localSettingsService;
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
 
+        // Load persisted temperature unit
+        _ = LoadTemperatureUnitAsync();
+
+
         _logr.LogInformation("SettingsViewModel initialized. Theme: {Theme}, Version: {Version}", _elementTheme, _versionDescription);
 
-        IsPackaged = Package.Current?.Id?.Name != null;
+        try
+        {
+            IsPackaged = Package.Current?.Id?.Name != null;
+        }
+        catch (Exception ex)
+        {
+            IsPackaged = false;
+            _logr.LogWarning(ex, "Failed to detect MSIX packaging. Assuming not packaged.");
+        }
         _logr.LogInformation($"IsPackaged: {IsPackaged}");
 
         SwitchThemeCommand = new RelayCommand<ElementTheme>(
@@ -238,6 +270,7 @@ public partial class SettingsViewModel : ObservableRecipient
                         _logr.LogInformation("Startup task disabled.");
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -263,11 +296,23 @@ public partial class SettingsViewModel : ObservableRecipient
                 }
 
                 StartWithWindows = enable;
+
+                await LoadStartupStateAsync();
+
             }
             catch (Exception ex)
             {
                 _logr.LogError(ex, "Failed to set startup task state for non-MSIX packaged app (Registry method)");
             }
         }
+    }
+
+    private async Task LoadTemperatureUnitAsync()
+    {
+        var persisted = await _localSettingsService.ReadSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+        TemperatureUnit = persisted;
+
+        _logr.LogInformation("Loaded unit: {TemperatureUnit}", TemperatureUnit);
+
     }
 }

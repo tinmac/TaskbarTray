@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.Persistance;
 using TaskbarTray.Power;
 using TaskbarTray.stuff;
 using Windows.Devices.Power;
@@ -28,10 +29,11 @@ namespace TaskbarTray.ViewModels
         High
     }
 
-
     public partial class TrayIconVM : ObservableObject
     {
         private readonly ILogger<TrayIconVM> _logr;
+        private readonly ILocalSettingsService _localSettingsService;
+        private const string TemperatureUnitKey = "TemperatureUnit";
 
         // to avoid warning `MVVMTK0045` use Communitty Toolkit 8.3.2 as 8.4.0 gives the warning  see https://stackoverflow.com/a/79302048/425357
 
@@ -72,14 +74,24 @@ namespace TaskbarTray.ViewModels
         List<PowerPlan> PowerPlans = new();
 
         public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
-
+        private TemperatureUnit _temperatureUnit = TemperatureUnit.Celsius;
+        public TemperatureUnit TemperatureUnit
+        {
+            get => _temperatureUnit;
+            set
+            {
+                if (SetProperty(ref _temperatureUnit, value))
+                {
+                    OnPropertyChanged(nameof(CpuTempTooltip));
+                }
+            }
+        }
 
         // Constructor
-        public TrayIconVM(ILogger<TrayIconVM> logr)
+        public TrayIconVM(ILogger<TrayIconVM> logr, ILocalSettingsService localSettingsService)
         {
             _logr = logr;
-
-            //_logr = Ioc.Default.GetRequiredService<ILogger<TrayIconVM>>();
+            _localSettingsService = localSettingsService;
 
             SelectedImage = new BitmapImage(new Uri("ms-appx:///Assets/ico/gauge.ico")); // Default icon
             ActiveScheme = new PowerPlan();
@@ -87,6 +99,7 @@ namespace TaskbarTray.ViewModels
             Show_OpenWindowMenuItem = false; // Initially hide the menu item to open the main window
             BatteryPercentage = string.Empty;
 
+            _ = LoadTemperatureUnitAsync();
 
             WeakReferenceMessenger.Default.Register<MyMessage>(this, (r, message) =>
             {
@@ -115,6 +128,19 @@ namespace TaskbarTray.ViewModels
                 });
 
             });
+
+            WeakReferenceMessenger.Default.Register<Msg_Readings>(this, (r, msg) =>
+            {
+                // Try to find the temperature reading (Core (Tctl/Tdie) or fallback to any temperature)
+                var temp = msg.SensorReadings?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
+                    ?? msg.SensorReadings?.FirstOrDefault(s => s.Category == "Temperature");
+                if (temp != null)
+                {
+                    LatestCpuTemp = temp.Value;
+                    _logr.LogInformation($"Received CPU Temp: {LatestCpuTemp}");
+                }
+            });
+
 
             #region old Messenger code
 
@@ -556,11 +582,66 @@ namespace TaskbarTray.ViewModels
 
 
         [RelayCommand]
-        public void OpenContextMenu()
+        public async void OpenContextMenu()
         {
+            // Always fetch the latest persisted value before showing the context menu
+            var persisted = await _localSettingsService.ReadSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+            TemperatureUnit = persisted;
+
+            _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
+
             GetBatteryPercentage();
         }
 
+
+        private float? _latestCpuTemp;
+
+        public float? LatestCpuTemp
+        {
+            get => _latestCpuTemp;
+            private set
+            {
+                if (SetProperty(ref _latestCpuTemp, value))
+                {
+                    OnPropertyChanged(nameof(CpuTempTooltip));
+                }
+            }
+        }
+
+
+        public string CpuTempTooltip
+        {
+            get
+            {
+                if (!LatestCpuTemp.HasValue)
+                    return "CPU: N/A";
+                float temp = LatestCpuTemp.Value;
+                if (TemperatureUnit == TemperatureUnit.Fahrenheit)
+                    temp = temp * 9 / 5 + 32;
+                string unit = TemperatureUnit == TemperatureUnit.Fahrenheit ? "°F" : "°C";
+                return $"CPU: {temp:F1} {unit}";
+            }
+        }
+
+
+        [RelayCommand]
+        public void ShowCpuTempPopup()
+        {
+            string tempText = LatestCpuTemp.HasValue ? $"CPU: {LatestCpuTemp:F1} °C" : "CPU: N/A";
+            // Show notification using tray icon logic (implement this in your tray icon class)
+            // Example: TrayIcon.ShowNotification("CPU Temperature", tempText);
+            _logr.LogInformation($"Show popup: {tempText}");
+            // TODO: Call your tray icon's ShowNotification method here
+        }
+
+        private async Task LoadTemperatureUnitAsync()
+        {
+            var persisted = await _localSettingsService.ReadSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+            TemperatureUnit = persisted;
+
+            _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
+
+        }
     }
 
 }

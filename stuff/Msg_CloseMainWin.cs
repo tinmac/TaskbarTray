@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TaskbarTray.Models;
 
-namespace TaskbarTray
+namespace TaskbarTray.stuff
 {
     public class MyMessage
     {
@@ -19,6 +20,12 @@ namespace TaskbarTray
         //    Content = content;
         //}
     }
+
+    public class Msg_Readings
+    {
+        public List<SensorReading> SensorReadings { get; set; }
+    }
+
 
     public class Msg_CloseMainWin
     {

@@ -23,12 +23,11 @@ public sealed partial class TrayIconView : UserControl
     // Constructor
     public TrayIconView()
     {
+        ViewModel = Ioc.Default.GetService<TrayIconVM>()!;
         InitializeComponent();
 
         _logr = Ioc.Default.GetRequiredService<ILogger<TrayIconView>>();
 
-
-        ViewModel = Ioc.Default.GetService<TrayIconVM>()!;// ! means null forgiving, as we know this will not be null
 
         ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 

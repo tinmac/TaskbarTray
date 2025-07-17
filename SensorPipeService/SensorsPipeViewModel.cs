@@ -19,6 +19,8 @@ using LiveChartsCore.Kernel;
 using TaskbarTray;
 using System.Diagnostics;
 using ExCSS;
+using CommunityToolkit.Mvvm.Messaging;
+using TaskbarTray.stuff;
 
 
 public partial class SensorsPipeViewModel : ObservableObject
@@ -146,6 +148,10 @@ public partial class SensorsPipeViewModel : ObservableObject
                         output_shown_once = true;
 
                         UpdateChartData();
+
+                        // Send to TrayIconVM to use in the popup
+                        WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings});
+
                     });
                 }
             }

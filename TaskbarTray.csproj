@@ -46,8 +46,6 @@
 		<None Remove="Assets\svg\gauge-max.svg" />
 		<None Remove="Assets\svg\gauge-min.svg" />
 		<None Remove="Assets\svg\gauge.svg" />
-		<None Remove="Sensor\SensorsPipeView.xaml" />
-		<None Remove="Views\Sensors.xaml" />
 		<None Remove="Views\Settings.xaml" />
 		<None Remove="Views\TestWindow1.xaml" />
 	</ItemGroup>
@@ -187,11 +185,6 @@
 		<None Update="install-service.ps1">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<Page Update="Sensor\SensorsPipeView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
 	</ItemGroup>
 	<ItemGroup>
 		<Page Update="Views\Settings.xaml">

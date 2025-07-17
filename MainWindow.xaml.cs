@@ -17,6 +17,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using TaskbarTray.Services;
+using TaskbarTray.stuff;
 using TaskbarTray.Views;
 using Windows.Foundation;
 using Windows.Foundation.Collections;

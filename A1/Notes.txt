@@ -116,3 +116,10 @@ Install manually in PS
 
 CURRENTLY
 - Getting the worker to outout to the log file AND listen for the pipe connection, see ChatGPT
+
+
+Readings from 
+07:54:30 [Temperature] Core (Tctl/Tdie): 51.875008
+07:54:30 [Temperature] Temperature: 44
+
+
