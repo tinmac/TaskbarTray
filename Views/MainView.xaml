@@ -12,45 +12,8 @@
 
     <Grid x:Name="RootGrid">
 
-        <NavigationView
-            x:Name="NavigationView"
-            IsBackButtonVisible="Collapsed"
-            IsBackEnabled="False"
-            IsPaneOpen="False"
-            IsSettingsVisible="False">
-
-            <NavigationView.MenuItems>
-
-                <NavigationViewItem
-                    Content="Sensors"
-                    SelectsOnInvoked="True"
-                    Tag="Sensors">
-                    <NavigationViewItem.Icon>
-                        <FontIcon Glyph="&#xf2c9;" />
-                    </NavigationViewItem.Icon>
-
-                </NavigationViewItem>
-
-
-                <NavigationViewItem
-                    Content="Notifications"
-                    Icon="Send"
-                    SelectsOnInvoked="True"
-                    Tag="Notifications" />
-
-
-                <NavigationViewItem
-                    Content="Settings"
-                    Icon="Setting"
-                    SelectsOnInvoked="True"
-                    Tag="Settings" />
-
-            </NavigationView.MenuItems>
-
-            <Frame x:Name="NavigationViewFrame" />
-
-        </NavigationView>
-
+        <!-- Only show the Settings page, hide navigation UI -->
+        <views:Settings x:Name="SettingsPage" />
         <views:TrayIconView x:Name="TrayIconView" />
 
     </Grid>
