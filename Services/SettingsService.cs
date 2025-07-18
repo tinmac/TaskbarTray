@@ -94,11 +94,17 @@ public class SettingsService : ISettingsService
     // Generic methods for any property
     public async Task<T?> GetSettingAsync<T>(string key)
     {
+        var value = await _localSettingsService.ReadSettingAsync<string>(key);
+        if (typeof(T).IsEnum && value != null)
+            return (T)Enum.Parse(typeof(T), value);
         return await _localSettingsService.ReadSettingAsync<T>(key);
     }
 
     public async Task SaveSettingAsync<T>(string key, T value)
     {
-        await _localSettingsService.SaveSettingAsync(key, value);
+        if (typeof(T).IsEnum)
+            await _localSettingsService.SaveSettingAsync(key, value.ToString());
+        else
+            await _localSettingsService.SaveSettingAsync(key, value);
     }
 }

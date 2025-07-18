@@ -71,7 +71,7 @@ namespace PowerSwitch.ViewModels
             {
                 if (SetProperty(ref _temperatureUnit, value))
                 {
-                    _ = _settingsService.SetTemperatureUnitAsync(value);
+                    _ = _settingsService.SaveSettingAsync(TemperatureUnitKey, value);
                     OnPropertyChanged(nameof(CpuTempTooltip));
                 }
             }
@@ -455,7 +455,7 @@ namespace PowerSwitch.ViewModels
         [RelayCommand]
         public async void OpenContextMenu()
         {
-            var persisted = await _settingsService.GetTemperatureUnitAsync();
+            var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
             TemperatureUnit = persisted;
             _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
             GetBatteryPercentage();
@@ -497,7 +497,7 @@ namespace PowerSwitch.ViewModels
 
         private async Task LoadTemperatureUnitAsync()
         {
-            var persisted = await _settingsService.GetTemperatureUnitAsync();
+            var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
             TemperatureUnit = persisted;
             _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
         }

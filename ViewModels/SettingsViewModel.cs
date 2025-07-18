@@ -37,7 +37,7 @@ public partial class SettingsViewModel : ObservableRecipient
             _logr.LogInformation("Unit Fired...");
             if (SetProperty(ref temperatureUnit, value))
             {
-                _ = _settingsService.SetTemperatureUnitAsync(temperatureUnit);
+                _ = _settingsService.SaveSettingAsync(TemperatureUnitKey, temperatureUnit);
                 _logr.LogInformation("Persisted Unit {TemperatureUnit}", temperatureUnit);
             }
         }
@@ -259,7 +259,7 @@ public partial class SettingsViewModel : ObservableRecipient
     }
     private async Task LoadTemperatureUnitAsync()
     {
-        var persisted = await _settingsService.GetTemperatureUnitAsync();
+        var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
         TemperatureUnit = persisted;
         _logr.LogInformation("Loaded unit: {TemperatureUnit}", TemperatureUnit);
     }
