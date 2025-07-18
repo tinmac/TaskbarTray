@@ -5,7 +5,6 @@ using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -21,23 +20,13 @@ namespace PowerSwitch.ViewModels;
 public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly ILogger<SettingsViewModel> _logr;
-
     [ObservableProperty] private bool serviceIsRunning;
     private const string ServiceName = "PowerSwitchService";
-
-    private readonly ISettingsService _themeSelectorService;
-    private readonly ILocalSettingsService _localSettingsService;
+    private readonly ISettingsService _settingsService;
     private const string TemperatureUnitKey = "TemperatureUnit";
-
-    [ObservableProperty]
-    private string serviceStatusText = "Checking sensor service...";
-
-    [ObservableProperty]
-    private ElementTheme _elementTheme;
-
-    [ObservableProperty]
-    private string _versionDescription;
-
+    [ObservableProperty] private string serviceStatusText = "Checking sensor service...";
+    [ObservableProperty] private ElementTheme _elementTheme;
+    [ObservableProperty] private string _versionDescription;
     private TemperatureUnit temperatureUnit = TemperatureUnit.Celsius;
     public TemperatureUnit TemperatureUnit
     {
@@ -46,27 +35,16 @@ public partial class SettingsViewModel : ObservableRecipient
         {
             if (SetProperty(ref temperatureUnit, value))
             {
-                // Persist the value
-                _ = _localSettingsService.SaveSettingAsync(TemperatureUnitKey, temperatureUnit);
-
+                _ = _settingsService.SaveSettingAsync(TemperatureUnitKey, temperatureUnit);
                 _logr.LogInformation("Persisted Unit {TemperatureUnit}", temperatureUnit);
             }
         }
     }
-
     public ICommand SwitchThemeCommand { get; }
-
-
-    // Detect if app is MSIX packaged
     private static bool IsPackaged;
-
-
-
-    // For start/stop when Windows starts
-    private const string AppName = "LLabsPowerSwitch"; // For registry value
+    private const string AppName = "LLabsPowerSwitch";
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string StartupTaskId = "StartMyApp"; // For MSIX manifest
-
+    private const string StartupTaskId = "StartMyApp";
     private bool _startWithWindows;
     public bool StartWithWindows
     {
@@ -80,24 +58,17 @@ public partial class SettingsViewModel : ObservableRecipient
             }
         }
     }
-
-    public SettingsViewModel(ISettingsService themeSelectorService, ILogger<SettingsViewModel> logr, ILocalSettingsService localSettingsService)
+    public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logr)
     {
         _logr = logr;
-        _themeSelectorService = themeSelectorService;
-        _localSettingsService = localSettingsService;
-        _elementTheme = _themeSelectorService.Theme;
+        _settingsService = settingsService;
+        _elementTheme = _settingsService.Theme;
         _versionDescription = GetVersionDescription();
-
-        // Load persisted temperature unit
         _ = LoadTemperatureUnitAsync();
-
-
         _logr.LogInformation("SettingsViewModel initialized. Theme: {Theme}, Version: {Version}", _elementTheme, _versionDescription);
-
         try
         {
-            IsPackaged = Package.Current?.Id?.Name != null;
+            IsPackaged = RuntimeHelper.IsMSIX;
         }
         catch (Exception ex)
         {
@@ -105,7 +76,6 @@ public partial class SettingsViewModel : ObservableRecipient
             _logr.LogWarning(ex, "Failed to detect MSIX packaging. Assuming not packaged.");
         }
         _logr.LogInformation($"IsPackaged: {IsPackaged}");
-
         SwitchThemeCommand = new RelayCommand<ElementTheme>(
             async (param) =>
             {
@@ -113,16 +83,13 @@ public partial class SettingsViewModel : ObservableRecipient
                 {
                     _logr.LogInformation("SwitchThemeCommand invoked. Changing theme from {OldTheme} to {NewTheme}", ElementTheme, param);
                     ElementTheme = param;
-                    await _themeSelectorService.SetThemeAsync(param);
+                    await settingsService.SetThemeAsync(param);
                     _logr.LogInformation("Theme changed to {Theme}", param);
                 }
             });
-
         _ = LoadStartupStateAsync();
-
         UpdateServiceStatus();
     }
-
     [RelayCommand]
     private void StartSensorService()
     {
@@ -141,7 +108,6 @@ public partial class SettingsViewModel : ObservableRecipient
         ServiceIsRunning = true;
         ServiceStatusText = "Running";
     }
-
     [RelayCommand]
     private void StopSensorService()
     {
@@ -160,11 +126,9 @@ public partial class SettingsViewModel : ObservableRecipient
         ServiceIsRunning = false;
         ServiceStatusText = "Stopped";
     }
-
     private static string GetVersionDescription()
     {
         Version version;
-
         if (RuntimeHelper.IsMSIX)
         {
             var packageVersion = Package.Current.Id.Version;
@@ -174,10 +138,8 @@ public partial class SettingsViewModel : ObservableRecipient
         {
             version = Assembly.GetExecutingAssembly().GetName().Version!;
         }
-
         return $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
-
     private async void UpdateServiceStatus()
     {
         const int maxAttempts = 5;
@@ -194,23 +156,18 @@ public partial class SettingsViewModel : ObservableRecipient
             catch (Exception ex)
             {
                 _logr.LogWarning(ex, "Failed to check service status on attempt {Attempt}", attempt + 1);
-                await Task.Delay(1000); // wait and retry
+                await Task.Delay(1000);
             }
         }
-
         ServiceIsRunning = false;
         ServiceStatusText = "Not installed.";
         _logr.LogError("Service {ServiceName} not installed or could not be queried after {MaxAttempts} attempts.", ServiceName, maxAttempts);
     }
-
-
-
     private async Task LoadStartupStateAsync()
     {
         if (IsPackaged)
         {
             _logr.LogInformation("IsPackaged: true, using StartupTask API.");
-
             try
             {
                 var task = await StartupTask.GetAsync(StartupTaskId);
@@ -226,7 +183,6 @@ public partial class SettingsViewModel : ObservableRecipient
         else
         {
             _logr.LogInformation("IsPackaged: false, using registry method.");
-
             try
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RunKey);
@@ -242,7 +198,6 @@ public partial class SettingsViewModel : ObservableRecipient
             }
         }
     }
-
     private async Task ApplyStartupSettingAsync(bool enable)
     {
         if (IsPackaged)
@@ -250,7 +205,6 @@ public partial class SettingsViewModel : ObservableRecipient
             try
             {
                 var task = await StartupTask.GetAsync(StartupTaskId);
-
                 if (enable)
                 {
                     if (task.State == StartupTaskState.Disabled)
@@ -265,12 +219,11 @@ public partial class SettingsViewModel : ObservableRecipient
                     if (task.State == StartupTaskState.Enabled ||
                         task.State == StartupTaskState.DisabledByUser)
                     {
-                        task.Disable(); // No prompt, effective immediately
+                        task.Disable();
                         StartWithWindows = false;
                         _logr.LogInformation("Startup task disabled.");
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -283,7 +236,6 @@ public partial class SettingsViewModel : ObservableRecipient
             {
                 using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
                 var exePath = Process.GetCurrentProcess().MainModule?.FileName ?? "";
-
                 if (enable)
                 {
                     key.SetValue(AppName, exePath);
@@ -294,11 +246,8 @@ public partial class SettingsViewModel : ObservableRecipient
                     key.DeleteValue(AppName, false);
                     _logr.LogInformation("Removed registry value for startup.");
                 }
-
                 StartWithWindows = enable;
-
                 await LoadStartupStateAsync();
-
             }
             catch (Exception ex)
             {
@@ -306,13 +255,10 @@ public partial class SettingsViewModel : ObservableRecipient
             }
         }
     }
-
     private async Task LoadTemperatureUnitAsync()
     {
-        var persisted = await _localSettingsService.ReadSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+        var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
         TemperatureUnit = persisted;
-
         _logr.LogInformation("Loaded unit: {TemperatureUnit}", TemperatureUnit);
-
     }
 }

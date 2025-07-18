@@ -1,5 +1,4 @@
-﻿//using Microsoft.UI.Xaml;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace PowerSwitch.Services;
 
@@ -24,4 +23,9 @@ public interface ISettingsService
     Task<WindowsData> GetWindowDataAsync();
 
     Task SetWindowDataAsync(WindowsData windowsData);
+
+    // Generic methods for any property
+    Task<T?> GetSettingAsync<T>(string key);
+
+    Task SaveSettingAsync<T>(string key, T value);
 }

@@ -5,7 +5,27 @@
 Todo
 ----
 
-Simplify the MainWindow to only show settings page by default, and remove/hide the page navigation ui 
+Log Settings file path in LocalSettingsService
+
+Get the persistance layer working properly
+
+At the moment we have LocalSettingsService and SettingsService layers, why are there two?
+
+OK so if we leave it as two, shouldnt we only be calling LocalSettingsService from SettingsService?
+
+can you remove any calls to _localSettingsService ie in TrayIconVM, 
+
+its confusing so can we 
+1 - re-write into one service 
+
+2 - current methods we can call are:
+- SaveThemeInSettingsAsync(ElementTheme theme)
+- GetWindowDataAsync()
+Can we add new methods, for example:
+- Save any property for example: TemperatureUnit, ShowIntroScreen, etc.
+- Load any property for example: TemperatureUnit, ShowIntroScreen, etc.
+At the moment the SettignsService uses
+
 
 At the mo you are creating the three system plans (Power Saver, Balanced, High Performance) but
 what if the user creates a new power plan in Windows control panel, the app should add it to the plans List & show it in the context Ui for user to select.

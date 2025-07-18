@@ -16,14 +16,10 @@ public class WindowsData
 public class SettingsService : ISettingsService
 {
     private const string BgThemeKey = "AppBackgroundRequestedTheme";
-
     private const string WindowSizePosKey = "AppWindowData";
 
-
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
-
     public WindowsData WindowsData { get; set; }
-
 
     private readonly ILocalSettingsService _localSettingsService;
 
@@ -41,7 +37,6 @@ public class SettingsService : ISettingsService
     public async Task SetThemeAsync(ElementTheme theme)
     {
         Theme = theme;
-
         await SetRequestedThemeAsync();
         await SaveThemeInSettingsAsync(Theme);
     }
@@ -51,22 +46,17 @@ public class SettingsService : ISettingsService
         if (App.Main_Window.Content is FrameworkElement rootElement)
         {
             rootElement.RequestedTheme = Theme;
-
-            //  TitleBarHelper.UpdateTitleBar(Theme);// Doesnt have one (yet)
         }
-
         await Task.CompletedTask;
     }
 
     private async Task<ElementTheme> LoadThemeFromSettingsAsync()
     {
         var themeName = await _localSettingsService.ReadSettingAsync<string>(BgThemeKey);
-
         if (Enum.TryParse(themeName, out ElementTheme cacheTheme))
         {
             return cacheTheme;
         }
-
         return ElementTheme.Default;
     }
 
@@ -75,14 +65,10 @@ public class SettingsService : ISettingsService
         await _localSettingsService.SaveSettingAsync(BgThemeKey, theme.ToString());
     }
 
-
-
     // Window Size & Position
-    //
     public async Task<WindowsData> GetWindowDataAsync()
     {
         var windowsData = await _localSettingsService.ReadSettingAsync<WindowsData>(WindowSizePosKey);
-
         return windowsData;
     }
 
@@ -91,5 +77,14 @@ public class SettingsService : ISettingsService
         await _localSettingsService.SaveSettingAsync(WindowSizePosKey, windowsData);
     }
 
+    // Generic methods for any property
+    public async Task<T?> GetSettingAsync<T>(string key)
+    {
+        return await _localSettingsService.ReadSettingAsync<T>(key);
+    }
 
+    public async Task SaveSettingAsync<T>(string key, T value)
+    {
+        await _localSettingsService.SaveSettingAsync(key, value);
+    }
 }

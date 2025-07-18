@@ -22,6 +22,10 @@ public class LocalSettingsService : ILocalSettingsService
     private readonly string _applicationDataFolder;
     private readonly string _localsettingsFile;
 
+    // Expose settings folder and file name
+    public string SettingsFolderPath => _applicationDataFolder;
+    public string SettingsFileName => _localsettingsFile;
+
     private IDictionary<string, object> _settings;
 
     private bool _isInitialized;
@@ -35,6 +39,10 @@ public class LocalSettingsService : ILocalSettingsService
         _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
 
         _settings = new Dictionary<string, object>();
+
+        // Log the settings file path at startup
+        var settingsPath = Path.Combine(_applicationDataFolder, _localsettingsFile);
+        Log.Information($"Settings dir: \n{_applicationDataFolder}");
     }
 
     private async Task InitializeAsync()

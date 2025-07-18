@@ -12,7 +12,7 @@
 
     <Grid x:Name="RootGrid">
 
-        <!-- Only show the Settings page, hide navigation UI -->
+        <!--  Only show the Settings page, hide navigation UI  -->
         <views:Settings x:Name="SettingsPage" />
         <views:TrayIconView x:Name="TrayIconView" />
 

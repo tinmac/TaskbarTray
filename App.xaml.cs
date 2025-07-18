@@ -47,35 +47,26 @@ public sealed partial class App : Application
         Ioc.Default.ConfigureServices(ServiceProvider);
         _logr = ServiceProvider.GetRequiredService<ILogger<App>>();
 
+        // No service for type 'Microsoft.Extensions.Logging.ILogger`1[PowerSwitch.App]' has been registered.'
+
+
     }
 
     private IServiceProvider ConfigureServices()
     {
-        // Register your services, viewmodels and pages here
         var services = new ServiceCollection();
-        services.AddSingleton<ISettingsService, SettingsService>();
 
-
-        #region SERILOG
-
-        // Serilog   : Verbose  Debug  Information  Warning  Error  Fatal
-        // Microsoft : Trace    Debug  Information  Warning  Error  Critical
-
-        //LogEventLevel level = LogEventLevel.Debug;
+        // Serilog setup (do not change)
         var tmpl_1 = "[{Timestamp:dd/MM  HH:mm:ss.fff} {Level:u3}{SourceContext} {AppId}]  {Message:lj}{NewLine}{Exception}";
-        var tmpl_2 = "[{Timestamp:HH:mm:ss} {Level:u3}{SourceContext}]  {Message:lj}{NewLine}";
-        var tmpl_3 = "[{Timestamp:HH:mm:ss} {Level:u3}{SourceContext} {AppId}]  {Message:lj}{NewLine}{Exception}";
-        var tmpl_4 = "[{Timestamp:HH:mm:ss} {Level:u3}{SourceContext} {AppId}]  {Message:lj}{NewLine}";
-
         var LogPath = @"C:\PowerSwitcher_logs\power_.log";
         var lgr = new LoggerConfiguration()
-            .MinimumLevel.Debug() // <<<<<<<--------------   MINIMUM LEVEL
+            .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
             .MinimumLevel.Override("System", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .Enrich.With(new SimpleClassEnricher()) // shortens the SourceContext ie: Agy.Wpf.Services.Duende to Duende
+            .Enrich.With(new SimpleClassEnricher())
             .WriteTo.File(
                 LogPath,
                 rollingInterval: RollingInterval.Day,
@@ -84,45 +75,35 @@ public sealed partial class App : Application
                 rollOnFileSizeLimit: true,
                 shared: true,
                 flushToDiskInterval: System.TimeSpan.FromSeconds(1))
-           .WriteTo.Debug(outputTemplate: tmpl_1)// was tmpl_3
-           .CreateLogger();
+            .WriteTo.Debug(outputTemplate: tmpl_1)
+            .CreateLogger();
 
-
-
-        // Now you're set to inject ILogger<TService> into any constructor you need.
         services.AddLogging(loggingBuilder =>
             loggingBuilder
-            .ClearProviders()
-            .AddSerilog(lgr, dispose: true));
-
-        // Static classes
-        // so we can use Log.LogInformation("bla"); in static classes (or any where)
+                .ClearProviders()
+                .AddSerilog(lgr, dispose: true));
         Log.Logger = lgr;
 
-        #endregion
-
-        services.AddTransient<TrayIconVM>(); // ViewModel for the tray icon
-        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
-
+        services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
         services.AddSingleton<IFileService, FileService>();
-
-
-        // Views and ViewModels
-        services.AddTransient<SettingsViewModel>();
+        services.AddTransient<TrayIconVM, TrayIconVM>((sp) =>
+            new TrayIconVM(
+                sp.GetRequiredService<ILogger<TrayIconVM>>(),
+                sp.GetRequiredService<ISettingsService>()));
+        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
+        services.AddTransient<SettingsViewModel, SettingsViewModel>((sp) =>
+            new SettingsViewModel(
+                sp.GetRequiredService<ISettingsService>(),
+                sp.GetRequiredService<ILogger<SettingsViewModel>>()));
         services.AddTransient<Settings>();
-     
         services.AddTransient<SensorsViewModel>();
         services.AddTransient<Sensors>();
-
         services.AddTransient<SensorsPipeViewModel>();
         services.AddTransient<SensorsPipeView>();
 
-
         var svcs = services.BuildServiceProvider();
-
         return svcs;
-
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
