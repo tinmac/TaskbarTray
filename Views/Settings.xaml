@@ -8,6 +8,7 @@
     xmlns:local="using:PowerSwitch.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:xaml="using:Microsoft.UI.Xaml"
+    xmlns:stuff="using:PowerSwitch.stuff"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -31,11 +32,9 @@
             <StackPanel Margin="10 20 0 0">
                 <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Temperature Unit" />
                 <ComboBox x:Name="TemperatureUnitComboBox"
-                          SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay}"
-                          Margin="0,4,0,0">
-                    <ComboBoxItem Content="Celsius" Tag="Celsius" />
-                    <ComboBoxItem Content="Fahrenheit" Tag="Fahrenheit" />
-                </ComboBox>
+                          ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
+                          SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,4,0,0" />
             </StackPanel>
 
             

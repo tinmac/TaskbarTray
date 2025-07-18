@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using PowerSwitch.Persistance;
+using PowerSwitch.stuff;
 
 namespace PowerSwitch.Services;
 
@@ -17,6 +18,7 @@ public class SettingsService : ISettingsService
 {
     private const string BgThemeKey = "AppBackgroundRequestedTheme";
     private const string WindowSizePosKey = "AppWindowData";
+    private const string TemperatureUnitKey = "TemperatureUnit";
 
     public ElementTheme Theme { get; set; } = ElementTheme.Default;
     public WindowsData WindowsData { get; set; }
@@ -75,6 +77,18 @@ public class SettingsService : ISettingsService
     public async Task SetWindowDataAsync(WindowsData windowsData)
     {
         await _localSettingsService.SaveSettingAsync(WindowSizePosKey, windowsData);
+    }
+
+    // TemperatureUnit methods
+    public async Task<TemperatureUnit> GetTemperatureUnitAsync()
+    {
+        var persisted = await _localSettingsService.ReadSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+        return persisted;
+    }
+
+    public async Task SetTemperatureUnitAsync(TemperatureUnit unit)
+    {
+        await _localSettingsService.SaveSettingAsync(TemperatureUnitKey, unit);
     }
 
     // Generic methods for any property

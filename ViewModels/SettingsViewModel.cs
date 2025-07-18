@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Threading;
@@ -33,9 +34,10 @@ public partial class SettingsViewModel : ObservableRecipient
         get => temperatureUnit;
         set
         {
+            _logr.LogInformation("Unit Fired...");
             if (SetProperty(ref temperatureUnit, value))
             {
-                _ = _settingsService.SaveSettingAsync(TemperatureUnitKey, temperatureUnit);
+                _ = _settingsService.SetTemperatureUnitAsync(temperatureUnit);
                 _logr.LogInformation("Persisted Unit {TemperatureUnit}", temperatureUnit);
             }
         }
@@ -257,8 +259,9 @@ public partial class SettingsViewModel : ObservableRecipient
     }
     private async Task LoadTemperatureUnitAsync()
     {
-        var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+        var persisted = await _settingsService.GetTemperatureUnitAsync();
         TemperatureUnit = persisted;
         _logr.LogInformation("Loaded unit: {TemperatureUnit}", TemperatureUnit);
     }
+    public TemperatureUnit[] TemperatureUnits => (TemperatureUnit[])Enum.GetValues(typeof(TemperatureUnit));
 }
