@@ -60,6 +60,37 @@ public partial class SettingsViewModel : ObservableRecipient
             }
         }
     }
+    [ObservableProperty] private bool includePowerSaver = true;
+    [ObservableProperty] private bool includeBalanced = true;
+    [ObservableProperty] private bool includeHighPerformance = false;
+
+    private const string IncludePowerSaverKey = "IncludePowerSaver";
+    private const string IncludeBalancedKey = "IncludeBalanced";
+    private const string IncludeHighPerformanceKey = "IncludeHighPerformance";
+
+    partial void OnIncludePowerSaverChanged(bool value)
+    {
+        _ = _settingsService.SaveSettingAsync(IncludePowerSaverKey, value);
+    }
+    partial void OnIncludeBalancedChanged(bool value)
+    {
+        _ = _settingsService.SaveSettingAsync(IncludeBalancedKey, value);
+    }
+    partial void OnIncludeHighPerformanceChanged(bool value)
+    {
+        _ = _settingsService.SaveSettingAsync(IncludeHighPerformanceKey, value);
+    }
+
+    private async Task LoadPlanToggleSettingsAsync()
+    {
+        var powerSaverSetting = await _settingsService.GetSettingAsync<bool?>(IncludePowerSaverKey);
+        var balancedSetting = await _settingsService.GetSettingAsync<bool?>(IncludeBalancedKey);
+        var highPerfSetting = await _settingsService.GetSettingAsync<bool?>(IncludeHighPerformanceKey);
+        IncludePowerSaver = powerSaverSetting ?? true;
+        IncludeBalanced = balancedSetting ?? true;
+        IncludeHighPerformance = highPerfSetting ?? false;
+    }
+
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logr)
     {
         _logr = logr;
@@ -91,6 +122,7 @@ public partial class SettingsViewModel : ObservableRecipient
             });
         _ = LoadStartupStateAsync();
         UpdateServiceStatus();
+        _ = LoadPlanToggleSettingsAsync();
     }
     [RelayCommand]
     private void StartSensorService()

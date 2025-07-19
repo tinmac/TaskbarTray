@@ -305,7 +305,7 @@ namespace PowerSwitch.ViewModels
         {
             try
             {
-                if (Scheme.Guid == ActiveScheme.Guid)
+                if (Scheme?.Guid == ActiveScheme?.Guid)
                 {
                     //_logr.LogInformation($"Already on the selected power plan: {Scheme.Name}");
                     return;
@@ -490,17 +490,30 @@ namespace PowerSwitch.ViewModels
             SetPowerPlan(high_performance);
         }
 
+        private List<PowerPlan> GetIncludedPlans()
+        {
+            var included = new List<PowerPlan>();
+            var settingsVM = Ioc.Default.GetService<SettingsViewModel>();
+            if (settingsVM == null)
+                return PowerPlans; // fallback: all plans
+            if (settingsVM.IncludePowerSaver)
+                included.Add(PowerPlans.FirstOrDefault(p => p.PowerMode == PowerMode.Eco));
+            if (settingsVM.IncludeBalanced)
+                included.Add(PowerPlans.FirstOrDefault(p => p.PowerMode == PowerMode.Balanced));
+            if (settingsVM.IncludeHighPerformance)
+                included.Add(PowerPlans.FirstOrDefault(p => p.PowerMode == PowerMode.High));
+            return included.Where(p => p != null).ToList();
+        }
+
         [RelayCommand]
         public void ToggleSpeed()
         {
-            if (IsSaverChecked)
-            {
-                Set_Balanced();
-            }
-            if (IsBalancedChecked)
-            {
-                Set_PowerSaver();
-            }
+            var includedPlans = GetIncludedPlans();
+            if (includedPlans.Count < 2)
+                return;
+            var currentIndex = includedPlans.FindIndex(p => p.Guid == ActiveScheme.Guid);
+            var nextIndex = (currentIndex + 1) % includedPlans.Count;
+            SetPowerPlan(includedPlans[nextIndex]);
         }
 
         [RelayCommand]

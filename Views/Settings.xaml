@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:PowerSwitch.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:stuff="using:PowerSwitch.stuff"
+    xmlns:xaml="using:Microsoft.UI.Xaml"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -31,13 +31,14 @@
 
             <StackPanel Margin="10 20 0 0">
                 <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Temperature Unit" />
-                <ComboBox x:Name="TemperatureUnitComboBox"
-                          ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
-                          SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Margin="0,4,0,0" />
+                <ComboBox
+                    x:Name="TemperatureUnitComboBox"
+                    Margin="0 4 0 0"
+                    ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
+                    SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
 
-            
+
             <StackPanel Margin="10 30 0 0">
                 <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Start when Windows starts" />
 
@@ -49,41 +50,20 @@
             </StackPanel>
 
 
-
             <StackPanel Margin="10 30 0 0">
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Sensors Service -" />
-
-                    <TextBlock
-                        Margin="4 0 0 0"
-                        Style="{ThemeResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
-
-                </StackPanel>
-
-                <!--<Button
-                    Command="{x:Bind ViewModel.StartSensorServiceCommand}"
-                    Content="Start Sensor Service"
-                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
-
-                <Button
-                    Command="{x:Bind ViewModel.StopSensorServiceCommand}"
-                    Content="Stop Sensor Service"
-                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverter}}" />-->
-
-
-            </StackPanel>
-
-
-            <StackPanel Margin="10 30 0 0">
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="v" />
-                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
-                </StackPanel>
-
-                <!--<TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="Description" />-->
+                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Included Power Plans for Toggle" />
+                <CheckBox
+                    Margin="0 4 0 0"
+                    Content="Power Saver"
+                    IsChecked="{x:Bind ViewModel.IncludePowerSaver, Mode=TwoWay}" />
+                <CheckBox
+                    Margin="0 4 0 0"
+                    Content="Balanced"
+                    IsChecked="{x:Bind ViewModel.IncludeBalanced, Mode=TwoWay}" />
+                <CheckBox
+                    Margin="0 4 0 0"
+                    Content="High Performance"
+                    IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
             </StackPanel>
 
 
@@ -124,6 +104,42 @@
                 </StackPanel>
 
             </StackPanel>
+
+            <StackPanel Margin="10 30 0 0">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Sensors Service -" />
+
+                    <TextBlock
+                        Margin="4 0 0 0"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
+
+                </StackPanel>
+
+                <!--<Button
+                    Command="{x:Bind ViewModel.StartSensorServiceCommand}"
+                    Content="Start Sensor Service"
+                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
+
+                <Button
+                    Command="{x:Bind ViewModel.StopSensorServiceCommand}"
+                    Content="Stop Sensor Service"
+                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverter}}" />-->
+
+
+            </StackPanel>
+
+            <StackPanel Margin="10 30 0 0">
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="v" />
+                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
+                </StackPanel>
+
+                <!--<TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="Description" />-->
+            </StackPanel>
+
 
         </StackPanel>
     </Grid>

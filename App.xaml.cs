@@ -92,7 +92,7 @@ public sealed partial class App : Application
                 sp.GetRequiredService<ILogger<TrayIconVM>>(),
                 sp.GetRequiredService<ISettingsService>()));
         services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
-        services.AddTransient<SettingsViewModel, SettingsViewModel>((sp) =>
+        services.AddSingleton<SettingsViewModel, SettingsViewModel>((sp) =>
             new SettingsViewModel(
                 sp.GetRequiredService<ISettingsService>(),
                 sp.GetRequiredService<ILogger<SettingsViewModel>>()));
