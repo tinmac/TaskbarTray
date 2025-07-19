@@ -8,6 +8,7 @@
     xmlns:local="using:PowerSwitch.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:stuff="using:PowerSwitch.stuff"
+    xmlns:wct="using:CommunityToolkit.WinUI.Controls"
     xmlns:xaml="using:Microsoft.UI.Xaml"
     mc:Ignorable="d">
 
@@ -15,7 +16,7 @@
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Page.Resources>
 
-    <Grid Margin="10 0 0 0">
+    <Grid Margin="0 0 0 0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -23,124 +24,136 @@
 
         <TextBlock
             Grid.Row="0"
-            Margin="10"
+            Margin="20 10 10 10"
             Style="{ThemeResource TitleLargeTextBlockStyle}"
             Text="Settings" />
 
-        <StackPanel x:Name="ContentArea" Grid.Row="1">
+        <ScrollViewer Grid.Row="1">
 
-            <StackPanel Margin="10 20 0 0">
-                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Temperature Unit" />
-                <ComboBox
-                    x:Name="TemperatureUnitComboBox"
-                    Margin="0 4 0 0"
-                    ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
-                    SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+            <StackPanel x:Name="ContentArea">
 
+                <!--  Temperature Unit Card  -->
+                <wct:SettingsCard Margin="16 0 16 16" Header="Temperature Unit">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <ComboBox
+                            x:Name="TemperatureUnitComboBox"
+                            Width="140"
+                            Margin="16 0 0 0"
+                            VerticalAlignment="Center"
+                            ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
+                            SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                </wct:SettingsCard>
 
-            <StackPanel Margin="10 30 0 0">
-                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Start when Windows starts" />
+                <!--  Start with Windows Card  -->
+                <wct:SettingsCard Margin="16 0 16 16" Header="Start when Windows starts">
+                    <StackPanel>
+                        <ToggleSwitch
+                            IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                            OffContent="Disabled"
+                            OnContent="Enabled" />
+                    </StackPanel>
+                </wct:SettingsCard>
 
-                <ToggleSwitch
-                    IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
-                    OffContent="Disabled"
-                    OnContent="Enabled" />
+                <!--  Power Plan Toggle Card  -->
+                <wct:SettingsCard Margin="16 0 16 16" ContentAlignment="Left">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0 0 0 0"
+                            Style="{ThemeResource BodyStrongTextBlockStyle}"
+                            Text="Included Power Plans for Toggle" />
+                        
+                        <TextBlock
+                            Margin="0 0 0 10"
+                            Style="{ThemeResource CaptionTextBlockStyle}"
+                            Text="Pick the plans here that you wish to toggle between when you click the tray icon" />
 
-            </StackPanel>
+                        <CheckBox
+                            Margin="0 4 0 0"
+                            Content="Power Saver"
+                            IsChecked="{x:Bind ViewModel.IncludePowerSaver, Mode=TwoWay}" />
+                        <CheckBox
+                            Margin="0 4 0 0"
+                            Content="Balanced"
+                            IsChecked="{x:Bind ViewModel.IncludeBalanced, Mode=TwoWay}" />
+                        <CheckBox
+                            Margin="0 4 0 0"
+                            Content="High Performance"
+                            IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
+                       
+                        <TextBlock
+                            Margin="0 8 0 0"
+                            Foreground="OrangeRed"
+                            FontWeight="Bold"
+                            TextWrapping="Wrap"
+                            Text="{Binding PowerPlanSelectionError, Mode=OneWay}" />
+                    </StackPanel>
+                </wct:SettingsCard>
 
+                <!--  Theme Card  -->
+                <wct:SettingsCard
+                    Margin="16 0 16 16"
+                    ContentAlignment="Left"
+                    Header="Theme">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0 0 0 10"
+                            Style="{ThemeResource BodyStrongTextBlockStyle}"
+                            Text="Theme" />
 
-            <StackPanel Margin="10 30 0 0">
-                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Included Power Plans for Toggle" />
-                <CheckBox
-                    Margin="0 4 0 0"
-                    Content="Power Saver"
-                    IsChecked="{x:Bind ViewModel.IncludePowerSaver, Mode=TwoWay}" />
-                <CheckBox
-                    Margin="0 4 0 0"
-                    Content="Balanced"
-                    IsChecked="{x:Bind ViewModel.IncludeBalanced, Mode=TwoWay}" />
-                <CheckBox
-                    Margin="0 4 0 0"
-                    Content="High Performance"
-                    IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
-            </StackPanel>
+                        <StackPanel>
+                            <RadioButton
+                                Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                Content="Light"
+                                FontSize="15"
+                                GroupName="AppTheme"
+                                IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}">
+                                <RadioButton.CommandParameter>
+                                    <xaml:ElementTheme>Light</xaml:ElementTheme>
+                                </RadioButton.CommandParameter>
+                            </RadioButton>
+                            <RadioButton
+                                Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                Content="Dark"
+                                FontSize="15"
+                                GroupName="AppTheme"
+                                IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}">
+                                <RadioButton.CommandParameter>
+                                    <xaml:ElementTheme>Dark</xaml:ElementTheme>
+                                </RadioButton.CommandParameter>
+                            </RadioButton>
+                            <RadioButton
+                                Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                Content="Default"
+                                FontSize="15"
+                                GroupName="AppTheme"
+                                IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}">
+                                <RadioButton.CommandParameter>
+                                    <xaml:ElementTheme>Default</xaml:ElementTheme>
+                                </RadioButton.CommandParameter>
+                            </RadioButton>
+                        </StackPanel>
+                    </StackPanel>
+                </wct:SettingsCard>
 
+                <!--  Sensors Service Status Card  -->
+                <wct:SettingsCard Margin="16 0 16 16" Header="Sensors Service Status" Description="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            Margin="4 0 0 0"
+                            Style="{ThemeResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
+                    </StackPanel>
+                </wct:SettingsCard>
 
-            <StackPanel Margin="10 30 0 0">
-                <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Theme" />
-
-                <StackPanel>
-                    <RadioButton
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        Content="Light"
-                        FontSize="15"
-                        GroupName="AppTheme"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Light</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        Content="Dark"
-                        FontSize="15"
-                        GroupName="AppTheme"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Dark</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
-                        Command="{x:Bind ViewModel.SwitchThemeCommand}"
-                        Content="Default"
-                        FontSize="15"
-                        GroupName="AppTheme"
-                        IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Default</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
+                <!--  App Version (not in card)  -->
+                <StackPanel Margin="10 10 0 10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="v" />
+                        <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
+                    </StackPanel>
                 </StackPanel>
-
             </StackPanel>
-
-            <StackPanel Margin="10 30 0 0">
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Sensors Service -" />
-
-                    <TextBlock
-                        Margin="4 0 0 0"
-                        Style="{ThemeResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
-
-                </StackPanel>
-
-                <!--<Button
-                    Command="{x:Bind ViewModel.StartSensorServiceCommand}"
-                    Content="Start Sensor Service"
-                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverterInvert}}" />
-
-                <Button
-                    Command="{x:Bind ViewModel.StopSensorServiceCommand}"
-                    Content="Stop Sensor Service"
-                    Visibility="{x:Bind ViewModel.ServiceIsRunning, Converter={StaticResource BoolToVisibilityConverter}}" />-->
-
-
-            </StackPanel>
-
-            <StackPanel Margin="10 30 0 0">
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="v" />
-                    <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
-                </StackPanel>
-
-                <!--<TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="Description" />-->
-            </StackPanel>
-
-
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

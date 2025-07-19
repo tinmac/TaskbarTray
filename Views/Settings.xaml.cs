@@ -35,6 +35,7 @@ namespace PowerSwitch.Views
             InitializeComponent();
 
             ViewModel = Ioc.Default.GetRequiredService<SettingsViewModel>();
+            this.DataContext = ViewModel;
         }
     }
 }

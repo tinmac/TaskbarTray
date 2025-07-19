@@ -35,7 +35,7 @@ public sealed partial class TrayIconView : UserControl
 
         TrayIcon.PopupActivation = PopupActivationMode.LeftClick;
 
-        ViewModel.Init();
+        ViewModel.InitAsync();
     }
 
     [RelayCommand]

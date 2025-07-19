@@ -5,13 +5,7 @@
 Todo
 ----
 
-In the Settings ui, add WCT SettingsCard for each of the Parent StackPanels, ie a card for each of these
-- TemperatureUnit
-- Starts whn windows start
-- Power plan toggle
-- Theme
-- Sensor service status
-- dont put the app version in a card
+Wait for ReceivedPipe with the Active Plan in the payload to run at least once before running the startup logic to select the power plan.
 
 
 Links

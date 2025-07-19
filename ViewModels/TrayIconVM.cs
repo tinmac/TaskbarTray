@@ -159,12 +159,36 @@ namespace PowerSwitch.ViewModels
         }
 
 
-        public void Init()
+        public async Task InitAsync()
         {
             try
             {
                 CreatePlans();
-                LoadPlansAsync();
+                await LoadPlansAsync();
+
+                // Ensure settings are loaded before startup check
+                var settingsVM = Ioc.Default.GetService<SettingsViewModel>();
+                if (settingsVM != null)
+                    await settingsVM.LoadPlanToggleSettingsAsync();
+
+                // Startup check for included plans
+                var includedPlans = GetIncludedPlans();
+                if (includedPlans.Count == 1)
+                {
+                    // Only one plan included, make sure it's active
+                    if (ActiveScheme.Guid != includedPlans[0].Guid)
+                    {
+                        SetPowerPlan(includedPlans[0]);
+                        _logr.LogInformation($"Startup: Only one plan included, switched to {includedPlans[0].Name}");
+                    }
+                }
+                else if (!includedPlans.Any(p => p.Guid == ActiveScheme.Guid))
+                {
+                    // Active plan not included, switch to the lowest included plan
+                    PowerPlan lowest = includedPlans.OrderBy(p => p.PowerMode).First();
+                    SetPowerPlan(lowest);
+                    _logr.LogInformation($"Startup: Active plan not included, switched to lowest included plan {lowest.Name}");
+                }
             }
             catch (Exception ex)
             {
@@ -305,7 +329,13 @@ namespace PowerSwitch.ViewModels
         {
             try
             {
-                if (Scheme?.Guid == ActiveScheme?.Guid)
+                //if (Scheme == null)
+                //{
+                //    //_logr.LogWarning("Attempted to set power plan to null.");
+                //    return;
+                //}
+               
+                if (Scheme == null || Scheme?.Guid == ActiveScheme?.Guid)
                 {
                     //_logr.LogInformation($"Already on the selected power plan: {Scheme.Name}");
                     return;
@@ -505,15 +535,68 @@ namespace PowerSwitch.ViewModels
             return included.Where(p => p != null).ToList();
         }
 
+        private PowerMode? _previousPowerMode = null;
+     
         [RelayCommand]
         public void ToggleSpeed()
         {
             var includedPlans = GetIncludedPlans();
             if (includedPlans.Count < 2)
+            {
+                // If only one plan is included and it's not active, switch to it
+                if (includedPlans.Count == 1 && ActiveScheme.Guid != includedPlans[0].Guid)
+                {
+                    SetPowerPlan(includedPlans[0]);
+                }
+                // Otherwise, do nothing
                 return;
-            var currentIndex = includedPlans.FindIndex(p => p.Guid == ActiveScheme.Guid);
-            var nextIndex = (currentIndex + 1) % includedPlans.Count;
-            SetPowerPlan(includedPlans[nextIndex]);
+            }
+
+            // If the active plan is not in the included plans, switch to the first included plan
+            if (!includedPlans.Any(p => p.Guid == ActiveScheme.Guid))
+            {
+                SetPowerPlan(includedPlans[0]);
+                return;
+            }
+
+            if (includedPlans.Count == 3)
+            {
+                var eco = includedPlans.FirstOrDefault(p => p.PowerMode == PowerMode.Eco);
+                var balanced = includedPlans.FirstOrDefault(p => p.PowerMode == PowerMode.Balanced);
+                var high = includedPlans.FirstOrDefault(p => p.PowerMode == PowerMode.High);
+                var current = ActiveScheme;
+
+                PowerPlan nextPlan = null;
+                if (current.PowerMode == PowerMode.High)
+                {
+                    nextPlan = balanced;
+                }
+                else if (current.PowerMode == PowerMode.Eco)
+                {
+                    nextPlan = balanced;
+                }
+                else if (current.PowerMode == PowerMode.Balanced)
+                {
+                    if (_previousPowerMode == PowerMode.Eco)
+                        nextPlan = high;
+                    else if (_previousPowerMode == PowerMode.High)
+                        nextPlan = eco;
+                    else
+                        nextPlan = high; // default direction
+                }
+                else
+                {
+                    nextPlan = balanced; // fallback
+                }
+                _previousPowerMode = current.PowerMode;
+                SetPowerPlan(nextPlan);
+            }
+            else
+            {
+                var currentIndex = includedPlans.FindIndex(p => p.Guid == ActiveScheme.Guid);
+                var nextIndex = (currentIndex + 1) % includedPlans.Count;
+                SetPowerPlan(includedPlans[nextIndex]);
+            }
         }
 
         [RelayCommand]

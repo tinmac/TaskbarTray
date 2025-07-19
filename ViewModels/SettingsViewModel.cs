@@ -60,35 +60,112 @@ public partial class SettingsViewModel : ObservableRecipient
             }
         }
     }
-    [ObservableProperty] private bool includePowerSaver = true;
-    [ObservableProperty] private bool includeBalanced = true;
-    [ObservableProperty] private bool includeHighPerformance = false;
+  
+    [ObservableProperty]
+    private bool includePowerSaver = true;
+    partial void OnIncludePowerSaverChanged(bool value)
+    {
+        _logr.LogInformation($"IncludePowerSaver changed to: {value}");
+        if (_suppressPlanFallback) return;
+        if (!value && !IncludeBalanced && !IncludeHighPerformance)
+        {
+            PowerPlanSelectionError = "At least one power plan must be selected.";
+            _isRevertingPlanSelection = true;
+            // Revert to first available plan
+            if (IncludeHighPerformance)
+                IncludeHighPerformance = true;
+            else if (IncludeBalanced)
+                IncludeBalanced = true;
+            else
+                IncludePowerSaver = true;
+            _isRevertingPlanSelection = false;
+            return;
+        }
+        if (!_isRevertingPlanSelection)
+            PowerPlanSelectionError = string.Empty;
+        _ = _settingsService.SaveSettingAsync(IncludePowerSaverKey, value);
+    }
+    [ObservableProperty]
+    private bool includeBalanced = true;
+    partial void OnIncludeBalancedChanged(bool value)
+    {
+        _logr.LogInformation($"IncludeBalanced changed to: {value}");
+        if (_suppressPlanFallback) return;
+        if (!value && !IncludePowerSaver && !IncludeHighPerformance)
+        {
+            PowerPlanSelectionError = "At least one power plan must be selected.";
+            _isRevertingPlanSelection = true;
+            if (IncludeHighPerformance)
+                IncludeHighPerformance = true;
+            else if (IncludePowerSaver)
+                IncludePowerSaver = true;
+            else
+                IncludeBalanced = true;
+            _isRevertingPlanSelection = false;
+            return;
+        }
+        if (!_isRevertingPlanSelection)
+            PowerPlanSelectionError = string.Empty;
+        _ = _settingsService.SaveSettingAsync(IncludeBalancedKey, value);
+    }
+    [ObservableProperty]
+    private bool includeHighPerformance = false;
+    partial void OnIncludeHighPerformanceChanged(bool value)
+    {
+        _logr.LogInformation($"IncludeHighPerformance changed to: {value}");
+        if (_suppressPlanFallback) return;
+        if (!value && !IncludePowerSaver && !IncludeBalanced)
+        {
+            PowerPlanSelectionError = "At least one power plan must be selected.";
+            _isRevertingPlanSelection = true;
+            if (IncludeBalanced)
+                IncludeBalanced = true;
+            else if (IncludePowerSaver)
+                IncludePowerSaver = true;
+            else
+                IncludeHighPerformance = true;
+            _isRevertingPlanSelection = false;
+            return;
+        }
+        if (!_isRevertingPlanSelection)
+            PowerPlanSelectionError = string.Empty;
+        _ = _settingsService.SaveSettingAsync(IncludeHighPerformanceKey, value);
+    }
+
+    private string _powerPlanSelectionError;
+    public string PowerPlanSelectionError
+    {
+        get => _powerPlanSelectionError;
+        set
+        {
+            _logr?.LogInformation($"PowerPlanSelectionError set to: {value}");
+            SetProperty(ref _powerPlanSelectionError, value);
+        }
+    }
 
     private const string IncludePowerSaverKey = "IncludePowerSaver";
     private const string IncludeBalancedKey = "IncludeBalanced";
     private const string IncludeHighPerformanceKey = "IncludeHighPerformance";
 
-    partial void OnIncludePowerSaverChanged(bool value)
-    {
-        _ = _settingsService.SaveSettingAsync(IncludePowerSaverKey, value);
-    }
-    partial void OnIncludeBalancedChanged(bool value)
-    {
-        _ = _settingsService.SaveSettingAsync(IncludeBalancedKey, value);
-    }
-    partial void OnIncludeHighPerformanceChanged(bool value)
-    {
-        _ = _settingsService.SaveSettingAsync(IncludeHighPerformanceKey, value);
-    }
+    private bool _isRevertingPlanSelection = false;
+    private bool _suppressPlanFallback = false;
 
-    private async Task LoadPlanToggleSettingsAsync()
+    public async Task LoadPlanToggleSettingsAsync()
     {
+        _suppressPlanFallback = true;
         var powerSaverSetting = await _settingsService.GetSettingAsync<bool?>(IncludePowerSaverKey);
         var balancedSetting = await _settingsService.GetSettingAsync<bool?>(IncludeBalancedKey);
         var highPerfSetting = await _settingsService.GetSettingAsync<bool?>(IncludeHighPerformanceKey);
-        IncludePowerSaver = powerSaverSetting ?? true;
-        IncludeBalanced = balancedSetting ?? true;
+        IncludePowerSaver = powerSaverSetting ?? false;
+        IncludeBalanced = balancedSetting ?? false;
         IncludeHighPerformance = highPerfSetting ?? false;
+        // Ensure at least one plan is included
+        if (!IncludePowerSaver && !IncludeBalanced && !IncludeHighPerformance)
+        {
+            // Prefer HighPerformance, then Balanced, then PowerSaver
+            IncludeHighPerformance = true;
+        }
+        _suppressPlanFallback = false;
     }
 
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logr)
@@ -98,6 +175,7 @@ public partial class SettingsViewModel : ObservableRecipient
         _elementTheme = _settingsService.Theme;
         _versionDescription = GetVersionDescription();
         _ = LoadTemperatureUnitAsync();
+        //PowerPlanSelectionError = "Test error: If you see this, binding works.";
         _logr.LogInformation("SettingsViewModel initialized. Theme: {Theme}, Version: {Version}", _elementTheme, _versionDescription);
         try
         {
@@ -122,8 +200,8 @@ public partial class SettingsViewModel : ObservableRecipient
             });
         _ = LoadStartupStateAsync();
         UpdateServiceStatus();
-        _ = LoadPlanToggleSettingsAsync();
     }
+ 
     [RelayCommand]
     private void StartSensorService()
     {
@@ -142,6 +220,7 @@ public partial class SettingsViewModel : ObservableRecipient
         ServiceIsRunning = true;
         ServiceStatusText = "Running";
     }
+  
     [RelayCommand]
     private void StopSensorService()
     {
