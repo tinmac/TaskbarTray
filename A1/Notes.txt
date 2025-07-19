@@ -5,11 +5,14 @@
 Todo
 ----
 
-- [ ] 
+In the Settings ui, add WCT SettingsCard for each of the Parent StackPanels, ie a card for each of these
+- TemperatureUnit
+- Starts whn windows start
+- Power plan toggle
+- Theme
+- Sensor service status
+- dont put the app version in a card
 
-At the momentwhen when the user clicks the TrayIcon the power plan is toggled, its fixed at the moment to toggle between Power Saver and Balanced
-Add settings check box's for user to select which plans are included in the plan toggle (Power Saver, Balanced or High Performance) 
-and when the user clicks the tray icon the check box's selections are toggled between
 
 Links
 -----
