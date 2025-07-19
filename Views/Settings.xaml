@@ -66,7 +66,7 @@
                         <TextBlock
                             Margin="0 0 0 10"
                             Style="{ThemeResource CaptionTextBlockStyle}"
-                            Text="Pick the plans here that you wish to toggle between when you click the tray icon" />
+                            Text="Pick the plans here that you wish to toggle between when you click the guage icon in the windows task bar notification area" />
 
                         <CheckBox
                             Margin="0 4 0 0"

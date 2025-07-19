@@ -5,7 +5,6 @@
 Todo
 ----
 
-Wait for ReceivedPipe with the Active Plan in the payload to run at least once before running the startup logic to select the power plan.
 
 
 Links

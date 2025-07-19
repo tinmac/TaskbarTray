@@ -170,31 +170,14 @@ namespace PowerSwitch.ViewModels
                 var settingsVM = Ioc.Default.GetService<SettingsViewModel>();
                 if (settingsVM != null)
                     await settingsVM.LoadPlanToggleSettingsAsync();
-
-                // Startup check for included plans
-                var includedPlans = GetIncludedPlans();
-                if (includedPlans.Count == 1)
-                {
-                    // Only one plan included, make sure it's active
-                    if (ActiveScheme.Guid != includedPlans[0].Guid)
-                    {
-                        SetPowerPlan(includedPlans[0]);
-                        _logr.LogInformation($"Startup: Only one plan included, switched to {includedPlans[0].Name}");
-                    }
-                }
-                else if (!includedPlans.Any(p => p.Guid == ActiveScheme.Guid))
-                {
-                    // Active plan not included, switch to the lowest included plan
-                    PowerPlan lowest = includedPlans.OrderBy(p => p.PowerMode).First();
-                    SetPowerPlan(lowest);
-                    _logr.LogInformation($"Startup: Active plan not included, switched to lowest included plan {lowest.Name}");
-                }
             }
             catch (Exception ex)
             {
                 _logr.LogError(ex, "Exception during TrayIconVM initialization");
             }
         }
+
+        private bool _startupPlanCheckDone = false;
 
         private async Task ReceiveSensorUpdates()
         {
@@ -219,6 +202,13 @@ namespace PowerSwitch.ViewModels
                         }
                         catch { }
                         if (payload == null || payload.Sensors == null) continue;
+
+                        // Run startup plan selection logic only once after first valid payload
+                        if (!_startupPlanCheckDone && payload.ActivePlanGuid != Guid.Empty)
+                        {
+                            RunStartupPlanSelection(payload.ActivePlanGuid);
+                            _startupPlanCheckDone = true;
+                        }
 
                         var readings = payload.Sensors;
 
@@ -680,6 +670,22 @@ namespace PowerSwitch.ViewModels
 
         #endregion
 
+        private void RunStartupPlanSelection(Guid activePlanGuid)
+        {
+            var includedPlans = GetIncludedPlans();
+            var activePlan = PowerPlans.FirstOrDefault(p => p.Guid == activePlanGuid);
+            if (includedPlans.Count == 1 && activePlan?.Guid != includedPlans[0].Guid)
+            {
+                SetPowerPlan(includedPlans[0]);
+                _logr.LogInformation($"Startup: Only one plan included, switched to {includedPlans[0].Name}");
+            }
+            else if (!includedPlans.Any(p => p.Guid == activePlanGuid))
+            {
+                var lowest = includedPlans.OrderBy(p => p.PowerMode).First();
+                SetPowerPlan(lowest);
+                _logr.LogInformation($"Startup: Active plan not included, switched to lowest included plan {lowest.Name}");
+            }
+        }
     }
 }
 
