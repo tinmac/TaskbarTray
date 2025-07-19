@@ -14,10 +14,11 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using PowerSwitch.SensorPipeService;
+using PowerSwitch.ViewModels;
 
 
 
-namespace PowerSwitch.SensorPipeService;
+namespace PowerSwitch.Views;
 
 
 public sealed partial class SensorsPipeView : Page

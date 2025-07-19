@@ -27,6 +27,7 @@ public interface ISettingsService
 
     // TemperatureUnit methods
     Task<TemperatureUnit> GetTemperatureUnitAsync();
+ 
     Task SetTemperatureUnitAsync(TemperatureUnit unit);
 
     // Generic methods for any property

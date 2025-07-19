@@ -5,35 +5,70 @@
 Todo
 ----
 
-Log Settings file path in LocalSettingsService
+- [ ] 
 
-Get the persistance layer working properly
+At the momentwhen when the user clicks the TrayIcon the power plan is toggled, its fixed at the moment to toggle between Power Saver and Balanced
+Add settings check box's for user to select which plans are included in the plan toggle (Power Saver, Balanced or High Performance) 
+and when the user clicks the tray icon the check box's selections are toggled between
 
-At the moment we have LocalSettingsService and SettingsService layers, why are there two?
+Links
+-----
 
-OK so if we leave it as two, shouldnt we only be calling LocalSettingsService from SettingsService?
+Docs:
+https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/configure-power-settings
 
-can you remove any calls to _localSettingsService ie in TrayIconVM, 
+Win32 Api - powrprof.h
+https://learn.microsoft.com/en-us/windows/win32/api/powrprof/
 
-its confusing so can we 
-1 - re-write into one service 
-
-2 - current methods we can call are:
-- SaveThemeInSettingsAsync(ElementTheme theme)
-- GetWindowDataAsync()
-Can we add new methods, for example:
-- Save any property for example: TemperatureUnit, ShowIntroScreen, etc.
-- Load any property for example: TemperatureUnit, ShowIntroScreen, etc.
-At the moment the SettignsService uses
-
-
-At the mo you are creating the three system plans (Power Saver, Balanced, High Performance) but
-what if the user creates a new power plan in Windows control panel, the app should add it to the plans List & show it in the context Ui for user to select.
+Attributes: 
+https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
 
 
 
-Extra Features
---------------
+
+Instlling the Service
+=====================
+Installing from PowerScript
+
+Set-ExecutionPolicy Bypass -Scope Process -Force
+
+Get-Service -Name PowerSwitchService
+Start-Service -Name PowerSwitchService
+Stop-Service -Name PowerSwitchService
+sc.exe delete "PowerSwitchService"
+
+
+
+sc.exe config PowerSwitchService obj= LocalSystem
+Restart-Service -Name PowerSwitchService
+
+
+
+Install manually in PS 
+- Open PS as Admin in the folde where install-service.ps1 is located
+- type: .\install-service.ps1
+
+
+
+
+Readings from 
+07:54:30 [Temperature] Core (Tctl/Tdie): 51.875008
+07:54:30 [Temperature] Temperature: 44
+
+
+
+Version 2
+----------------------------------------------------------------------------------------------
+
+Limited to 3 standard plans
+- Im happy with this for now
+- if anyone pester me I will pull in power plans from users win device:
+- At the mo you are creating the three system plans (Power Saver, Balanced, High Performance) but
+- what if the user creates a new power plan in Windows control panel, the app should add it to the plans List & show it in the context Ui for user to select.
+
+
+
+Plan Creator/Editor
 
 Can you create a WinUI page (c# & xaml ui) that does the following:
 
@@ -90,55 +125,4 @@ Plugged In (Battery Aver, Better Battery, Better Performance, Best Performance)
 Show any other AMD sepcific settings that can be read/written
 
 Likewise Detect if Users Machine has Intel, if yes show Intel specific settings whatever they are
-
-
-
-
-
-Links
------
-
-Docs:
-https://learn.microsoft.com/en-us/windows-hardware/customize/power-settings/configure-power-settings
-
-Win32 Api - powrprof.h
-https://learn.microsoft.com/en-us/windows/win32/api/powrprof/
-
-Attributes: 
-https://learn.microsoft.com/en-us/windows/win32/api/powrprof/nf-powrprof-powerreadsettingattributes
-
-
-
-
-Instlling the Service
-=====================
-Installing from PowerScript
-
-Set-ExecutionPolicy Bypass -Scope Process -Force
-
-Get-Service -Name PowerSwitchService
-Start-Service -Name PowerSwitchService
-Stop-Service -Name PowerSwitchService
-sc.exe delete "PowerSwitchService"
-
-
-
-sc.exe config PowerSwitchService obj= LocalSystem
-Restart-Service -Name PowerSwitchService
-
-
-
-Install manually in PS 
-- Open PS as Admin in the folde where install-service.ps1 is located
-- type: .\install-service.ps1
-
-
-CURRENTLY
-- Getting the worker to outout to the log file AND listen for the pipe connection, see ChatGPT
-
-
-Readings from 
-07:54:30 [Temperature] Core (Tctl/Tdie): 51.875008
-07:54:30 [Temperature] Temperature: 44
-
 

@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,6 +21,7 @@ using Windows.Devices.Power;
 using Windows.Security.Isolation;
 using Windows.System.Power;
 using Common.Models;
+using System.Text.Json;
 
 namespace PowerSwitch.ViewModels
 {
@@ -62,8 +65,37 @@ namespace PowerSwitch.ViewModels
 
         List<PowerPlan> PowerPlans = new();
 
+        private float? _latestCpuTemp;
+        public float? LatestCpuTemp
+        {
+            get => _latestCpuTemp;
+            private set
+            {
+                if (SetProperty(ref _latestCpuTemp, value))
+                {
+                    OnPropertyChanged(nameof(CpuTempTooltip));
+                }
+            }
+        }
+
+        public string CpuTempTooltip
+        {
+            get
+            {
+                if (!LatestCpuTemp.HasValue)
+                    return "CPU: N/A";
+                float temp = LatestCpuTemp.Value;
+                if (TemperatureUnit == TemperatureUnit.Fahrenheit)
+                    temp = temp * 9 / 5 + 32;
+                string unit = TemperatureUnit == TemperatureUnit.Fahrenheit ? "°F" : "°C";
+                return $"CPU: {temp:F1} {unit}";
+            }
+        }
+
         public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
+
         private TemperatureUnit _temperatureUnit = TemperatureUnit.Celsius;
+
         public TemperatureUnit TemperatureUnit
         {
             get => _temperatureUnit;
@@ -76,6 +108,8 @@ namespace PowerSwitch.ViewModels
                 }
             }
         }
+
+
 
         // Constructor
         public TrayIconVM(ILogger<TrayIconVM> logr, ISettingsService settingsService)
@@ -114,56 +148,16 @@ namespace PowerSwitch.ViewModels
                 });
             });
 
-            WeakReferenceMessenger.Default.Register<Msg_Readings>(this, (r, msg) =>
-            {
-                var temp = msg.SensorReadings?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
-                    ?? msg.SensorReadings?.FirstOrDefault(s => s.Category == "Temperature");
-                if (temp != null)
-                {
-                    LatestCpuTemp = temp.Value;
-                    _logr.LogInformation($"Received CPU Temp: {LatestCpuTemp}");
-                }
-
-                if (msg.ActivePlanGuid != Guid.Empty)
-                {
-                    var plan = PowerPlans.FirstOrDefault(p => p.Guid == msg.ActivePlanGuid);
-                    if (plan != null)
-                    {
-                        SetPowerPlan(plan);
-                    }
-                }
-            });
 
             Show_OpenWindowMenuItem = true;
+
             PowerManager.BatteryStatusChanged += OnBatteryStatusChanged;
             PowerManager.PowerSupplyStatusChanged += OnPowerSupplyStatusChanged;
+
+            // Start background sensor pipe reading worker service
+            Task.Run(ReceiveSensorUpdates);
         }
 
-        private async void OnBatteryStatusChanged(object sender, object e)
-        {
-            try
-            {
-                _logr.LogInformation("Battery status changed");
-                TheDispatcher.TryEnqueue(() => { GetBatteryPercentage(); });
-            }
-            catch (Exception ex)
-            {
-                _logr.LogError(ex, "Exception handling battery status change");
-            }
-        }
-
-        private async void OnPowerSupplyStatusChanged(object sender, object e)
-        {
-            try
-            {
-                _logr.LogInformation("Power supply status changed");
-                TheDispatcher.TryEnqueue(() => { GetBatteryPercentage(); });
-            }
-            catch (Exception ex)
-            {
-                _logr.LogError(ex, "Exception handling power supply status change");
-            }
-        }
 
         public void Init()
         {
@@ -175,6 +169,73 @@ namespace PowerSwitch.ViewModels
             catch (Exception ex)
             {
                 _logr.LogError(ex, "Exception during TrayIconVM initialization");
+            }
+        }
+
+        private async Task ReceiveSensorUpdates()
+        {
+            bool output_shown_once = false;
+            while (true)
+            {
+                try
+                {
+                    using var pipe = new NamedPipeClientStream(".", "SensorPipe", PipeDirection.In);
+                    await pipe.ConnectAsync(2000);
+                    using var reader = new StreamReader(pipe);
+
+                    while (!reader.EndOfStream)
+                    {
+                        var line = await reader.ReadLineAsync();
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+
+                        SensorPipePayload payload = null;
+                        try
+                        {
+                            payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
+                        }
+                        catch { }
+                        if (payload == null || payload.Sensors == null) continue;
+
+                        var readings = payload.Sensors;
+
+                        // Change to recieved Power Plan       
+                        var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
+                        SetPowerPlan(SelectedPlan);
+
+
+                        App.Main_Window.DispatcherQueue.TryEnqueue(() =>
+                        {
+                            var temp = readings?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
+                                       ?? readings?.FirstOrDefault(s => s.Category == "Temperature");
+                           
+                            if (temp != null)
+                            {
+                                //_logr.LogInformation($"Received CPU Temp: {LatestCpuTemp}");
+                                LatestCpuTemp = temp.Value;
+                            }
+                        });
+
+                        //if (!output_shown_once)
+                        Debug.WriteLine($"\nReadings...");
+
+                        foreach (var r in readings)
+                        {
+                            //if (!output_shown_once)
+                            {
+                                string debugLine = $"{r.Timestamp:HH:mm:ss} [{r.Category}] {r.Name}: {r.Value.ToString()}";
+                                Debug.WriteLine(debugLine);
+                            }
+                        }
+                        output_shown_once = true;
+
+                        // Send to TrayIconVM to use in the popup
+                        //WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings, ActivePlanGuid = activePlanGuid });
+                    }
+                }
+                catch
+                {
+                    await Task.Delay(2000);
+                }
             }
         }
 
@@ -224,24 +285,6 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        private BitmapImage ConvertEnumToImage(PowerPlan Schene)
-        {
-            var PowerMode = Schene.PowerMode;
-            _logr.LogInformation($"Active PowerMode {PowerMode}");
-            if (PowerMode == PowerMode.None)
-            {
-                _logr.LogInformation($"PowerMode is None, returning null image.");
-                return null;
-            }
-            string uri = PowerMode switch
-            {
-                PowerMode.Eco => "ms-appx:///Assets/gauge_low.ico",
-                PowerMode.Balanced => "ms-appx:///Assets/Inactive.ico",
-                PowerMode.High => "ms-appx:///Assets/gauge_high.ico",
-            };
-            return new BitmapImage(new Uri(uri));
-        }
-
         public async Task LoadPlansAsync()
         {
             try
@@ -262,8 +305,15 @@ namespace PowerSwitch.ViewModels
         {
             try
             {
-                ActiveScheme = Scheme;
+                if (Scheme.Guid == ActiveScheme.Guid)
+                {
+                    //_logr.LogInformation($"Already on the selected power plan: {Scheme.Name}");
+                    return;
+                }
+
                 bool success = await Task.Run(() => PowerPlanManager.SetActivePowerPlan(Scheme.Guid));
+
+                ActiveScheme = Scheme;
                 if (success)
                 {
                     UpdateUi();
@@ -274,6 +324,7 @@ namespace PowerSwitch.ViewModels
                     _logr.LogWarning("Failed to set power plan to {PlanName}", Scheme.Name);
                     _logr.LogWarning($"Failed to set power plan.");
                 }
+
             }
             catch (Exception ex)
             {
@@ -282,15 +333,62 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        private void SetCPUPercentage()
+        private void UpdateUi()
         {
-            Guid plan = PowerPlanManager.GetActivePlanGuid();
-            int acCpu = PowerPlanManager.GetCpuMaxPercentage(plan);
-            int dcCpu = PowerPlanManager.GetCpuMaxPercentageDC(plan);
-            Console.WriteLine($"AC Max CPU: {acCpu}%");
-            Console.WriteLine($"DC Max CPU: {dcCpu}%");
-            PowerPlanManager.SetCpuMaxPercentage(plan, 65);
-            PowerPlanManager.SetCpuMaxPercentageDC(plan, 63);
+            try
+            {
+                App.Main_Window.DispatcherQueue.TryEnqueue(async () =>
+                {
+
+                    var isWinDark = ThemeHelper.IsWindowsInDarkMode();
+                    if (isWinDark)
+                    {
+                        var img = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
+                        SelectedImage = img;
+                    }
+                    else
+                    {
+                        var img = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
+                        SelectedImage = img;
+                    }
+                    if (ActiveScheme.PowerMode == PowerMode.Eco)
+                    {
+                        IsSaverChecked = true;
+                        IsBalancedChecked = false;
+                        IsHighChecked = false;
+                    }
+                    else if (ActiveScheme.PowerMode == PowerMode.Balanced)
+                    {
+                        IsSaverChecked = false;
+                        IsBalancedChecked = true;
+                        IsHighChecked = false;
+                    }
+                    else if (ActiveScheme.PowerMode == PowerMode.High)
+                    {
+                        IsSaverChecked = false;
+                        IsBalancedChecked = false;
+                        IsHighChecked = true;
+                    }
+                    else if (ActiveScheme.PowerMode == PowerMode.None)
+                    {
+                        IsSaverChecked = false;
+                        IsBalancedChecked = false;
+                        IsHighChecked = false;
+                    }
+                    else
+                    {
+                        IsSaverChecked = false;
+                        IsBalancedChecked = false;
+                        IsHighChecked = false;
+                        _logr.LogInformation($"No known plan!");
+                    }
+                    GetBatteryPercentage();
+                });
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Exception updating UI");
+            }
         }
 
         private void GetBatteryPercentage()
@@ -319,59 +417,42 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        private void UpdateUi()
+        private async Task LoadTemperatureUnitAsync()
+        {
+            var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+            TemperatureUnit = persisted;
+            _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
+        }
+
+        private void OnBatteryStatusChanged(object sender, object e)
         {
             try
             {
-                var isWinDark = ThemeHelper.IsWindowsInDarkMode();
-                if (isWinDark)
-                {
-                    var img = new BitmapImage(new Uri(ActiveScheme.IconPath_WhiteFG));
-                    SelectedImage = img;
-                }
-                else
-                {
-                    var img = new BitmapImage(new Uri(ActiveScheme.IconPath_DarkFG));
-                    SelectedImage = img;
-                }
-                if (ActiveScheme.PowerMode == PowerMode.Eco)
-                {
-                    IsSaverChecked = true;
-                    IsBalancedChecked = false;
-                    IsHighChecked = false;
-                }
-                else if (ActiveScheme.PowerMode == PowerMode.Balanced)
-                {
-                    IsSaverChecked = false;
-                    IsBalancedChecked = true;
-                    IsHighChecked = false;
-                }
-                else if (ActiveScheme.PowerMode == PowerMode.High)
-                {
-                    IsSaverChecked = false;
-                    IsBalancedChecked = false;
-                    IsHighChecked = true;
-                }
-                else if (ActiveScheme.PowerMode == PowerMode.None)
-                {
-                    IsSaverChecked = false;
-                    IsBalancedChecked = false;
-                    IsHighChecked = false;
-                }
-                else
-                {
-                    IsSaverChecked = false;
-                    IsBalancedChecked = false;
-                    IsHighChecked = false;
-                    _logr.LogInformation($"No known plan!");
-                }
-                GetBatteryPercentage();
+                _logr.LogInformation("Battery status changed");
+                TheDispatcher.TryEnqueue(() => { GetBatteryPercentage(); });
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex, "Exception updating UI");
+                _logr.LogError(ex, "Exception handling battery status change");
             }
         }
+
+        private void OnPowerSupplyStatusChanged(object sender, object e)
+        {
+            try
+            {
+                _logr.LogInformation("Power supply status changed");
+                TheDispatcher.TryEnqueue(() => { GetBatteryPercentage(); });
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex, "Exception handling power supply status change");
+            }
+        }
+
+
+
+        #region RELAY COMMANDS
 
         [RelayCommand]
         public void Set_PowerSaver()
@@ -461,33 +542,6 @@ namespace PowerSwitch.ViewModels
             GetBatteryPercentage();
         }
 
-        private float? _latestCpuTemp;
-        public float? LatestCpuTemp
-        {
-            get => _latestCpuTemp;
-            private set
-            {
-                if (SetProperty(ref _latestCpuTemp, value))
-                {
-                    OnPropertyChanged(nameof(CpuTempTooltip));
-                }
-            }
-        }
-
-        public string CpuTempTooltip
-        {
-            get
-            {
-                if (!LatestCpuTemp.HasValue)
-                    return "CPU: N/A";
-                float temp = LatestCpuTemp.Value;
-                if (TemperatureUnit == TemperatureUnit.Fahrenheit)
-                    temp = temp * 9 / 5 + 32;
-                string unit = TemperatureUnit == TemperatureUnit.Fahrenheit ? "°F" : "°C";
-                return $"CPU: {temp:F1} {unit}";
-            }
-        }
-
         [RelayCommand]
         public void ShowCpuTempPopup()
         {
@@ -495,12 +549,41 @@ namespace PowerSwitch.ViewModels
             _logr.LogInformation($"Show popup: {tempText}");
         }
 
-        private async Task LoadTemperatureUnitAsync()
+        #endregion
+
+
+        #region OTHER
+
+        private BitmapImage ConvertEnumToImage(PowerPlan Schene)
         {
-            var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
-            TemperatureUnit = persisted;
-            _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
+            var PowerMode = Schene.PowerMode;
+            _logr.LogInformation($"Active PowerMode {PowerMode}");
+            if (PowerMode == PowerMode.None)
+            {
+                _logr.LogInformation($"PowerMode is None, returning null image.");
+                return null;
+            }
+            string uri = PowerMode switch
+            {
+                PowerMode.Eco => "ms-appx:///Assets/gauge_low.ico",
+                PowerMode.Balanced => "ms-appx:///Assets/Inactive.ico",
+                PowerMode.High => "ms-appx:///Assets/gauge_high.ico",
+            };
+            return new BitmapImage(new Uri(uri));
         }
+        private void SetCPUPercentage()
+        {
+            Guid plan = PowerPlanManager.GetActivePlanGuid();
+            int acCpu = PowerPlanManager.GetCpuMaxPercentage(plan);
+            int dcCpu = PowerPlanManager.GetCpuMaxPercentageDC(plan);
+            Console.WriteLine($"AC Max CPU: {acCpu}%");
+            Console.WriteLine($"DC Max CPU: {dcCpu}%");
+            PowerPlanManager.SetCpuMaxPercentage(plan, 65);
+            PowerPlanManager.SetCpuMaxPercentageDC(plan, 63);
+        }
+
+        #endregion
+
     }
 }
 

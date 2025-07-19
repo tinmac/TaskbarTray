@@ -22,6 +22,8 @@ using PowerSwitch.stuff;
 using PowerSwitch;
 using Serilog;
 
+namespace PowerSwitch.ViewModels;
+
 public partial class SensorsPipeViewModel : ObservableObject
 {
     [ObservableProperty] private ObservableCollection<ISeries> temperatureSeries = new();
@@ -49,7 +51,6 @@ public partial class SensorsPipeViewModel : ObservableObject
         _sensorHistory["fan #1"] = new List<(DateTime, float)> { (DateTime.Now, 1200f) };
 
         SetupInitialCharts();
-        Task.Run(ReceiveSensorUpdates);
     }
 
     private void SetupInitialCharts()
@@ -105,71 +106,6 @@ public partial class SensorsPipeViewModel : ObservableObject
         {
             new Axis { Labels = FanLabels }
         };
-    }
-
-    private async Task ReceiveSensorUpdates()
-    {
-        bool output_shown_once = false;
-        while (true)
-        {
-            try
-            {
-                using var pipe = new NamedPipeClientStream(".", "SensorPipe", PipeDirection.In);
-                await pipe.ConnectAsync(2000);
-                using var reader = new StreamReader(pipe);
-
-                while (!reader.EndOfStream)
-                {
-                    var line = await reader.ReadLineAsync();
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-
-                    // Deserialize as SensorPipePayload from Common.Models
-                    SensorPipePayload payload = null;
-                    try
-                    {
-                        payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
-                    }
-                    catch { }
-                    if (payload == null || payload.Sensors == null) continue;
-
-                    var readings = payload.Sensors;
-                    var activePlanGuid = payload.ActivePlanGuid;
-
-                    Log.Information($"Plan: {activePlanGuid}");
-
-                    App.Main_Window.DispatcherQueue.TryEnqueue(() =>
-                    {
-                        if (output_shown_once == false)
-                            Debug.WriteLine($"\nReadings...");
-
-                        foreach (var r in readings)
-                        {
-                            var list = _sensorHistory.GetOrAdd(r.Name, _ => new());
-                            list.Add((r.Timestamp, r.Value));
-                            if (list.Count > 50) list.RemoveAt(0);
-
-                            if (output_shown_once == false)
-                            {
-                                string line = $"\n{r.Timestamp:HH:mm:ss} [{r.Category}] {r.Name}: {r.Value}";
-                                Debug.WriteLine($"{line}");
-                            }
-                        }
-
-                        output_shown_once = true;
-
-                        UpdateChartData();
-
-
-                        // Send to TrayIconVM to use in the popup
-                        WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings, ActivePlanGuid = activePlanGuid });
-                    });
-                }
-            }
-            catch
-            {
-                await Task.Delay(2000);
-            }
-        }
     }
 
     private void UpdateChartData()
