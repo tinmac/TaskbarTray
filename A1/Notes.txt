@@ -4,12 +4,14 @@
 
 Todo
 ----
-Detect Service Status in App or via service?? ie of stopped or started how does app get instant feedback of service status?
 
-Startup logic: when the app is first installed localsettings.json doesnt exist, the app should create a new one with default values:
-- IncludePowerSaver true
-- IncludeBalanced true
-- IncludeHighPerformance false
+Thoroughly test Startup logic
+- delete localsettings.json
+- try all the permutations
+
+Change app to MSIX & check persistance of settings
+
+Add App Icon
 
 
 

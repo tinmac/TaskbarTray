@@ -45,7 +45,7 @@ namespace PowerSwitch
             try
             {
 
-                Title = "Taskbar Tray App"; // Set the title of the window
+                Title = "Power Switch"; // Set the title of the window
                                             // Icon = new BitmapImage(new Uri("ms-appx:///Assets/Icons/app_icon.ico")) // Set the icon if needed
 
                 _settingsService = Ioc.Default.GetRequiredService<ISettingsService>();
@@ -61,7 +61,7 @@ namespace PowerSwitch
 
                     WindowsData saveWinData = new WindowsData { Width = this.Width, Height = this.Height, X = position.X, Y = position.Y };
 
-                    Log.Information($"Saving X [{saveWinData.X}]  Y [{saveWinData.Y}]  W [{saveWinData.Width}]  H [{saveWinData.Height}]");
+                   // Log.Information($"Saving X [{saveWinData.X}]  Y [{saveWinData.Y}]  W [{saveWinData.Width}]  H [{saveWinData.Height}]");
 
 
 

@@ -63,6 +63,14 @@ namespace PowerSwitch.ViewModels
         [ObservableProperty]
         private string _batteryPercentage;
 
+        [ObservableProperty]
+        private Common.Models.ServiceStatus _serviceStatus = Common.Models.ServiceStatus.Unknown;
+
+        public Microsoft.UI.Xaml.Media.Brush ServiceStatusBrush =>
+            ServiceStatus == Common.Models.ServiceStatus.Running
+                ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen)
+                : new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
+
         List<PowerPlan> PowerPlans = new();
 
         private float? _latestCpuTemp;
@@ -156,6 +164,7 @@ namespace PowerSwitch.ViewModels
 
             // Start background sensor pipe reading worker service
             Task.Run(ReceiveSensorUpdates);
+            Task.Run(PollServiceStatusAsync); // Start polling service status
         }
 
 
@@ -684,6 +693,46 @@ namespace PowerSwitch.ViewModels
                 var lowest = includedPlans.OrderBy(p => p.PowerMode).First();
                 SetPowerPlan(lowest);
                 _logr.LogInformation($"Startup: Active plan not included, switched to lowest included plan {lowest.Name}");
+            }
+        }
+
+        private async Task PollServiceStatusAsync()
+        {
+            while (true)
+            {
+                try
+                {
+                    var status = GetServiceStatus();
+                    if (ServiceStatus != status)
+                    {
+                        ServiceStatus = status;
+                    }
+                }
+                catch { }
+                await Task.Delay(3000);
+            }
+        }
+
+        private Common.Models.ServiceStatus GetServiceStatus()
+        {
+            try
+            {
+                using var sc = new System.ServiceProcess.ServiceController("PowerSwitchService");
+                return sc.Status switch
+                {
+                    System.ServiceProcess.ServiceControllerStatus.Stopped => Common.Models.ServiceStatus.Stopped,
+                    System.ServiceProcess.ServiceControllerStatus.StartPending => Common.Models.ServiceStatus.StartPending,
+                    System.ServiceProcess.ServiceControllerStatus.StopPending => Common.Models.ServiceStatus.StopPending,
+                    System.ServiceProcess.ServiceControllerStatus.Running => Common.Models.ServiceStatus.Running,
+                    System.ServiceProcess.ServiceControllerStatus.ContinuePending => Common.Models.ServiceStatus.ContinuePending,
+                    System.ServiceProcess.ServiceControllerStatus.PausePending => Common.Models.ServiceStatus.PausePending,
+                    System.ServiceProcess.ServiceControllerStatus.Paused => Common.Models.ServiceStatus.Paused,
+                    _ => Common.Models.ServiceStatus.Unknown
+                };
+            }
+            catch
+            {
+                return Common.Models.ServiceStatus.Unknown;
             }
         }
     }

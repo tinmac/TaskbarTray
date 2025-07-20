@@ -249,7 +249,7 @@
                                     HorizontalAlignment="Center"
                                     Foreground="#444"
                                     Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                    Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
+                                    Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
 
                             </Border>
                         </StackPanel>

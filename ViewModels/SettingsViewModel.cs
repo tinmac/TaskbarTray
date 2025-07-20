@@ -168,6 +168,19 @@ public partial class SettingsViewModel : ObservableRecipient
         _suppressPlanFallback = false;
     }
 
+    [ObservableProperty]
+    private Common.Models.ServiceStatus _serviceStatus = Common.Models.ServiceStatus.Unknown;
+
+    [ObservableProperty]
+    private Microsoft.UI.Xaml.Media.Brush _serviceStatusBrush = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
+
+    partial void OnServiceStatusChanged(Common.Models.ServiceStatus value)
+    {
+        ServiceStatusBrush = value == Common.Models.ServiceStatus.Running
+            ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen)
+            : new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
+    }
+
     public SettingsViewModel(ISettingsService settingsService, ILogger<SettingsViewModel> logr)
     {
         _logr = logr;
@@ -200,6 +213,7 @@ public partial class SettingsViewModel : ObservableRecipient
             });
         _ = LoadStartupStateAsync();
         UpdateServiceStatus();
+        _ = PollServiceStatusAsync();
     }
  
     [RelayCommand]
@@ -389,8 +403,43 @@ public partial class SettingsViewModel : ObservableRecipient
         }
     }
 
-    public Microsoft.UI.Xaml.Media.Brush ServiceStatusBrush =>
-        ServiceStatusText == "Running"
-            ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen)
-            : new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
+    private async Task PollServiceStatusAsync()
+    {
+        while (true)
+        {
+            try
+            {
+                var status = GetServiceStatus();
+                if (ServiceStatus != status)
+                {
+                    ServiceStatus = status;
+                }
+            }
+            catch { }
+            await Task.Delay(3000);
+        }
+    }
+
+    private Common.Models.ServiceStatus GetServiceStatus()
+    {
+        try
+        {
+            using var sc = new ServiceController(ServiceName);
+            return sc.Status switch
+            {
+                ServiceControllerStatus.Stopped => Common.Models.ServiceStatus.Stopped,
+                ServiceControllerStatus.StartPending => Common.Models.ServiceStatus.StartPending,
+                ServiceControllerStatus.StopPending => Common.Models.ServiceStatus.StopPending,
+                ServiceControllerStatus.Running => Common.Models.ServiceStatus.Running,
+                ServiceControllerStatus.ContinuePending => Common.Models.ServiceStatus.ContinuePending,
+                ServiceControllerStatus.PausePending => Common.Models.ServiceStatus.PausePending,
+                ServiceControllerStatus.Paused => Common.Models.ServiceStatus.Paused,
+                _ => Common.Models.ServiceStatus.Unknown
+            };
+        }
+        catch
+        {
+            return Common.Models.ServiceStatus.Unknown;
+        }
+    }
 }
