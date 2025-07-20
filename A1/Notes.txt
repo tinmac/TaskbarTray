@@ -5,6 +5,8 @@
 Todo
 ----
 
+Did NOT start after a windows restart :-(
+
 Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star
 
 What is the second Temperature being reported? the case or what?? 

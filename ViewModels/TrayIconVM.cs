@@ -210,7 +210,7 @@ namespace PowerSwitch.ViewModels
                             payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
                         }
                         catch { }
-                        if (payload == null || payload.Sensors == null) continue;
+                        if (payload == null || payload.Hardware == null) continue;
 
                         // Run startup plan selection logic only once after first valid payload
                         if (!_startupPlanCheckDone && payload.ActivePlanGuid != Guid.Empty)
@@ -219,39 +219,35 @@ namespace PowerSwitch.ViewModels
                             _startupPlanCheckDone = true;
                         }
 
-                        var readings = payload.Sensors;
+                        var hardwareList = payload.Hardware;
 
                         // Change to recieved Power Plan       
                         var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
                         SetPowerPlan(SelectedPlan);
 
-
                         App.Main_Window.DispatcherQueue.TryEnqueue(() =>
                         {
-                            var temp = readings?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
-                                       ?? readings?.FirstOrDefault(s => s.Category == "Temperature");
-                           
+                            // Find CPU temp from hardware list
+                            var cpuHardware = hardwareList?.FirstOrDefault(h => h.Type.Contains("Cpu", StringComparison.OrdinalIgnoreCase));
+                            var temp = cpuHardware?.Sensors?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
+                                       ?? cpuHardware?.Sensors?.FirstOrDefault(s => s.Category == "Temperature");
                             if (temp != null)
                             {
-                                //_logr.LogInformation($"Received CPU Temp: {LatestCpuTemp}");
                                 LatestCpuTemp = temp.Value;
                             }
                         });
 
-                        //if (!output_shown_once)
-                        Debug.WriteLine($"\nReadings...");
-
-                        foreach (var r in readings)
+                        Debug.WriteLine($"\nHardware Readings...");
+                        foreach (var hw in hardwareList)
                         {
-                            //if (!output_shown_once)
+                            Debug.WriteLine($"Hardware: {hw.Name} ({hw.Type})");
+                            foreach (var r in hw.Sensors)
                             {
                                 string debugLine = $"{r.Timestamp:HH:mm:ss} [{r.Category}] {r.Name}: {r.Value.ToString()}";
                                 Debug.WriteLine(debugLine);
                             }
                         }
                         output_shown_once = true;
-
-                        // Send to TrayIconVM to use in the popup
                         //WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings, ActivePlanGuid = activePlanGuid });
                     }
                 }
@@ -478,8 +474,6 @@ namespace PowerSwitch.ViewModels
                 _logr.LogError(ex, "Exception handling power supply status change");
             }
         }
-
-
 
         #region RELAY COMMANDS
 
