@@ -49,8 +49,23 @@ public class LocalSettingsService : ILocalSettingsService
     {
         if (!_isInitialized)
         {
-            _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? new Dictionary<string, object>();
-
+            var path = Path.Combine(_applicationDataFolder, _localsettingsFile);
+            if (!File.Exists(path))
+            {
+                // Create with default values
+                var defaults = new Dictionary<string, object>
+                {
+                    { "IncludePowerSaver", true },
+                    { "IncludeBalanced", true },
+                    { "IncludeHighPerformance", false }
+                };
+                _fileService.Save(_applicationDataFolder, _localsettingsFile, defaults);
+                _settings = defaults;
+            }
+            else
+            {
+                _settings = await Task.Run(() => _fileService.Read<IDictionary<string, object>>(_applicationDataFolder, _localsettingsFile)) ?? new Dictionary<string, object>();
+            }
             _isInitialized = true;
         }
     }
@@ -72,11 +87,18 @@ public class LocalSettingsService : ILocalSettingsService
 
                 if (_settings != null && _settings.TryGetValue(key, out var obj))
                 {
-                    var strObj = (string)obj;
-
-                    var ret = await Json.ToObjectAsync<T>(strObj);
-
-                    return ret;
+                    if (obj is T tObj)
+                        return tObj;
+                    if (obj is string strObj)
+                        return await Json.ToObjectAsync<T>(strObj);
+                    try
+                    {
+                        return (T)Convert.ChangeType(obj, typeof(T));
+                    }
+                    catch
+                    {
+                        return default;
+                    }
                 }
                 else
                 {
