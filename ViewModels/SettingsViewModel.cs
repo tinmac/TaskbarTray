@@ -388,4 +388,9 @@ public partial class SettingsViewModel : ObservableRecipient
                 return "ms-appx:///Assets/ico/gauge.ico";
         }
     }
+
+    public Microsoft.UI.Xaml.Media.Brush ServiceStatusBrush =>
+        ServiceStatusText == "Running"
+            ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen)
+            : new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
 }

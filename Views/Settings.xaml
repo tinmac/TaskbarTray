@@ -34,75 +34,97 @@
             <StackPanel x:Name="ContentArea">
 
                 <!--  Temperature Unit Card  -->
-                <wct:SettingsCard
+                <Border
                     Margin="16 0 16 16"
-                    Header="Temperature Unit"
-                    HeaderIcon="{ui:FontIcon Glyph=&#xE8BE;}">
-                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                        <ComboBox
-                            x:Name="TemperatureUnitComboBox"
-                            Width="140"
-                            Margin="16 0 0 0"
-                            VerticalAlignment="Center"
-                            ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
-                            SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </wct:SettingsCard>
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF2C8;" />
+
+                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Temperature Unit" />
+                            <ComboBox
+                                x:Name="TemperatureUnitComboBox"
+                                Width="140"
+                                Margin="0 0 0 0"
+                                VerticalAlignment="Center"
+                                ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
+                                SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <!--  Start with Windows Card  -->
-                <wct:SettingsCard
+                <Border
                     Margin="16 0 16 16"
-                    Header="Start when Windows starts"
-                    HeaderIcon="{ui:FontIcon Glyph=&#xE7E8;}">
-                    <StackPanel>
-                        <ToggleSwitch
-                            IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
-                            OffContent="Disabled"
-                            OnContent="Enabled" />
-                    </StackPanel>
-                </wct:SettingsCard>
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF011;" />
+                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Start when Windows starts" />
+                            <ToggleSwitch
+                                IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                                OffContent="Disabled"
+                                OnContent="Enabled" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <!--  Power Plan Toggle Card  -->
-                <wct:SettingsCard Margin="16 0 16 16" ContentAlignment="Left">
-
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF62c;" />
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Margin="2 0 10 0"
-                            Orientation="Horizontal">
-
-                            <FontIcon FontFamily="{StaticResource FA6_Light}" Glyph="&#xF62c;"  />
-
-
-                            <!--<BitmapIcon
-                                Width="20"
-                                Height="20"
-                                VerticalAlignment="Top"
-                                UriSource="{x:Bind ViewModel.GaugeIconUri, Mode=OneWay}" />-->
-
+                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
                             <TextBlock
-                                Margin="20 -1 0 0"
-                                VerticalAlignment="Top"
-                                Style="{ThemeResource BodyTextBlockStyle}"
-                                Text="Quick Toggle" />
-
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1" Margin="42 0 0 0">
-                            <StackPanel Margin="0 0 0 0" Orientation="Horizontal">
-
-                                <TextBlock
-                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                    Text="Pick the plans here that you wish to toggle between when you click the Task Bar guage icon"
-                                    TextWrapping="Wrap" />
-
-                            </StackPanel>
-
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Included Power Plans for Toggle" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                Text="Pick the plans here that you wish to toggle between when you click the Task Bar guage icon"
+                                TextWrapping="Wrap" />
                             <CheckBox
                                 Margin="0 10 0 0"
                                 Content="Power Saver"
@@ -115,7 +137,6 @@
                                 Margin="0 4 0 0"
                                 Content="High Performance"
                                 IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
-
                             <TextBlock
                                 Margin="0 8 0 0"
                                 FontWeight="Bold"
@@ -124,35 +145,31 @@
                                 TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
-
-                </wct:SettingsCard>
+                </Border>
 
                 <!--  Theme Card  -->
-                <wct:SettingsCard Margin="16 0 16 16" ContentAlignment="Left">
-
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF186;" />
 
-                        <StackPanel
-                            Grid.Row="0"
-                            Margin="2 0 0 0"
-                            Orientation="Horizontal">
-
-                            <FontIcon FontFamily="{StaticResource FA6_Light}" Glyph="&#xF042;" />
-
+                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
                             <TextBlock
-                                Margin="20 0 0 0"
-                                VerticalAlignment="Top"
-                                Style="{ThemeResource BodyTextBlockStyle}"
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
                                 Text="Theme" />
-
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1" Margin="42 10 0 0">
-
                             <StackPanel>
                                 <RadioButton
                                     Command="{x:Bind ViewModel.SwitchThemeCommand}"
@@ -187,23 +204,57 @@
                             </StackPanel>
                         </StackPanel>
                     </Grid>
-
-
-                </wct:SettingsCard>
+                </Border>
 
                 <!--  Sensors Service Status Card  -->
-                <wct:SettingsCard
+                <Border
                     Margin="16 0 16 16"
-                    HeaderIcon="{ui:FontIcon Glyph=&#xEC4E;}"
-                    Description="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
-                    Header="Sensors Service Status">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock
-                            Margin="4 0 0 0"
-                            Style="{ThemeResource BodyStrongTextBlockStyle}"
-                            Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
-                    </StackPanel>
-                </wct:SettingsCard>
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF390;" />
+
+                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Sensors Service Status" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
+                                TextWrapping="Wrap" />
+
+                            <!--  Pill button for service status  -->
+                            <Border
+                                Width="100"
+                                Margin="0 10 0 0"
+                                Padding="8 4 8 5"
+                                HorizontalAlignment="Left"
+                                Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
+                                CornerRadius="8">
+
+                                <TextBlock
+                                    Margin="0 -1 0 0"
+                                    HorizontalAlignment="Center"
+                                    Foreground="#444"
+                                    Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.ServiceStatusText, Mode=OneWay}" />
+
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
 
                 <!--  App Version (not in card)  -->
                 <StackPanel Margin="10 10 0 10">
