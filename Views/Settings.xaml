@@ -113,18 +113,38 @@
                             Margin="0 0 12 0"
                             VerticalAlignment="Top"
                             FontFamily="{StaticResource FA6_Light}"
-                            Glyph="&#xF62c;" />
+                            Glyph="&#xF363;" />
 
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
                             <TextBlock
                                 Margin="0 0 0 8"
                                 Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                Text="Included Power Plans for Toggle" />
-                            <TextBlock
-                                Margin="0 0 0 8"
-                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                Text="Pick the plans here that you wish to toggle between when you click the Task Bar guage icon"
-                                TextWrapping="Wrap" />
+                                Text="Quick Switch" />
+
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock
+                                    Margin="0 0 0 8"
+                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                    Text="Select the plans that you wish to switch between when you click the Task Bar guage icon"
+                                    TextWrapping="Wrap" />
+
+                                <FontIcon
+                                    Grid.Column="0"
+                                    Margin="10 0 0 0"
+                                    VerticalAlignment="Top"
+                                    FontFamily="{StaticResource FA6_Light}"
+                                    Glyph="&#xF624;" />
+
+                                <!--<Image
+                                    Width="16"
+                                    Height="16"
+                                    Margin="10 0 0 0"
+                                    Source="{x:Bind ViewModel.GaugeIconUri, Mode=OneWay}" />-->
+
+                            </StackPanel>
+
+
                             <CheckBox
                                 Margin="0 10 0 0"
                                 Content="Power Saver"

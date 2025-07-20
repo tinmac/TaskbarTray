@@ -9,6 +9,8 @@
 		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
 		<PublishProfile>win-$(Platform).pubxml</PublishProfile>
 		<UseWinUI>true</UseWinUI>
+		
+		<ApplicationIcon>Assets\\AppIcon.ico</ApplicationIcon>
 
 		<!--<Nullable>enable</Nullable>-->
 
@@ -33,6 +35,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Assets\AppIcon.ico" />
 		<None Remove="Assets\gauge-high.ico" />
 		<None Remove="Assets\gauge.ico" />
 		<None Remove="Assets\ico\gauge-max-wh.ico" />
@@ -182,6 +185,11 @@
 			<HintPath>ExternalLibs\LibreHardwareMonitorLib.dll</HintPath>
 			<Private>True</Private>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="Assets\AppIcon.ico">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="install-service.ps1">
