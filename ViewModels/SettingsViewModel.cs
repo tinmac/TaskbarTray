@@ -375,4 +375,17 @@ public partial class SettingsViewModel : ObservableRecipient
         _logr.LogInformation("Loaded unit: {TemperatureUnit}", TemperatureUnit);
     }
     public TemperatureUnit[] TemperatureUnits => (TemperatureUnit[])Enum.GetValues(typeof(TemperatureUnit));
+
+    public string GaugeIconUri
+    {
+        get
+        {
+            // Use the system theme to select the correct icon
+            var theme = ElementTheme;
+            if (theme == ElementTheme.Dark)
+                return "ms-appx:///Assets/ico/gauge-wh.ico";
+            else
+                return "ms-appx:///Assets/ico/gauge.ico";
+        }
+    }
 }
