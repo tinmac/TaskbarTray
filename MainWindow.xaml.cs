@@ -40,6 +40,10 @@ namespace PowerSwitch
         {
             InitializeComponent();
 
+            // Enable custom title bar
+            ExtendsContentIntoTitleBar = true;
+            SetTitleBar(CustomTitleBar);
+
             //this.Activated += OnWindowActivated;
 
             try
@@ -153,5 +157,22 @@ namespace PowerSwitch
             }
         }
 
+        //private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.Minimize();
+        //}
+
+        //private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (this.WindowState == WinUIEx.WindowState.Maximized)
+        //        this.Restore();
+        //    else
+        //        this.Maximize();
+        //}
+
+        //private void CloseButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.Close();
+        //}
     }
 }

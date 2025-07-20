@@ -735,6 +735,14 @@ namespace PowerSwitch.ViewModels
                 return Common.Models.ServiceStatus.Unknown;
             }
         }
+
+        private async Task SaveAllTrayTogglesAsync(bool saver, bool balanced, bool high)
+        {
+            await _settingsService.SaveSettingAsync("IncludePowerSaver", saver);
+            await _settingsService.SaveSettingAsync("IncludeBalanced", balanced);
+            await _settingsService.SaveSettingAsync("IncludeHighPerformance", high);
+        }
+
     }
 }
 

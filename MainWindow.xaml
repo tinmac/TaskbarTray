@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
-    Title="MainWindow1"
+    Title="Power Switch"
     Width="700"
     Height="888"
     MinWidth="700"
@@ -17,6 +17,65 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid x:Name="main_grid" Loaded="main_grid_Loaded" />
+    <Grid>
+        <!--  Custom Title Bar  -->
+        <Grid
+            x:Name="CustomTitleBar"
+            Height="40"
+            VerticalAlignment="Top"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+         
+            <Image
+                Width="28"
+                Height="28"
+                Margin="8 6 8 6"
+                VerticalAlignment="Center"
+                Source="ms-appx:///Assets/AppIcon.ico" />
+            
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Style="{ThemeResource TitleLargeTextBlockStyle}"
+                Text="Power Switch" />
+            
+            <!--<StackPanel
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Orientation="Horizontal">
+             
+                <Button
+                    x:Name="MinimizeButton"
+                    Width="40"
+                    Height="32"
+                    Click="MinimizeButton_Click"
+                    Content="_" />
+              
+                <Button
+                    x:Name="MaximizeButton"
+                    Width="40"
+                    Height="32"
+                    Click="MaximizeButton_Click"
+                    Content="□" />
+                
+                <Button
+                    x:Name="CloseButton"
+                    Width="40"
+                    Height="32"
+                    Click="CloseButton_Click"
+                    Content="X" />
+                
+            </StackPanel>-->
+            
+        </Grid>
+        <Grid
+            x:Name="main_grid"
+            Margin="0 40 0 0"
+            Loaded="main_grid_Loaded" />
+    </Grid>
 
 </winex:WindowEx>

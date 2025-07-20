@@ -63,6 +63,13 @@ public partial class SettingsViewModel : ObservableRecipient
   
     [ObservableProperty]
     private bool includePowerSaver = true;
+    private async Task SaveAllPlanTogglesAsync()
+    {
+        await _settingsService.SaveSettingAsync(IncludePowerSaverKey, IncludePowerSaver);
+        await _settingsService.SaveSettingAsync(IncludeBalancedKey, IncludeBalanced);
+        await _settingsService.SaveSettingAsync(IncludeHighPerformanceKey, IncludeHighPerformance);
+    }
+
     partial void OnIncludePowerSaverChanged(bool value)
     {
         _logr.LogInformation($"IncludePowerSaver changed to: {value}");
@@ -83,7 +90,7 @@ public partial class SettingsViewModel : ObservableRecipient
         }
         if (!_isRevertingPlanSelection)
             PowerPlanSelectionError = string.Empty;
-        _ = _settingsService.SaveSettingAsync(IncludePowerSaverKey, value);
+        _ = SaveAllPlanTogglesAsync();
     }
     [ObservableProperty]
     private bool includeBalanced = true;
@@ -106,7 +113,7 @@ public partial class SettingsViewModel : ObservableRecipient
         }
         if (!_isRevertingPlanSelection)
             PowerPlanSelectionError = string.Empty;
-        _ = _settingsService.SaveSettingAsync(IncludeBalancedKey, value);
+        _ = SaveAllPlanTogglesAsync();
     }
     [ObservableProperty]
     private bool includeHighPerformance = false;
@@ -129,7 +136,7 @@ public partial class SettingsViewModel : ObservableRecipient
         }
         if (!_isRevertingPlanSelection)
             PowerPlanSelectionError = string.Empty;
-        _ = _settingsService.SaveSettingAsync(IncludeHighPerformanceKey, value);
+        _ = SaveAllPlanTogglesAsync();
     }
 
     private string _powerPlanSelectionError;

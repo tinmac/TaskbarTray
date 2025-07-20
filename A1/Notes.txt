@@ -5,14 +5,17 @@
 Todo
 ----
 
-Thoroughly test Startup logic
-- delete localsettings.json
-- try all the permutations
+Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star
+
+What is the second Temperature being reported? the case or what?? 
+
+Clean up logging
+- remove sanity logging 
+- not use Console.WriteLine
+- overwrite the log file each month? 
+- Max log file siz?
 
 Change app to MSIX & check persistance of settings
-
-Add App Icon
-
 
 
 Links
