@@ -5,6 +5,23 @@
 Todo
 ----
 
+Install the App but dont install the service, 
+ handle gracefully ie hide temp & battery levels, 
+ is battery level coming from service or direct??
+
+Send to the worker that we want to monitor the following Hardware categories and SensorTypes
+- CPU Temperature
+- Storage Temperature
+- Energy 
+- Battery
+- PSU
+
+
+Provide a means for the user to pick the Hardware categories and then filter that hardware for the SensorTypes allowed that the user also picks, like a parent/child relationship
+so we can for example have Temperature reoprted for CPU and Storage, but not for GPU 
+then send this list to the Worker via the new pipe
+
+
 Did NOT start after a windows restart :-(
 
 Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star

@@ -15,6 +15,13 @@ using PowerSwitch.Persistance;
 using PowerSwitch.Services;
 using PowerSwitch.stuff;
 using Windows.ApplicationModel;
+using Common.Models;
+using LibreHardwareMonitor.Hardware;
+using System.Collections.ObjectModel;
+using System.IO.Pipes;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.IO;
 
 namespace PowerSwitch.ViewModels;
 
@@ -63,6 +70,7 @@ public partial class SettingsViewModel : ObservableRecipient
   
     [ObservableProperty]
     private bool includePowerSaver = true;
+
     private async Task SaveAllPlanTogglesAsync()
     {
         await _settingsService.SaveSettingAsync(IncludePowerSaverKey, IncludePowerSaver);
@@ -447,6 +455,64 @@ public partial class SettingsViewModel : ObservableRecipient
         catch
         {
             return Common.Models.ServiceStatus.Unknown;
+        }
+    }
+
+    [ObservableProperty]
+    private ObservableCollection<HardwareSensorSelection> hardwareSensorSelections = new();
+
+    [ObservableProperty]
+    private ObservableCollection<string> availableSensorTypes = new();
+
+    [RelayCommand]
+    public async Task LoadHardwareAndSensorsAsync()
+    {
+        var computer = new Computer
+        {
+            IsCpuEnabled = true,
+            IsGpuEnabled = true,
+            IsMotherboardEnabled = true,
+            IsControllerEnabled = true,
+            IsMemoryEnabled = true,
+            IsStorageEnabled = true,
+            IsNetworkEnabled = true
+        };
+        computer.Open();
+        HardwareSensorSelections.Clear();
+        var sensorTypesSet = new HashSet<string>();
+        foreach (var hardware in computer.Hardware)
+        {
+            hardware.Update();
+            var types = hardware.Sensors.Select(s => s.SensorType.ToString()).Distinct().ToList();
+            foreach (var t in types)
+                sensorTypesSet.Add(t);
+            HardwareSensorSelections.Add(new HardwareSensorSelection
+            {
+                HardwareType = hardware.HardwareType.ToString(),
+                HardwareName = hardware.Name,
+                AllowedSensorTypes = new List<string>(types) // default: all available
+            });
+        }
+        AvailableSensorTypes = new ObservableCollection<string>(sensorTypesSet);
+        computer.Close();
+    }
+
+    [RelayCommand]
+    public async Task SendHardwareSensorSelectionAsync()
+    {
+        // Send the user's selection to the Worker via the control pipe
+        try
+        {
+            var selections = HardwareSensorSelections.ToList();
+            string json = JsonSerializer.Serialize(selections);
+            using var pipe = new NamedPipeClientStream(".", "SensorPipeControl", PipeDirection.Out);
+            await pipe.ConnectAsync(1000);
+            using var writer = new StreamWriter(pipe) { AutoFlush = true };
+            await writer.WriteLineAsync(json);
+        }
+        catch (Exception ex)
+        {
+            _logr.LogError(ex, "Failed to send hardware/sensor selection to Worker");
         }
     }
 }
