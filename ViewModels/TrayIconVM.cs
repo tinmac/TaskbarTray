@@ -39,6 +39,9 @@ namespace PowerSwitch.ViewModels
         private readonly ISettingsService _settingsService;
         private const string TemperatureUnitKey = "TemperatureUnit";
 
+        public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
+
+
         [ObservableProperty]
         private BitmapImage _selectedImage;
 
@@ -66,6 +69,9 @@ namespace PowerSwitch.ViewModels
         [ObservableProperty]
         private ServiceStatus _serviceStatus = ServiceStatus.Unknown;
 
+        List<PowerPlan> PowerPlans = new();
+    
+
         private bool _isBatteryPercentageVisible;
         public bool IsBatteryPercentageVisible
         {
@@ -81,6 +87,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
+     
         private bool _isCpuTempVisible;
         public bool IsCpuTempVisible
         {
@@ -96,6 +103,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
+      
         private bool _isInfoSeparatorVisible;
         public bool IsInfoSeparatorVisible
         {
@@ -115,9 +123,6 @@ namespace PowerSwitch.ViewModels
         }
 
 
-        List<PowerPlan> PowerPlans = new();
-
-
         private string _cpuTempTooltip;
         public string CpuTempTooltip
         {
@@ -132,10 +137,8 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
 
         private TemperatureUnit _temperatureUnit = TemperatureUnit.Celsius;
-
         public TemperatureUnit TemperatureUnit
         {
             get => _temperatureUnit;
