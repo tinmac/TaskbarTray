@@ -4,6 +4,7 @@
 
 Todo
 ----
+Did NOT start after a windows restart :-(
 
 Install the App but dont install the service, 
  handle gracefully ie hide temp & battery levels, 
@@ -22,11 +23,9 @@ so we can for example have Temperature reoprted for CPU and Storage, but not for
 then send this list to the Worker via the new pipe
 
 
-Did NOT start after a windows restart :-(
-
 Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star
 
-What is the second Temperature being reported? the case or what?? 
+What is the second Temperature being reported? the case or what?? - Its the SSD
 
 Clean up logging
 - remove sanity logging 

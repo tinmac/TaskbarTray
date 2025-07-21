@@ -190,7 +190,6 @@ namespace PowerSwitch.ViewModels
 
         private async Task ReceiveSensorUpdates()
         {
-            bool output_shown_once = false;
             while (true)
             {
                 try
@@ -204,51 +203,27 @@ namespace PowerSwitch.ViewModels
                         var line = await reader.ReadLineAsync();
                         if (string.IsNullOrWhiteSpace(line)) continue;
 
-                        SensorPipePayload payload = null;
                         try
                         {
-                            payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
-                        }
-                        catch { }
-                        if (payload == null || payload.Hardware == null) continue;
-
-                        // Run startup plan selection logic only once after first valid payload
-                        if (!_startupPlanCheckDone && payload.ActivePlanGuid != Guid.Empty)
-                        {
-                            RunStartupPlanSelection(payload.ActivePlanGuid);
-                            _startupPlanCheckDone = true;
-                        }
-
-                        var hardwareList = payload.Hardware;
-
-                        // Change to recieved Power Plan       
-                        var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
-                        SetPowerPlan(SelectedPlan);
-
-                        App.Main_Window.DispatcherQueue.TryEnqueue(() =>
-                        {
-                            // Find CPU temp from hardware list
-                            var cpuHardware = hardwareList?.FirstOrDefault(h => h.Type.Contains("Cpu", StringComparison.OrdinalIgnoreCase));
-                            var temp = cpuHardware?.Sensors?.FirstOrDefault(s => s.Name.Contains("Tctl/Tdie", StringComparison.OrdinalIgnoreCase))
-                                       ?? cpuHardware?.Sensors?.FirstOrDefault(s => s.Category == "Temperature");
-                            if (temp != null)
+                            var payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
+                            if (payload != null)
                             {
-                                LatestCpuTemp = temp.Value;
-                            }
-                        });
-
-                        Debug.WriteLine($"\nHardware Readings...");
-                        foreach (var hw in hardwareList)
-                        {
-                            Debug.WriteLine($"Hardware: {hw.Name} ({hw.Type})");
-                            foreach (var r in hw.Sensors)
-                            {
-                                string debugLine = $"{r.Timestamp:HH:mm:ss} [{r.Category}] {r.Name}: {r.Value.ToString()}";
-                                Debug.WriteLine(debugLine);
+                                if (float.TryParse(payload.CpuTemperature, out float temp))
+                                {
+                                    LatestCpuTemp = temp;
+                                }
+                                else
+                                {
+                                    LatestCpuTemp = null;
+                                }
+                                var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
+                                SetPowerPlan(SelectedPlan);
                             }
                         }
-                        output_shown_once = true;
-                        //WeakReferenceMessenger.Default.Send(new Msg_Readings { SensorReadings = readings, ActivePlanGuid = activePlanGuid });
+                        catch (Exception ex)
+                        {
+                            _logr.LogError(ex, "Error parsing SensorPipePayload");
+                        }
                     }
                 }
                 catch
