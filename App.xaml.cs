@@ -43,6 +43,20 @@ public sealed partial class App : Application
     {
         InitializeComponent();
 
+        this.UnhandledException += (sender, e) =>
+        {
+            Log.Fatal($"Unhandled exception: {e.Exception}");
+
+            Debug.WriteLine($"Unhandled exception: {e.Exception}");
+
+            try
+            {
+                var logger = ServiceProvider?.GetService<ILogger<App>>();
+                logger?.LogError(e.Exception, "Unhandled exception in App");
+            }
+            catch { }
+        };
+
         ServiceProvider = ConfigureServices();
         Ioc.Default.ConfigureServices(ServiceProvider);
         _logr = ServiceProvider.GetRequiredService<ILogger<App>>();
