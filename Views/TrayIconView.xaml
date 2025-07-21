@@ -92,20 +92,13 @@
 
         <tb:TaskbarIcon.ContextFlyout>
 
-            <MenuFlyout x:Name="MyMenuFlyout" AreOpenCloseAnimationsEnabled="False">
-
-                <!--<RadioMenuFlyoutItem Text="Options 1" />
-                <RadioMenuFlyoutItem Text="Options 2" />
-                <RadioMenuFlyoutItem Text="Options 3" />
-
-                <MenuFlyoutSeparator />-->
+            <MenuFlyout x:Name="MyMenuFlyout" AreOpenCloseAnimationsEnabled="True">
 
                 <MenuFlyoutItem
                     IsEnabled="False"
                     Text="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{x:Bind ViewModel.IsBatteryPercentageVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <!---->
                 <MenuFlyoutItem
                     IsEnabled="False"
                     Text="{x:Bind ViewModel.CpuTempTooltip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

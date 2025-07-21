@@ -70,7 +70,7 @@ namespace PowerSwitch.ViewModels
         private ServiceStatus _serviceStatus = ServiceStatus.Unknown;
 
         List<PowerPlan> PowerPlans = new();
-    
+
 
         private bool _isBatteryPercentageVisible;
         public bool IsBatteryPercentageVisible
@@ -87,7 +87,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-     
+
         private bool _isCpuTempVisible;
         public bool IsCpuTempVisible
         {
@@ -103,7 +103,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-      
+
         private bool _isInfoSeparatorVisible;
         public bool IsInfoSeparatorVisible
         {
@@ -667,13 +667,24 @@ namespace PowerSwitch.ViewModels
             }
         }
 
+
         [RelayCommand]
         public async void OpenContextMenu()
         {
-            var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
-            TemperatureUnit = persisted;
-            _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
-            GetBatteryPercentage();
+            try
+            {
+                var persisted = await _settingsService.GetSettingAsync<TemperatureUnit>(TemperatureUnitKey);
+                TemperatureUnit = persisted;
+                _logr.LogInformation("Temperature unit: {TemperatureUnit}", TemperatureUnit);
+                GetBatteryPercentage();
+
+            }
+            catch (Exception ex)
+            {
+                _logr.LogError(ex,$"Exception in OpenContextMenu: {ex.Message}");
+                throw;
+            }
+
         }
 
 

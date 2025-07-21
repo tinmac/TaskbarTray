@@ -96,7 +96,11 @@ public class SettingsService : ISettingsService
     {
         var value = await _localSettingsService.ReadSettingAsync<string>(key);
         if (typeof(T).IsEnum && value != null)
+        {
+            // Remove surrounding quotes if present
+            value = value.Trim('"');
             return (T)Enum.Parse(typeof(T), value);
+        }
         return await _localSettingsService.ReadSettingAsync<T>(key);
     }
 
