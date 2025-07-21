@@ -66,15 +66,12 @@ namespace PowerSwitch.ViewModels
         [ObservableProperty]
         private Common.Models.ServiceStatus _serviceStatus = Common.Models.ServiceStatus.Unknown;
 
-        public Microsoft.UI.Xaml.Media.Brush ServiceStatusBrush =>
-            ServiceStatus == Common.Models.ServiceStatus.Running
-                ? new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LightGreen)
-                : new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.OrangeRed);
 
         List<PowerPlan> PowerPlans = new();
 
-        private float? _latestCpuTemp;
-        public float? LatestCpuTemp
+
+        private string _latestCpuTemp;
+        public string LatestCpuTemp
         {
             get => _latestCpuTemp;
             private set
@@ -90,13 +87,10 @@ namespace PowerSwitch.ViewModels
         {
             get
             {
-                if (!LatestCpuTemp.HasValue)
+                if (string.IsNullOrWhiteSpace(LatestCpuTemp) || LatestCpuTemp == "N/A")
                     return "CPU: N/A";
-                float temp = LatestCpuTemp.Value;
-                if (TemperatureUnit == TemperatureUnit.Fahrenheit)
-                    temp = temp * 9 / 5 + 32;
-                string unit = TemperatureUnit == TemperatureUnit.Fahrenheit ? "°F" : "°C";
-                return $"CPU: {temp:F1} {unit}";
+                // If you want to show units, append them
+                return $"CPU: {LatestCpuTemp} °C";
             }
         }
 
@@ -205,24 +199,30 @@ namespace PowerSwitch.ViewModels
 
                         try
                         {
-                            var payload = JsonSerializer.Deserialize<SensorPipePayload>(line);
-                            if (payload != null)
+                            var options = new JsonSerializerOptions
                             {
-                                if (float.TryParse(payload.CpuTemperature, out float temp))
-                                {
-                                    LatestCpuTemp = temp;
-                                }
-                                else
-                                {
-                                    LatestCpuTemp = null;
-                                }
+                                PropertyNameCaseInsensitive = true
+                            };
+                            var payload = JsonSerializer.Deserialize<SensorPipePayload>(line, options);
+                            if (payload != null && !string.IsNullOrWhiteSpace(payload.CpuTemperature))
+                            {
+                                TheDispatcher.TryEnqueue(() => LatestCpuTemp = payload.CpuTemperature);
                                 var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
                                 SetPowerPlan(SelectedPlan);
+
+                                _logr.LogInformation($"Rx {LatestCpuTemp}");
+
+                            }
+                            else
+                            {
+                                _logr.LogError($"Payload is null or missing CpuTemperature. Raw: {line}");
+                                TheDispatcher.TryEnqueue(() => LatestCpuTemp = "N/A");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logr.LogError(ex, "Error parsing SensorPipePayload");
+                            _logr.LogError(ex, $"Error parsing SensorPipePayload. Raw: {line}");
+                            TheDispatcher.TryEnqueue(() => LatestCpuTemp = "N/A");
                         }
                     }
                 }
@@ -609,7 +609,9 @@ namespace PowerSwitch.ViewModels
         [RelayCommand]
         public void ShowCpuTempPopup()
         {
-            string tempText = LatestCpuTemp.HasValue ? $"CPU: {LatestCpuTemp:F1} °C" : "CPU: N/A";
+            string tempText = string.IsNullOrWhiteSpace(LatestCpuTemp) || LatestCpuTemp == "N/A"
+                ? "CPU: N/A"
+                : $"CPU: {LatestCpuTemp} °C";
             _logr.LogInformation($"Show popup: {tempText}");
         }
 

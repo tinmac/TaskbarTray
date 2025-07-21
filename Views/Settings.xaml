@@ -7,9 +7,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:PowerSwitch.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:Common.Models"
     xmlns:stuff="using:PowerSwitch.stuff"
     xmlns:xaml="using:Microsoft.UI.Xaml"
-    xmlns:models="using:Common.Models"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -18,81 +18,193 @@
     </Page.Resources>
 
     <Grid Margin="0 0 0 0">
-        <ScrollViewer>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Page Title  -->
+        <TextBlock
+            Grid.Row="0"
+            Margin="16 10 0 16"
+            FontSize="32"
+            FontWeight="Bold"
+            Style="{ThemeResource TitleTextBlockStyle}"
+            Text="Settings" />
+
+        <ScrollViewer Grid.Row="1">
+
             <StackPanel x:Name="ContentArea">
-                <!-- Page Title -->
-                <TextBlock Text="Settings" Margin="16 16 0 16" FontSize="32" FontWeight="Bold" Style="{ThemeResource TitleTextBlockStyle}" />
+
                 <!--  Temperature Unit Card  -->
-                <Border Margin="16 0 16 16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Margin="0 0 12 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF2C8;" />
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF2C8;" />
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Temperature Unit" />
-                            <ComboBox x:Name="TemperatureUnitComboBox" Width="140" Margin="0 0 0 0" VerticalAlignment="Center" ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Temperature Unit" />
+                            <ComboBox
+                                x:Name="TemperatureUnitComboBox"
+                                Width="140"
+                                Margin="0 0 0 0"
+                                VerticalAlignment="Center"
+                                ItemsSource="{x:Bind ViewModel.TemperatureUnits, Mode=OneWay}"
+                                SelectedItem="{x:Bind ViewModel.TemperatureUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         </StackPanel>
                     </Grid>
                 </Border>
+
                 <!--  Start with Windows Card  -->
-                <Border Margin="16 0 16 16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Margin="0 0 12 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF011;" />
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF011;" />
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Start when Windows starts" />
-                            <ToggleSwitch IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}" OffContent="Disabled" OnContent="Enabled" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Start when Windows starts" />
+                            <ToggleSwitch
+                                IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                                OffContent="Disabled"
+                                OnContent="Enabled" />
                         </StackPanel>
                     </Grid>
                 </Border>
+
                 <!--  Power Plan Toggle Card  -->
-                <Border Margin="16 0 16 16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Margin="0 0 12 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF363;" />
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF363;" />
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Quick Switch" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Quick Switch" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Margin="0 0 0 8" Style="{ThemeResource CaptionTextBlockStyle}" Text="Select the plans that you wish to switch between when you click the Task Bar guage icon" TextWrapping="Wrap" />
-                                <FontIcon Grid.Column="0" Margin="10 0 0 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF624;" />
+                                <TextBlock
+                                    Margin="0 0 0 8"
+                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                    Text="Select the plans that you wish to switch between when you click the Task Bar guage icon"
+                                    TextWrapping="Wrap" />
+                                <FontIcon
+                                    Grid.Column="0"
+                                    Margin="10 0 0 0"
+                                    VerticalAlignment="Top"
+                                    FontFamily="{StaticResource FA6_Light}"
+                                    Glyph="&#xF624;" />
                             </StackPanel>
-                            <CheckBox Margin="0 10 0 0" Content="Power Saver" IsChecked="{x:Bind ViewModel.IncludePowerSaver, Mode=TwoWay}" />
-                            <CheckBox Margin="0 4 0 0" Content="Balanced" IsChecked="{x:Bind ViewModel.IncludeBalanced, Mode=TwoWay}" />
-                            <CheckBox Margin="0 4 0 0" Content="High Performance" IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
-                            <TextBlock Margin="0 8 0 0" FontWeight="Bold" Foreground="OrangeRed" Text="{Binding PowerPlanSelectionError, Mode=OneWay}" TextWrapping="Wrap" />
+                            <CheckBox
+                                Margin="0 10 0 0"
+                                Content="Power Saver"
+                                IsChecked="{x:Bind ViewModel.IncludePowerSaver, Mode=TwoWay}" />
+                            <CheckBox
+                                Margin="0 4 0 0"
+                                Content="Balanced"
+                                IsChecked="{x:Bind ViewModel.IncludeBalanced, Mode=TwoWay}" />
+                            <CheckBox
+                                Margin="0 4 0 0"
+                                Content="High Performance"
+                                IsChecked="{x:Bind ViewModel.IncludeHighPerformance, Mode=TwoWay}" />
+                            <TextBlock
+                                Margin="0 8 0 0"
+                                FontWeight="Bold"
+                                Foreground="OrangeRed"
+                                Text="{Binding PowerPlanSelectionError, Mode=OneWay}"
+                                TextWrapping="Wrap" />
                         </StackPanel>
                     </Grid>
                 </Border>
+
                 <!--  Theme Card  -->
-                <Border Margin="16 0 16 16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Margin="0 0 12 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF186;" />
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF186;" />
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Theme" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Theme" />
                             <StackPanel>
-                                <RadioButton Command="{x:Bind ViewModel.SwitchThemeCommand}" Content="Light" FontSize="15" GroupName="AppTheme" IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}">
+                                <RadioButton
+                                    Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                    Content="Light"
+                                    FontSize="15"
+                                    GroupName="AppTheme"
+                                    IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}">
                                     <RadioButton.CommandParameter>
                                         <xaml:ElementTheme>Light</xaml:ElementTheme>
                                     </RadioButton.CommandParameter>
                                 </RadioButton>
-                                <RadioButton Command="{x:Bind ViewModel.SwitchThemeCommand}" Content="Dark" FontSize="15" GroupName="AppTheme" IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}">
+                                <RadioButton
+                                    Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                    Content="Dark"
+                                    FontSize="15"
+                                    GroupName="AppTheme"
+                                    IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}">
                                     <RadioButton.CommandParameter>
                                         <xaml:ElementTheme>Dark</xaml:ElementTheme>
                                     </RadioButton.CommandParameter>
                                 </RadioButton>
-                                <RadioButton Command="{x:Bind ViewModel.SwitchThemeCommand}" Content="Default" FontSize="15" GroupName="AppTheme" IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}">
+                                <RadioButton
+                                    Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                    Content="Default"
+                                    FontSize="15"
+                                    GroupName="AppTheme"
+                                    IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}">
                                     <RadioButton.CommandParameter>
                                         <xaml:ElementTheme>Default</xaml:ElementTheme>
                                     </RadioButton.CommandParameter>
@@ -101,30 +213,58 @@
                         </StackPanel>
                     </Grid>
                 </Border>
+
                 <!--  Sensors Service Status Card  -->
-                <Border Margin="16 0 16 16" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" CornerRadius="8">
+                <Border
+                    Margin="16 0 16 16"
+                    Padding="16"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Margin="0 0 12 0" VerticalAlignment="Top" FontFamily="{StaticResource FA6_Light}" Glyph="&#xF390;" />
+                        <FontIcon
+                            Grid.Column="0"
+                            Margin="0 0 12 0"
+                            VerticalAlignment="Top"
+                            FontFamily="{StaticResource FA6_Light}"
+                            Glyph="&#xF390;" />
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Sensors Service Status" />
-                            <TextBlock Margin="0 0 0 8" Style="{ThemeResource CaptionTextBlockStyle}" Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan" TextWrapping="Wrap" />
-                            <Border Width="100" Margin="0 10 0 0" Padding="8 4 8 5" HorizontalAlignment="Left" Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}" CornerRadius="8">
-                                <TextBlock Margin="0 -1 0 0" HorizontalAlignment="Center" Foreground="#444" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                Text="Sensors Service Status" />
+                            <TextBlock
+                                Margin="0 0 0 8"
+                                Style="{ThemeResource CaptionTextBlockStyle}"
+                                Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
+                                TextWrapping="Wrap" />
+                            <Border
+                                Width="100"
+                                Margin="0 10 0 0"
+                                Padding="8 4 8 5"
+                                HorizontalAlignment="Left"
+                                Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
+                                CornerRadius="8">
+                                <TextBlock
+                                    Margin="0 -1 0 0"
+                                    HorizontalAlignment="Center"
+                                    Foreground="#444"
+                                    Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
                             </Border>
                         </StackPanel>
                     </Grid>
                 </Border>
+
                 <!--  App Version (not in card)  -->
-                <StackPanel Margin="10 10 0 10">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="v" />
-                        <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
-                    </StackPanel>
+                <StackPanel Margin="10 10 0 10" Orientation="Horizontal">
+                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="v" />
+                    <TextBlock Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
                 </StackPanel>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

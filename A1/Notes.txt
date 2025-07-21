@@ -4,7 +4,6 @@
 
 Todo
 ----
-Did NOT start after a windows restart :-(
 
 Install the App but dont install the service, 
  handle gracefully ie hide temp & battery levels, 
