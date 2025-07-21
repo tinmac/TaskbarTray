@@ -234,7 +234,10 @@ namespace PowerSwitch.ViewModels
                     TheDispatcher?.TryEnqueue(() => { IsCpuTempVisible = false; });
                     await Task.Delay(2000);
                     if (!error_shown_once)
+                    {
                         _logr.LogInformation("Service not running, hiding CPU temp.");
+                        error_shown_once = true;
+                    }
                     continue;
                 }
 
@@ -263,7 +266,7 @@ namespace PowerSwitch.ViewModels
                             var payload = JsonSerializer.Deserialize<SensorPipePayload>(line, options);
                             if (payload != null && !string.IsNullOrWhiteSpace(payload.CpuTemperature))
                             {
-                                var t_disp = $"CPU: {payload.CpuTemperature} °C";
+                                var t_disp = FormatTemperature(payload.CpuTemperature);
                                 TheDispatcher.TryEnqueue(() =>
                                 {
                                     CpuTempTooltip = t_disp;
@@ -520,6 +523,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
+
         #region RELAY COMMANDS
 
         [RelayCommand]
@@ -764,7 +768,33 @@ namespace PowerSwitch.ViewModels
             }
         }
 
+        private string FormatTemperature(string tempStr)
+        {
+            if (string.IsNullOrWhiteSpace(tempStr) || tempStr == "N/A")
+                return "CPU: N/A";
+            if (!double.TryParse(tempStr, out double tempC))
+                return $"CPU: {tempStr}";
+            
+            if (TemperatureUnit == TemperatureUnit.Fahrenheit)
+            {
+                double tempF = (tempC * 9.0 / 5.0) + 32.0;
+                return $"CPU: {tempF:F1} °F";
+            }
+            else
+            {
+                return $"CPU: {tempC:F1} °C";
+            }
+        }
 
+        private string FormatTemperatureBoth(string tempStr)
+        {
+            if (string.IsNullOrWhiteSpace(tempStr) || tempStr == "N/A")
+                return "CPU: N/A";
+            if (!double.TryParse(tempStr, out double tempC))
+                return $"CPU: {tempStr}";
+            double tempF = (tempC * 9.0 / 5.0) + 32.0;
+            return $"CPU: {tempC:F1} °C / {tempF:F1} °F";
+        }
     }
 }
 

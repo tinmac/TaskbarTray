@@ -4,31 +4,9 @@
 
 Todo
 ----
-My logic is wrong, battery is not reported by the worker service only cpu temp
-We need to show battery if its available (dont hode if service not running)
-only temp should be hidden if service not running
-
-
-Install the App but dont install the service, 
- handle gracefully ie hide temp & battery levels, 
- is battery level coming from service or direct??
-
-Send to the worker that we want to monitor the following Hardware categories and SensorTypes
-- CPU Temperature
-- Storage Temperature
-- Energy 
-- Battery
-- PSU
-
-
-Provide a means for the user to pick the Hardware categories and then filter that hardware for the SensorTypes allowed that the user also picks, like a parent/child relationship
-so we can for example have Temperature reoprted for CPU and Storage, but not for GPU 
-then send this list to the Worker via the new pipe
-
 
 Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star
 
-What is the second Temperature being reported? the case or what?? - Its the SSD
 
 Clean up logging
 - remove sanity logging 
