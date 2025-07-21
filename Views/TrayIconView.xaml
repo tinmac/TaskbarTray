@@ -100,11 +100,18 @@
 
                 <MenuFlyoutSeparator />-->
 
-                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <MenuFlyoutItem
+                    IsEnabled="False"
+                    Text="{x:Bind ViewModel.BatteryPercentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{x:Bind ViewModel.IsBatteryPercentageVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <MenuFlyoutItem IsEnabled="False" Text="{x:Bind ViewModel.CpuTempTooltip, Mode=OneWay}" />
+                <!---->
+                <MenuFlyoutItem
+                    IsEnabled="False"
+                    Text="{x:Bind ViewModel.CpuTempTooltip, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{x:Bind ViewModel.IsCpuTempVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                <MenuFlyoutSeparator />
+                <MenuFlyoutSeparator Visibility="{x:Bind ViewModel.IsInfoSeparatorVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                 <ToggleMenuFlyoutItem
                     Command="{x:Bind ViewModel.Set_PowerSaverCommand}"

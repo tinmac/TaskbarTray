@@ -64,33 +64,71 @@ namespace PowerSwitch.ViewModels
         private string _batteryPercentage;
 
         [ObservableProperty]
-        private Common.Models.ServiceStatus _serviceStatus = Common.Models.ServiceStatus.Unknown;
+        private ServiceStatus _serviceStatus = ServiceStatus.Unknown;
+
+        private bool _isBatteryPercentageVisible;
+        public bool IsBatteryPercentageVisible
+        {
+            get => _isBatteryPercentageVisible;
+            set
+            {
+                if (_isBatteryPercentageVisible != value)
+                {
+                    _isBatteryPercentageVisible = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(IsInfoSeparatorVisible));
+                }
+            }
+        }
+
+        private bool _isCpuTempVisible;
+        public bool IsCpuTempVisible
+        {
+            get => _isCpuTempVisible;
+            set
+            {
+                if (_isCpuTempVisible != value)
+                {
+                    _isCpuTempVisible = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(IsInfoSeparatorVisible));
+                }
+            }
+        }
+
+        private bool _isInfoSeparatorVisible;
+        public bool IsInfoSeparatorVisible
+        {
+            get
+            {
+                // Only show separator if either battery or CPU temp is visible
+                return IsBatteryPercentageVisible || IsCpuTempVisible;
+            }
+            set
+            {
+                if (_isInfoSeparatorVisible != value)
+                {
+                    _isInfoSeparatorVisible = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
 
         List<PowerPlan> PowerPlans = new();
 
 
-        private string _latestCpuTemp;
-        public string LatestCpuTemp
-        {
-            get => _latestCpuTemp;
-            private set
-            {
-                if (SetProperty(ref _latestCpuTemp, value))
-                {
-                    OnPropertyChanged(nameof(CpuTempTooltip));
-                }
-            }
-        }
-
+        private string _cpuTempTooltip;
         public string CpuTempTooltip
         {
-            get
+            get => _cpuTempTooltip;
+            set
             {
-                if (string.IsNullOrWhiteSpace(LatestCpuTemp) || LatestCpuTemp == "N/A")
-                    return "CPU: N/A";
-                // If you want to show units, append them
-                return $"CPU: {LatestCpuTemp} °C";
+                if (_cpuTempTooltip != value)
+                {
+                    _cpuTempTooltip = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -184,50 +222,77 @@ namespace PowerSwitch.ViewModels
 
         private async Task ReceiveSensorUpdates()
         {
+            bool error_shown_once = false; // don't pollute the log with errors if service is not running
             while (true)
             {
+                // Only hide CPU temp if service is not running
+                if (ServiceStatus != Common.Models.ServiceStatus.Running)
+                {
+                    TheDispatcher?.TryEnqueue(() => { IsCpuTempVisible = false; });
+                    await Task.Delay(2000);
+                    if (!error_shown_once)
+                        _logr.LogInformation("Service not running, hiding CPU temp.");
+                    continue;
+                }
+
                 try
                 {
                     using var pipe = new NamedPipeClientStream(".", "SensorPipe", PipeDirection.In);
-                    await pipe.ConnectAsync(2000);
+                    try
+                    {
+                        await pipe.ConnectAsync(6000); // Connect before reading
+                    }
+                    catch (Exception ex)
+                    {
+                        _logr.LogError(ex, "Pipe connection failed");
+                        TheDispatcher?.TryEnqueue(() => { IsCpuTempVisible = false; });
+                        await Task.Delay(2000);
+                        continue;
+                    }
                     using var reader = new StreamReader(pipe);
-
                     while (!reader.EndOfStream)
                     {
                         var line = await reader.ReadLineAsync();
                         if (string.IsNullOrWhiteSpace(line)) continue;
-
                         try
                         {
-                            var options = new JsonSerializerOptions
-                            {
-                                PropertyNameCaseInsensitive = true
-                            };
+                            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                             var payload = JsonSerializer.Deserialize<SensorPipePayload>(line, options);
                             if (payload != null && !string.IsNullOrWhiteSpace(payload.CpuTemperature))
                             {
-                                TheDispatcher.TryEnqueue(() => LatestCpuTemp = payload.CpuTemperature);
+                                var t_disp = $"CPU: {payload.CpuTemperature} °C";
+                                TheDispatcher.TryEnqueue(() =>
+                                {
+                                    CpuTempTooltip = t_disp;
+                                    IsCpuTempVisible = true;
+                                });
                                 var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
                                 SetPowerPlan(SelectedPlan);
-
-                                _logr.LogInformation($"Rx {LatestCpuTemp}");
-
+                                _logr.LogInformation($"Rx {CpuTempTooltip}");
                             }
                             else
                             {
                                 _logr.LogError($"Payload is null or missing CpuTemperature. Raw: {line}");
-                                TheDispatcher.TryEnqueue(() => LatestCpuTemp = "N/A");
+                                TheDispatcher.TryEnqueue(() =>
+                                {
+                                    IsCpuTempVisible = false;
+                                });
                             }
                         }
                         catch (Exception ex)
                         {
                             _logr.LogError(ex, $"Error parsing SensorPipePayload. Raw: {line}");
-                            TheDispatcher.TryEnqueue(() => LatestCpuTemp = "N/A");
+                            TheDispatcher.TryEnqueue(() => CpuTempTooltip = "");
                         }
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    _logr.LogError(ex, $"EXCEPTION: {ex.Message}");
+                    TheDispatcher.TryEnqueue(() =>
+                    {
+                        IsCpuTempVisible = false;
+                    });
                     await Task.Delay(2000);
                 }
             }
@@ -304,7 +369,7 @@ namespace PowerSwitch.ViewModels
                 //    //_logr.LogWarning("Attempted to set power plan to null.");
                 //    return;
                 //}
-               
+
                 if (Scheme == null || Scheme?.Guid == ActiveScheme?.Guid)
                 {
                     //_logr.LogInformation($"Already on the selected power plan: {Scheme.Name}");
@@ -403,9 +468,11 @@ namespace PowerSwitch.ViewModels
                 {
                     int percentage = (int)((remaining.Value / (double)full.Value) * 100);
                     BatteryPercentage = $"Battery: {percentage}% ({status})";
+                    IsBatteryPercentageVisible = true;
                 }
                 else
                 {
+                    IsBatteryPercentageVisible = false;
                     BatteryPercentage = "Battery info not available.";
                 }
                 _logr.LogInformation($"{BatteryPercentage}");
@@ -504,7 +571,7 @@ namespace PowerSwitch.ViewModels
         }
 
         private PowerMode? _previousPowerMode = null;
-     
+
         [RelayCommand]
         public void ToggleSpeed()
         {
@@ -606,14 +673,6 @@ namespace PowerSwitch.ViewModels
             GetBatteryPercentage();
         }
 
-        [RelayCommand]
-        public void ShowCpuTempPopup()
-        {
-            string tempText = string.IsNullOrWhiteSpace(LatestCpuTemp) || LatestCpuTemp == "N/A"
-                ? "CPU: N/A"
-                : $"CPU: {LatestCpuTemp} °C";
-            _logr.LogInformation($"Show popup: {tempText}");
-        }
 
         #endregion
 
@@ -650,22 +709,6 @@ namespace PowerSwitch.ViewModels
 
         #endregion
 
-        private void RunStartupPlanSelection(Guid activePlanGuid)
-        {
-            var includedPlans = GetIncludedPlans();
-            var activePlan = PowerPlans.FirstOrDefault(p => p.Guid == activePlanGuid);
-            if (includedPlans.Count == 1 && activePlan?.Guid != includedPlans[0].Guid)
-            {
-                SetPowerPlan(includedPlans[0]);
-                _logr.LogInformation($"Startup: Only one plan included, switched to {includedPlans[0].Name}");
-            }
-            else if (!includedPlans.Any(p => p.Guid == activePlanGuid))
-            {
-                var lowest = includedPlans.OrderBy(p => p.PowerMode).First();
-                SetPowerPlan(lowest);
-                _logr.LogInformation($"Startup: Active plan not included, switched to lowest included plan {lowest.Name}");
-            }
-        }
 
         private async Task PollServiceStatusAsync()
         {
@@ -707,12 +750,6 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        private async Task SaveAllTrayTogglesAsync(bool saver, bool balanced, bool high)
-        {
-            await _settingsService.SaveSettingAsync("IncludePowerSaver", saver);
-            await _settingsService.SaveSettingAsync("IncludeBalanced", balanced);
-            await _settingsService.SaveSettingAsync("IncludeHighPerformance", high);
-        }
 
     }
 }

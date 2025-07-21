@@ -4,6 +4,10 @@
 
 Todo
 ----
+My logic is wrong, battery is not reported by the worker service only cpu temp
+We need to show battery if its available (dont hode if service not running)
+only temp should be hidden if service not running
+
 
 Install the App but dont install the service, 
  handle gracefully ie hide temp & battery levels, 
