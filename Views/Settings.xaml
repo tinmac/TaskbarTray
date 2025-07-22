@@ -15,6 +15,9 @@
     <Page.Resources>
         <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
         <converters:SensorTypeAllowedConverter x:Key="SensorTypeAllowedConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverterInvert" Invert="True" />
+
     </Page.Resources>
 
     <Grid Margin="0 0 0 0">
@@ -23,14 +26,23 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!--  Page Title  -->
-        <TextBlock
-            Grid.Row="0"
-            Margin="16 10 0 16"
-            FontSize="32"
-            FontWeight="Bold"
-            Style="{ThemeResource TitleTextBlockStyle}"
-            Text="Settings" />
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Image
+                Width="32"
+                Height="32"
+                Margin="16 6 8 6"
+                VerticalAlignment="Center"
+                Source="/Assets/AppIconDark.png" />
+
+
+            <!--  Page Title  -->
+            <TextBlock
+                Margin="16 10 0 16"
+                FontSize="32"
+                FontWeight="Bold"
+                Style="{ThemeResource TitleTextBlockStyle}"
+                Text="Settings" />
+        </StackPanel>
 
         <ScrollViewer Grid.Row="1">
 
@@ -110,12 +122,14 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
+
                         <FontIcon
                             Grid.Column="0"
                             Margin="0 0 12 0"
                             VerticalAlignment="Top"
                             FontFamily="{StaticResource FA6_Light}"
                             Glyph="&#xF363;" />
+
                         <StackPanel Grid.Column="1" Margin="10 0 0 0">
                             <TextBlock
                                 Margin="0 0 0 8"
@@ -220,44 +234,93 @@
                     Padding="16"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     CornerRadius="8">
+
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
+
                         <FontIcon
                             Grid.Column="0"
                             Margin="0 0 12 0"
                             VerticalAlignment="Top"
                             FontFamily="{StaticResource FA6_Light}"
                             Glyph="&#xF390;" />
-                        <StackPanel Grid.Column="1" Margin="10 0 0 0">
-                            <TextBlock
-                                Margin="0 0 0 8"
-                                Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                Text="Sensors Service Status" />
-                            <TextBlock
-                                Margin="0 0 0 8"
-                                Style="{ThemeResource CaptionTextBlockStyle}"
-                                Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
-                                TextWrapping="Wrap" />
-                            <Border
-                                Width="100"
-                                Margin="0 10 0 0"
-                                Padding="8 4 8 5"
-                                HorizontalAlignment="Left"
-                                Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
-                                CornerRadius="8">
+
+                        <Grid Grid.Column="1" Margin="10 0 0 0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0">
                                 <TextBlock
-                                    Margin="0 -1 0 0"
-                                    HorizontalAlignment="Center"
-                                    Foreground="#444"
+                                    Margin="0 0 0 8"
                                     Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                    Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
-                            </Border>
-                        </StackPanel>
+                                    Text="Sensors Service Status" />
+                                <TextBlock
+                                    Margin="0 0 0 8"
+                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                    Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
+                                    TextWrapping="Wrap" />
+                                <Border
+                                    Width="100"
+                                    Margin="0 10 0 0"
+                                    Padding="8 4 8 5"
+                                    HorizontalAlignment="Left"
+                                    Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
+                                    CornerRadius="8">
+                                    <TextBlock
+                                        Margin="0 -1 0 0"
+                                        HorizontalAlignment="Center"
+                                        Foreground="#444"
+                                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
+                                </Border>
+                            </StackPanel>
+
+                            <!--  Relaunch as Admin Button  -->
+                            <StackPanel Grid.Row="1">
+
+                                <StackPanel
+                                    x:Name="AdminSP"
+                                    Margin="0 16 0 0"
+                                    Orientation="Horizontal"
+                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterInvert}}">
+
+                                    <Image
+                                        Width="32"
+                                        Height="32"
+                                        Margin="0 0 0 0"
+                                        VerticalAlignment="Top"
+                                        Source="/Assets/run_as_admin.png" />
+
+                                    <TextBlock
+                                        Margin="10 0 0 0"
+                                        VerticalAlignment="Top"
+                                        Style="{ThemeResource BodyTextBlockStyle}"
+                                        Text="App running with admin rights and able to install/start/stop service" />
+
+                                </StackPanel>
+
+                                <Button
+                                    Margin="0 16 16 16"
+                                    Command="{x:Bind ViewModel.RelaunchAsAdminCommand}"
+                                    Content="Relaunch as Admin"
+                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+
+                            </StackPanel>
+
+                        </Grid>
+
                     </Grid>
                 </Border>
+
 
                 <!--  App Version (not in card)  -->
                 <StackPanel Margin="10 10 0 10" Orientation="Horizontal">

@@ -24,18 +24,26 @@
             Height="40"
             VerticalAlignment="Top"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+           
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="128" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="128" />
             </Grid.ColumnDefinitions>
 
-            <Image
-                Width="28"
-                Height="28"
-                Margin="8 6 8 6"
-                VerticalAlignment="Center"
-                Source="ms-appx:///Assets/AppIcon.ico" />
+            <!--
+                Source="/Assets/AppIcon_3.png"
+                Source="ms-appx:///Assets/AppIcon_3.png"
+            -->
+            <StackPanel Width="100" Height="30" Background="red" Grid.Column="2">
+                <Image
+                    Grid.Column="2"
+                    Width="128"
+                    Height="128"
+                    Margin="8 6 8 6"
+                    VerticalAlignment="Center"
+                    Source="/Assets/AppIcon_3.png" />
+            </StackPanel>
 
             <TextBlock
                 Grid.Column="1"

@@ -40,6 +40,8 @@ namespace PowerSwitch
         {
             InitializeComponent();
 
+            this.SetIcon("Assets/AppIcon.ico");
+
             // Enable custom title bar
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(CustomTitleBar);

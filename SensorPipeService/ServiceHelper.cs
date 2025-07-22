@@ -18,6 +18,9 @@ public static class ServiceInstallerHelper
 
     public static async Task RunInstallScriptIfNeededAsync()
     {
+        // If the service is already installed, un-install it
+        bool userDeclinedServiceInstall = false;
+
         var services = ServiceController.GetServices();
         bool isInstalled = services.Any(s => s.ServiceName == ServiceName);
 
@@ -45,7 +48,8 @@ public static class ServiceInstallerHelper
         try
         {
             Process.Start(psi);
-            Log.Information("ℹ️ install-service.ps1 launched, waiting for service to be installed...");
+           
+            Log.Information("ℹ️ install-service.ps1  installing...");
 
             bool appeared = await WaitForServiceInstallationAsync(ServiceName, WaitForInstallTimeoutSeconds);
             if (appeared)
@@ -60,7 +64,14 @@ public static class ServiceInstallerHelper
         }
         catch (Exception ex)
         {
-            Log.Error($"❌ Failed to run install-service.ps1: {ex.Message}");
+            if(ex.Message.Contains("The operation was canceled by the user"))
+            {
+                Log.Error($"❌ User declined to run install-service.ps1, ie at UAC prompt to install service they picked `No`");
+            }
+            else
+            {
+                Log.Error($"❌ Failed to run install-service.ps1: {ex.Message}");
+            }
         }
     }
 

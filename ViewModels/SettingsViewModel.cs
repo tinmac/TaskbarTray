@@ -457,4 +457,12 @@ public partial class SettingsViewModel : ObservableRecipient
             return Common.Models.ServiceStatus.Unknown;
         }
     }
+
+    [RelayCommand]
+    public void RelaunchAsAdmin()
+    {
+        PowerSwitch.stuff.ElevationHelper.RelaunchAsAdmin();
+    }
+
+    public bool IsRelaunchButtonVisible => !PowerSwitch.stuff.ElevationHelper.IsRunningAsAdmin();
 }

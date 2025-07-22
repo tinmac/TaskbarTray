@@ -267,11 +267,20 @@ namespace PowerSwitch.ViewModels
                             if (payload != null && !string.IsNullOrWhiteSpace(payload.CpuTemperature))
                             {
                                 var t_disp = FormatTemperature(payload.CpuTemperature);
+
                                 TheDispatcher.TryEnqueue(() =>
                                 {
-                                    CpuTempTooltip = t_disp;
-                                    IsCpuTempVisible = true;
+                                    if (t_disp != "")
+                                    {
+                                        CpuTempTooltip = t_disp;
+                                        IsCpuTempVisible = true;
+                                    }
+                                    else
+                                    {
+                                        IsCpuTempVisible = false;
+                                    }
                                 });
+
                                 var SelectedPlan = PowerPlans.FirstOrDefault(p => p.Guid == payload.ActivePlanGuid);
                                 SetPowerPlan(SelectedPlan);
                                 _logr.LogInformation($"Rx {CpuTempTooltip}");
@@ -685,7 +694,7 @@ namespace PowerSwitch.ViewModels
             }
             catch (Exception ex)
             {
-                _logr.LogError(ex,$"Exception in OpenContextMenu: {ex.Message}");
+                _logr.LogError(ex, $"Exception in OpenContextMenu: {ex.Message}");
                 throw;
             }
 
@@ -693,6 +702,7 @@ namespace PowerSwitch.ViewModels
 
 
         #endregion
+
 
 
         #region OTHER
@@ -714,6 +724,7 @@ namespace PowerSwitch.ViewModels
             };
             return new BitmapImage(new Uri(uri));
         }
+      
         private void SetCPUPercentage()
         {
             Guid plan = PowerPlanManager.GetActivePlanGuid();
@@ -726,6 +737,7 @@ namespace PowerSwitch.ViewModels
         }
 
         #endregion
+
 
 
         private async Task PollServiceStatusAsync()
@@ -745,7 +757,7 @@ namespace PowerSwitch.ViewModels
             }
         }
 
-        private Common.Models.ServiceStatus GetServiceStatus()
+        private ServiceStatus GetServiceStatus()
         {
             try
             {
@@ -770,11 +782,12 @@ namespace PowerSwitch.ViewModels
 
         private string FormatTemperature(string tempStr)
         {
-            if (string.IsNullOrWhiteSpace(tempStr) || tempStr == "N/A")
-                return "CPU: N/A";
+            if (string.IsNullOrWhiteSpace(tempStr))
+                return "";
+
             if (!double.TryParse(tempStr, out double tempC))
                 return $"CPU: {tempStr}";
-            
+
             if (TemperatureUnit == TemperatureUnit.Fahrenheit)
             {
                 double tempF = (tempC * 9.0 / 5.0) + 32.0;

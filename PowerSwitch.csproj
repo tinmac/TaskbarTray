@@ -34,24 +34,6 @@
 
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="Assets\AppIcon.ico" />
-		<None Remove="Assets\gauge-high.ico" />
-		<None Remove="Assets\gauge.ico" />
-		<None Remove="Assets\ico\gauge-max-wh.ico" />
-		<None Remove="Assets\ico\gauge-max.ico" />
-		<None Remove="Assets\ico\gauge-min-wh.ico" />
-		<None Remove="Assets\ico\gauge-min.ico" />
-		<None Remove="Assets\ico\gauge-wh.ico" />
-		<None Remove="Assets\ico\gauge.ico" />
-		<None Remove="Assets\svg\gauge-high.svg" />
-		<None Remove="Assets\svg\gauge-low.svg" />
-		<None Remove="Assets\svg\gauge-max.svg" />
-		<None Remove="Assets\svg\gauge-min.svg" />
-		<None Remove="Assets\svg\gauge.svg" />
-		<None Remove="Views\Settings.xaml" />
-		<None Remove="Views\TestWindow1.xaml" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<COMReference Include="IWshRuntimeLibrary">
@@ -160,6 +142,7 @@
 			<Link>Service\%(RecursiveDir)%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Remove="Assets\AppIcon_3.png" />
 		
 		<!-- 2. Copy install-service.ps1 from the root of TaskbarTray into the output -->		
 		<Content Include="install-service.ps1">
@@ -170,9 +153,17 @@
 
 	
 	<ItemGroup>
-	  <ProjectReference Include="..\Common\Common.csproj" />
+	  <None Include="AppIcon_3.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 
+
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Common\Common.csproj" />
+	</ItemGroup>
 
 
 	<ItemGroup>
@@ -187,11 +178,20 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
+	  <Content Update="Assets\AppIconDark.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	  <Content Update="Assets\AppIcon.ico">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\AppIcon_3.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\run_as_admin.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
-	<ItemGroup>
+	<ItemGroup>		
 		<None Update="install-service.ps1">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -227,5 +227,6 @@
 		<PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
 		<PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
 		<PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+		<PackageIcon>AppIcon_3.png</PackageIcon>
 	</PropertyGroup>
 </Project>

@@ -9,8 +9,8 @@ $DisplayName = "Power Switch Service - CPU Temperature Monitor Service - Labs"
 $ExePath = Join-Path $PSScriptRoot "Service\PowerSwitchService.exe"
 
 # Setup logging
-$LogDir  = "$env:ProgramData\A1_PowerSwitchService"
-$LogFile = Join-Path $LogDir "install_log.txt"
+$LogDir  = "$env:ProgramData\PowerSwitch"
+$LogFile = Join-Path $LogDir "service_setup_log.txt"
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 }

@@ -17,6 +17,7 @@ using PowerSwitch.Persistance;
 using System.Threading.Tasks;
 using PowerSwitch.Sensor;
 using PowerSwitch.SensorPipeService;
+using System.IO;
 
 
 namespace PowerSwitch;
@@ -72,7 +73,7 @@ public sealed partial class App : Application
 
         // Serilog setup (do not change)
         var tmpl_1 = "[{Timestamp:dd/MM  HH:mm:ss.fff} {Level:u3}{SourceContext} {AppId}]  {Message:lj}{NewLine}{Exception}";
-        var LogPath = @"C:\PowerSwitcher_logs\power_.log";
+        var LogPath = @"C:\Programdata\PowerSwitch\.log";
         var lgr = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -125,6 +126,14 @@ public sealed partial class App : Application
         try
         {
             var _settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+
+            // Ensure log directory exists
+            string logDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "PowerSwitch");
+            
+            Directory.CreateDirectory(logDir);
+
 
             // Execute tasks before activation.
             // Get Theme
@@ -203,7 +212,9 @@ public sealed partial class App : Application
             await Task.CompletedTask;
 
 
-
+            // Create Icons!!
+            //
+           // ConvertSvgToIco();
         }
         catch (Exception ex)
         {
@@ -216,24 +227,95 @@ public sealed partial class App : Application
 
     private void ConvertSvgToIco()
     {
-        // Create ico files from FA svg files
-        //
-        // syntax: ImageHelper.ConvertSvgToIco("svg Path", "ico Path", 24, 24);
+        try
+        {
+            // Create ico files from FA svg files
+            //
+            // syntax: ImageHelper.ConvertSvgToIco("svg Path", "ico Path", 24, 24);
 
-        //var DbPath = ApplicationData.Current.LocalFolder.Path;
+            //var DbPath = ApplicationData.Current.LocalFolder.Path;
 
-        string appFolderPath = AppContext.BaseDirectory;
-        _logr.LogInformation($"App folder path: {appFolderPath}");
+            string appFolderPath = AppContext.BaseDirectory;
+            _logr.LogInformation($"App folder path: {appFolderPath}");
 
-        // White Foreground
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge.svg", "c:/assets/ico/gauge-wh.ico", 24, 24, SKColors.White);
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge-min.svg", "c:/assets/ico/gauge-min-wh.ico", 24, 24, SKColors.White);
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge-max.svg", "c:/assets/ico/gauge-max-wh.ico", 24, 24, SKColors.White);
 
-        // Black Foreground
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge.svg", "c:/assets/ico/gauge.ico", 24, 24);
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge-min.svg", "c:/assets/ico/gauge-min.ico", 24, 24);
-        ImageHelper.ConvertSvgToIco("c:/assets/svg/gauge-max.svg", "c:/assets/ico/gauge-max.ico", 24, 24);
+            // File Paths
+            var source_svg = "C:\\Users\\mmcca\\OneDrive\\Pictures\\Power Switch App\\svg"; // svgs are vectors 
+            var blue_1 = new SKColor(173, 216, 230, 255); // Light blue with full opacity
+            var blue_2 = new SKColor(105, 195, 230, 255); // Darker blue with full opacity
+            var darkGrey = new SKColor(40, 40, 40, 255); //
+
+            // Creating the App Png
+            //
+            bool CreateAppPng = true;
+            if (CreateAppPng)
+            {
+                var dest_app_png = "C:\\Users\\mmcca\\OneDrive\\Pictures\\Power Switch App\\app";
+           
+                _logr.LogInformation($"Creating Windows AppIcon.png at {dest_app_png}");
+              
+                // Foreground Light blue with full opacity: SKColor(173, 216, 230, 255)
+                ImageHelper.ConvertSvgToPng(
+                    $"{source_svg}/gauge-high.svg",
+                    $"{dest_app_png}/AppIcon.png",
+                    128,
+                    128, 
+                    blue_2
+                );
+
+                // Foreground black
+                ImageHelper.ConvertSvgToPng(
+                    $"{source_svg}/gauge-high.svg",
+                    $"{dest_app_png}/AppIconDark.png",
+                    256,
+                    256,
+                    darkGrey
+                );
+            }
+
+
+            // Creating the App Icon
+            //
+            bool CreateAppIcon = true;
+            if (CreateAppIcon)
+            {
+                var dest_app_ico = "C:\\Users\\mmcca\\OneDrive\\Pictures\\Power Switch App\\app";
+           
+                _logr.LogInformation($"Creating Windows AppIcon.ico at {dest_app_ico}");
+                
+                ImageHelper.ConvertSvgToMultiSizeIco(
+                    $"{source_svg}/gauge-high.svg", 
+                    $"{dest_app_ico}/AppIcon.ico",
+                    blue_2
+                );
+            }
+
+
+            // Creatig the Taskbar Icons
+            //
+            bool CreateTaskBarIcons = false;
+            var dest_task_bar = "C:\\Users\\mmcca\\OneDrive\\Pictures\\Power Switch App\\task-bar";
+            if (CreateTaskBarIcons)
+            {
+                _logr.LogInformation($"Creating Taskbar icons at {dest_task_bar}");
+
+                // White Foreground
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge.svg", $"{dest_task_bar}/gauge-wh.ico", 24, 24, SKColors.White);
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge-min.svg", $"{dest_task_bar}/gauge-min-wh.ico", 24, 24, SKColors.White);
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge-max.svg", $"{dest_task_bar}/gauge-max-wh.ico", 24, 24, SKColors.White);
+
+                // Black Foreground
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge.svg", $"{dest_task_bar}/gauge.ico", 24, 24);
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge-min.svg", $"{dest_task_bar}/gauge-min.ico", 24, 24);
+                ImageHelper.ConvertSvgToIco($"{source_svg}/gauge-max.svg", $"{dest_task_bar}/gauge-max.ico", 24, 24);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Exception in App.xaml.cs -> ConvertSvgToIco: {ex}");
+            throw;
+        }
 
     }
 

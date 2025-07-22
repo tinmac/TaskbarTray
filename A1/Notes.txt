@@ -5,8 +5,6 @@
 Todo
 ----
 
-Add App Icon - Create a new GuageIcon.ico that replicated AppIcon.ico but with a guage not star
-
 
 Clean up logging
 - remove sanity logging 
