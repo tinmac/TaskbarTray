@@ -27,6 +27,8 @@ namespace PowerSwitch.ViewModels;
 
 public partial class SettingsViewModel : ObservableRecipient
 {
+    public Microsoft.UI.Dispatching.DispatcherQueue TheDispatcher { get; set; }
+
     private readonly ILogger<SettingsViewModel> _logr;
     [ObservableProperty] private bool serviceIsRunning;
     private const string ServiceName = "PowerSwitchService";
@@ -231,43 +233,74 @@ public partial class SettingsViewModel : ObservableRecipient
         _ = PollServiceStatusAsync();
     }
  
-    [RelayCommand]
+    //[RelayCommand]
     private void StartSensorService()
     {
-        _logr.LogInformation("Attempting to start service: {ServiceName}", ServiceName);
-        using var sc = new ServiceController(ServiceName);
-        if (sc.Status != ServiceControllerStatus.Running)
+        try
         {
-            sc.Start();
-            sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
-            _logr.LogInformation("Service {ServiceName} started.", ServiceName);
+            _logr.LogInformation("Attempting to start service: {ServiceName}", ServiceName);
+            using var sc = new ServiceController(ServiceName);
+            if (sc.Status != ServiceControllerStatus.Running)
+            {
+                sc.Start();
+                sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10));
+                _logr.LogInformation("Service {ServiceName} started.", ServiceName);
+            }
+            else
+            {
+                _logr.LogInformation("Service {ServiceName} was already running.", ServiceName);
+            }
+            TheDispatcher?.TryEnqueue(() =>
+            {
+                ServiceIsRunning = true;
+                ServiceStatusText = "Running";
+            });
         }
-        else
+        catch (Exception ex)
         {
-            _logr.LogInformation("Service {ServiceName} was already running.", ServiceName);
+            _logr.LogError(ex, "Exception in StartSensorService");
+            TheDispatcher?.TryEnqueue(() =>
+            {
+                ServiceIsRunning = false;
+                ServiceStatusText = $"Error: {ex.Message}";
+            });
         }
-        ServiceIsRunning = true;
-        ServiceStatusText = "Running";
     }
   
-    [RelayCommand]
+    //[RelayCommand]
     private void StopSensorService()
     {
-        _logr.LogInformation("Attempting to stop service: {ServiceName}", ServiceName);
-        using var sc = new ServiceController(ServiceName);
-        if (sc.Status == ServiceControllerStatus.Running)
+        try
         {
-            sc.Stop();
-            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
-            _logr.LogInformation("Service {ServiceName} stopped.", ServiceName);
+            _logr.LogInformation("Attempting to stop service: {ServiceName}", ServiceName);
+            using var sc = new ServiceController(ServiceName);
+            if (sc.Status == ServiceControllerStatus.Running)
+            {
+                sc.Stop();
+                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10));
+                _logr.LogInformation("Service {ServiceName} stopped.", ServiceName);
+            }
+            else
+            {
+                _logr.LogInformation("Service {ServiceName} was already stopped.", ServiceName);
+            }
+            TheDispatcher?.TryEnqueue(() =>
+            {
+                ServiceIsRunning = false;
+                ServiceStatusText = "Stopped";
+            });
         }
-        else
+        catch (Exception ex)
         {
-            _logr.LogInformation("Service {ServiceName} was already stopped.", ServiceName);
+            _logr.LogError(ex, "Exception in StopSensorService");
+            TheDispatcher?.TryEnqueue(() =>
+            {
+                ServiceIsRunning = false;
+                ServiceStatusText = $"Error: {ex.Message}";
+            });
         }
-        ServiceIsRunning = false;
-        ServiceStatusText = "Stopped";
     }
+
     private static string GetVersionDescription()
     {
         Version version;
@@ -465,4 +498,62 @@ public partial class SettingsViewModel : ObservableRecipient
     }
 
     public bool IsRelaunchButtonVisible => !PowerSwitch.stuff.ElevationHelper.IsRunningAsAdmin();
+
+
+    // MY COMMANDS
+    public ICommand JobCommand => new AsyncRelayCommand(Job_Executed);
+    private async Task Job_Executed()
+    {
+    }
+
+    public ICommand InstallServiceCommand => new AsyncRelayCommand(InstallService_Executed);
+    public ICommand UninstallServiceCommand => new AsyncRelayCommand(UninstallService_Executed);
+
+    private async Task InstallService_Executed()
+    {
+        await PowerSwitch.SensorPipeService.ServiceInstallerHelper.RunInstallScriptIfNeededAsync();
+        // Optionally update status or notify user
+    }
+
+    private async Task UninstallService_Executed()
+    {
+        string scriptPath = Path.Combine(AppContext.BaseDirectory, "uninstall-service.ps1");
+        if (!File.Exists(scriptPath))
+        {
+            _logr.LogError($"❌ uninstall-service.ps1 not found at: {scriptPath}");
+            return;
+        }
+        var psi = new ProcessStartInfo
+        {
+            FileName = "powershell.exe",
+            Arguments = $"-ExecutionPolicy Bypass -File \"{scriptPath}\"",
+            UseShellExecute = true,
+            Verb = "runas"
+        };
+        try
+        {
+            Process.Start(psi);
+            _logr.LogInformation("ℹ️ uninstall-service.ps1 running...");
+        }
+        catch (Exception ex)
+        {
+            _logr.LogError($"❌ Failed to run uninstall-service.ps1: {ex.Message}");
+        }
+        await Task.Delay(3000); // Give time for uninstall
+        // Optionally update status or notify user
+    }
+
+    public ICommand StartServiceCommand => new AsyncRelayCommand(StartService_Executed);
+    public ICommand StopServiceCommand => new AsyncRelayCommand(StopService_Executed);
+
+    private async Task StartService_Executed()
+    {
+        await Task.Run(() => StartSensorService());
+    }
+
+    private async Task StopService_Executed()
+    {
+        await Task.Run(() => StopSensorService());
+    }
+
 }

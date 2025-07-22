@@ -4,13 +4,7 @@
 
 Todo
 ----
-
-
-Clean up logging
-- remove sanity logging 
-- not use Console.WriteLine
-- overwrite the log file each month? 
-- Max log file siz?
+Worker Service buttons enabled/disabled logic
 
 Change app to MSIX & check persistance of settings
 

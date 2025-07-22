@@ -255,6 +255,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0">
@@ -285,7 +286,6 @@
 
                             <!--  Relaunch as Admin Button  -->
                             <StackPanel Grid.Row="1">
-
                                 <StackPanel
                                     x:Name="AdminSP"
                                     Margin="0 16 0 0"
@@ -297,10 +297,10 @@
                                         Height="32"
                                         Margin="0 0 0 0"
                                         VerticalAlignment="Top"
-                                        Source="/Assets/run_as_admin.png" />
+                                        Source="/Assets/UAC_Prompt.png" />
 
                                     <TextBlock
-                                        Margin="10 0 0 0"
+                                        Margin="10 5 0 0"
                                         VerticalAlignment="Top"
                                         Style="{ThemeResource BodyTextBlockStyle}"
                                         Text="App running with admin rights and able to install/start/stop service" />
@@ -313,6 +313,43 @@
                                     Content="Relaunch as Admin"
                                     Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
+                            </StackPanel>
+
+                            <!--  Install/Uninstall Service Buttons  -->
+                            <StackPanel
+                                Grid.Row="2"
+                                Margin="0 16 0 0"
+                                Orientation="Horizontal">
+
+                                <Button
+                                    MinWidth="140"
+                                    Margin="0 0 8 0"
+                                    Command="{x:Bind ViewModel.InstallServiceCommand}"
+                                    Content="Install Service" />
+
+                                <Button
+                                    MinWidth="140"
+                                    Command="{x:Bind ViewModel.UninstallServiceCommand}"
+                                    Content="Uninstall Service" />
+
+                            </StackPanel>
+
+                            <!--  Start/Stop Service Buttons  -->
+                            <StackPanel
+                                Grid.Row="3"
+                                Margin="0 18 0 0"
+                                Orientation="Horizontal">
+
+                                <Button
+                                    MinWidth="140"
+                                    Margin="0 0 8 0"
+                                    Command="{x:Bind ViewModel.StartServiceCommand}"
+                                    Content="Start" />
+
+                                <Button
+                                    MinWidth="140"
+                                    Command="{x:Bind ViewModel.StopServiceCommand}"
+                                    Content="Stop" />
 
                             </StackPanel>
 

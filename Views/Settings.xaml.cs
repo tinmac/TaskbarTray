@@ -37,8 +37,10 @@ namespace PowerSwitch.Views
 
         public Settings()
         {
-            InitializeComponent();
             ViewModel = Ioc.Default.GetRequiredService<SettingsViewModel>();
+            ViewModel.TheDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+            InitializeComponent();
+
             this.DataContext = ViewModel;
 
             // With this line:

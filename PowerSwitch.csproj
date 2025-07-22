@@ -61,39 +61,6 @@
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
-	<!--
-		The BUG:
-		All those files & Dll's you had to make sure were in SensorsWorkerService output folder 
-		You also need to make sure they are also in the TaskbarTray output folder as thats were the Winui app installs from
-	-->
-
-	<!--<ItemGroup>
-
-		--><!-- 
-			Copy SensorsWorkerService.exe to TaskbarTray output,  
-		--><!--
-		<Content Include="..\SensorsWorkerService\bin\$(Configuration)\net8.0\SensorsWorkerService.exe">
-			<Link>SensorsWorkerService.exe</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-
-		--><!-- 
-			Copy install-service.ps1 from scripts folder to TaskbarTray output
-		--><!--
-		<Content Include="scripts\install-service.ps1">
-			<Link>install-service.ps1</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-
-	</ItemGroup>-->
-
-	<!-- 	
-		Add this to also copy install-service.ps1 to the SensorsWorkerService output folder
-	-->
-	<!--<Target Name="CopyInstallScriptToServiceBin" AfterTargets="Build">
-		<Copy SourceFiles="scripts\install-service.ps1" DestinationFolder="..\SensorsWorkerService\bin\$(Configuration)\net8.0" SkipUnchangedFiles="true" />
-	</Target>-->
-
 
 
 	<!--
@@ -149,6 +116,13 @@
 			<Link>install-service.ps1</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+
+		<!-- 3. Copy uninstall-service.ps1 from the root of TaskbarTray into the output -->
+		<Content Include="uninstall-service.ps1">
+			<Link>uninstall-service.ps1</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+
 	</ItemGroup>
 
 	
@@ -188,6 +162,9 @@
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Assets\run_as_admin.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\UAC_Prompt.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
