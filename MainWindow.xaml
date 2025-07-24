@@ -24,7 +24,7 @@
             Height="40"
             VerticalAlignment="Top"
             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
-           
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="128" />
                 <ColumnDefinition Width="*" />
@@ -35,7 +35,11 @@
                 Source="/Assets/AppIcon_3.png"
                 Source="ms-appx:///Assets/AppIcon_3.png"
             -->
-            <StackPanel Width="100" Height="30" Background="red" Grid.Column="2">
+            <StackPanel
+                Grid.Column="2"
+                Width="100"
+                Height="30"
+                Background="red">
                 <Image
                     Grid.Column="2"
                     Width="128"

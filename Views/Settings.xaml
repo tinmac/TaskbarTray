@@ -9,7 +9,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="using:Common.Models"
     xmlns:stuff="using:PowerSwitch.stuff"
-    xmlns:xaml="using:Microsoft.UI.Xaml"
+    xmlns:xaml="using:Microsoft.UI.Xaml" 
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -300,14 +300,53 @@
 
                             </StackPanel>
 
-                            <!--  Relaunch as Admin Button  -->
+                            <!--  Not Running as Administrator  -->
                             <StackPanel Grid.Row="1">
 
                                 <StackPanel
+                                    Margin="0 16 16 16"
+                                    Orientation="Horizontal"
+                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+                                    <TextBlock
+                                        Margin="0 10 0 8"
+                                        Style="{ThemeResource CaptionTextBlockStyle}"
+                                        Text="To administer the service you need to Run As Administrator"
+                                        TextWrapping="Wrap" />
+
+                                    <Button Margin="10 0 0 0" Command="{x:Bind ViewModel.RelaunchAsAdminCommand}">
+                                        <StackPanel Orientation="Horizontal">
+
+                                            <Image
+                                                Width="22"
+                                                Height="22"
+                                                Margin="0 0 10 0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Top"
+                                                Source="/Assets/UAC_Prompt.png" />
+
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                Style="{ThemeResource BodyTextBlockStyle}"
+                                                Text="Run as Administrator" />
+                                        </StackPanel>
+
+                                    </Button>
+
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!--
+                                Running as Administrator Ui
+                            -->
+
+                            <StackPanel Grid.Row="2" Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterInvert}}">
+
+                                <!--  Title  -->
+                                <StackPanel
                                     x:Name="AdminSP"
                                     Margin="0 16 0 0"
-                                    Orientation="Horizontal"
-                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterInvert}}">
+                                    Orientation="Horizontal">
 
                                     <Image
                                         Width="32"
@@ -320,49 +359,12 @@
                                         Margin="10 5 0 0"
                                         VerticalAlignment="Top"
                                         Style="{ThemeResource BodyTextBlockStyle}"
-                                        Text="App is running with admin rights and able to install/start/stop service" />
+                                        Text="Running as administrator" />
 
                                 </StackPanel>
-
-                                <StackPanel
-                                    Margin="0 16 16 16"
-                                    Orientation="Horizontal"
-                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                    <TextBlock
-                                        Margin="0 10 0 8"
-                                        Style="{ThemeResource CaptionTextBlockStyle}"
-                                        Text="To administer the server you need to Run As Administrator"
-                                        TextWrapping="Wrap" />
-
-                                    <Button Margin="10 0 0 0" Command="{x:Bind ViewModel.RelaunchAsAdminCommand}">
-                                        <StackPanel Orientation="Horizontal">
-
-                                            <TextBlock Style="{ThemeResource BodyTextBlockStyle}" Text="Run as Administrator" />
-
-                                            <Image
-                                                Width="24"
-                                                Height="24"
-                                                Margin="10 0 0 0"
-                                                VerticalAlignment="Top"
-                                                Source="/Assets/UAC_Prompt.png" />
-
-                                        </StackPanel>
-
-                                    </Button>
-
-                                </StackPanel>
-                            </StackPanel>
-
-                            <!--
-                                Running as Administrator Ui
-                            -->
-                            <StackPanel  Grid.Row="2" Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterInvert}}">
 
                                 <!--  Install/Uninstall Service Buttons  -->
-                                <StackPanel
-                                   
-                                    Margin="0 16 0 0"
-                                    Orientation="Horizontal">
+                                <StackPanel Margin="0 16 0 0" Orientation="Horizontal">
 
                                     <Button
                                         MinWidth="140"
