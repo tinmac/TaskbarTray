@@ -370,12 +370,14 @@
                                         MinWidth="140"
                                         Margin="0 0 8 0"
                                         Command="{x:Bind ViewModel.InstallServiceCommand}"
-                                        Content="Install Service" />
+                                        Content="Install Service"
+                                        IsEnabled="{x:Bind ViewModel.CanInstallService, Mode=OneWay}" />
 
                                     <Button
                                         MinWidth="140"
                                         Command="{x:Bind ViewModel.UninstallServiceCommand}"
-                                        Content="Uninstall Service" />
+                                        Content="Uninstall Service"
+                                        IsEnabled="{x:Bind ViewModel.CanUninstallService, Mode=OneWay}" />
 
                                 </StackPanel>
 
@@ -389,12 +391,14 @@
                                         MinWidth="140"
                                         Margin="0 0 8 0"
                                         Command="{x:Bind ViewModel.StartServiceCommand}"
-                                        Content="Start" />
+                                        Content="Start Service"
+                                        IsEnabled="{x:Bind ViewModel.CanStartService, Mode=OneWay}" />
 
                                     <Button
                                         MinWidth="140"
                                         Command="{x:Bind ViewModel.StopServiceCommand}"
-                                        Content="Stop" />
+                                        Content="Stop Service"
+                                        IsEnabled="{x:Bind ViewModel.CanStopService, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
 
                                 </StackPanel>
                             </StackPanel>

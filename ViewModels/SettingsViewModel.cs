@@ -265,6 +265,7 @@ public partial class SettingsViewModel : ObservableRecipient
                 ServiceStatusText = $"Error: {ex.Message}";
             });
         }
+        UpdateServiceButtonStates();
     }
   
     //[RelayCommand]
@@ -299,6 +300,55 @@ public partial class SettingsViewModel : ObservableRecipient
                 ServiceStatusText = $"Error: {ex.Message}";
             });
         }
+        UpdateServiceButtonStates();
+    }
+
+    private bool _canInstallService;
+    public bool CanInstallService
+    {
+        get => _canInstallService;
+        set => SetProperty(ref _canInstallService, value);
+    }
+
+    private bool _canUninstallService;
+    public bool CanUninstallService
+    {
+        get => _canUninstallService;
+        set => SetProperty(ref _canUninstallService, value);
+    }
+
+    private bool _canStartService;
+    public bool CanStartService
+    {
+        get => _canStartService;
+        set => SetProperty(ref _canStartService, value);
+    }
+
+    private bool _canStopService;
+    public bool CanStopService
+    {
+        get => _canStopService;
+        set => SetProperty(ref _canStopService, value);
+    }
+
+    private void UpdateServiceButtonStates()
+    {
+        bool installed = false, running = false;
+        try
+        {
+            installed = ServiceController.GetServices().Any(s => s.ServiceName == ServiceName);
+            if (installed)
+            {
+                using var sc = new ServiceController(ServiceName);
+                running = sc.Status == ServiceControllerStatus.Running;
+            }
+        }
+        catch { }
+
+        CanInstallService = !installed;
+        CanUninstallService = installed;
+        CanStartService = installed && !running;
+        CanStopService = installed && running;
     }
 
     private static string GetVersionDescription()
@@ -326,6 +376,7 @@ public partial class SettingsViewModel : ObservableRecipient
                 ServiceIsRunning = sc.Status == ServiceControllerStatus.Running;
                 ServiceStatusText = ServiceIsRunning ? "Running" : "Stopped";
                 _logr.LogInformation("Checked service status: {Status}", ServiceStatusText);
+                UpdateServiceButtonStates();
                 return;
             }
             catch (Exception ex)
@@ -512,7 +563,7 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task InstallService_Executed()
     {
         await PowerSwitch.SensorPipeService.ServiceInstallerHelper.RunInstallScriptIfNeededAsync();
-        // Optionally update status or notify user
+        UpdateServiceButtonStates();
     }
 
     private async Task UninstallService_Executed()
@@ -540,7 +591,7 @@ public partial class SettingsViewModel : ObservableRecipient
             _logr.LogError($"❌ Failed to run uninstall-service.ps1: {ex.Message}");
         }
         await Task.Delay(3000); // Give time for uninstall
-        // Optionally update status or notify user
+        UpdateServiceButtonStates();
     }
 
     public ICommand StartServiceCommand => new AsyncRelayCommand(StartService_Executed);
@@ -549,11 +600,13 @@ public partial class SettingsViewModel : ObservableRecipient
     private async Task StartService_Executed()
     {
         await Task.Run(() => StartSensorService());
+        UpdateServiceButtonStates();
     }
 
     private async Task StopService_Executed()
     {
         await Task.Run(() => StopSensorService());
+        UpdateServiceButtonStates();
     }
 
 }
