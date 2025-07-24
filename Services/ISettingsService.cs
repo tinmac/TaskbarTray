@@ -34,4 +34,7 @@ public interface ISettingsService
     Task<T?> GetSettingAsync<T>(string key);
 
     Task SaveSettingAsync<T>(string key, T value);
+
+    // Ensure all settings defaults exist
+    Task InitAsync();
 }

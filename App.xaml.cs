@@ -100,8 +100,7 @@ public sealed partial class App : Application
         Log.Logger = lgr;
 
         services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
-        services.AddSingleton<IFileService, FileService>();
+        services.AddSingleton<FileService>();
         services.AddTransient<TrayIconVM, TrayIconVM>((sp) =>
             new TrayIconVM(
                 sp.GetRequiredService<ILogger<TrayIconVM>>(),
@@ -127,11 +126,13 @@ public sealed partial class App : Application
         {
             var _settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
 
+            // Ensure all settings defaults are present before any use
+            await _settingsService.InitAsync();
+
             // Ensure log directory exists
             string logDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "PowerSwitch");
-            
             Directory.CreateDirectory(logDir);
 
 
@@ -142,7 +143,6 @@ public sealed partial class App : Application
 
             // Pipe Service Worker Check
             await ServiceInstallerHelper.RunInstallScriptIfNeededAsync();
-
 
 
             Main_Window = new MainWindow();
