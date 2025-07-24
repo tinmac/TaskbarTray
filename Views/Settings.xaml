@@ -27,17 +27,19 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Horizontal">
+
             <Image
                 Width="32"
                 Height="32"
-                Margin="16 6 8 6"
-                VerticalAlignment="Center"
-                Source="/Assets/AppIconDark.png" />
+                Margin="16 14 0 0"
+                VerticalAlignment="Top"
+                Source="/Assets/UAC_Prompt.png"
+                Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverterInvert}}"/>
 
 
             <!--  Page Title  -->
             <TextBlock
-                Margin="16 10 0 16"
+                Margin="20 7 0 16"
                 FontSize="32"
                 FontWeight="Bold"
                 Style="{ThemeResource TitleTextBlockStyle}"
@@ -139,7 +141,8 @@
                                 <TextBlock
                                     Margin="0 0 0 8"
                                     Style="{ThemeResource CaptionTextBlockStyle}"
-                                    Text="Select the plans that you wish to switch between when you click the Task Bar guage icon"
+                                    Text="Select the plans that you wish to switch between when you click Windows Task Bar guage icon"
+                                    ToolTipService.ToolTip="Gauge icon is located bottom right near time &amp; date"
                                     TextWrapping="Wrap" />
                                 <FontIcon
                                     Grid.Column="0"
@@ -259,33 +262,47 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0">
-                                <TextBlock
-                                    Margin="0 0 0 8"
-                                    Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                    Text="Sensors Service Status" />
-                                <TextBlock
-                                    Margin="0 0 0 8"
-                                    Style="{ThemeResource CaptionTextBlockStyle}"
-                                    Text="The sensor service is installed when you install the app, it reports CPU temperature and the active power plan"
-                                    TextWrapping="Wrap" />
-                                <Border
-                                    Width="100"
-                                    Margin="0 10 0 0"
-                                    Padding="8 4 8 5"
-                                    HorizontalAlignment="Left"
-                                    Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
-                                    CornerRadius="8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
                                     <TextBlock
-                                        Margin="0 -1 0 0"
-                                        HorizontalAlignment="Center"
-                                        Foreground="#444"
+                                        Margin="0 0 0 8"
                                         Style="{ThemeResource BodyStrongTextBlockStyle}"
-                                        Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
-                                </Border>
+                                        Text="Sensors Service Status" />
+
+                                    <Border
+                                        Grid.Column="1"
+                                        Width="100"
+                                        Margin="0 0 0 0"
+                                        Padding="8 4 8 5"
+                                        HorizontalAlignment="Left"
+                                        Background="{x:Bind ViewModel.ServiceStatusBrush, Mode=OneWay}"
+                                        CornerRadius="8">
+                                        <TextBlock
+                                            Margin="0 -1 0 0"
+                                            HorizontalAlignment="Center"
+                                            Foreground="#444"
+                                            Style="{ThemeResource BodyStrongTextBlockStyle}"
+                                            Text="{x:Bind ViewModel.ServiceStatus, Mode=OneWay}" />
+                                    </Border>
+
+                                </Grid>
+
+
+                                <TextBlock
+                                    Margin="0 20 0 8"
+                                    Style="{ThemeResource CaptionTextBlockStyle}"
+                                    Text="The sensor service is installed when you install the app, it reports CPU temperature and the power plan"
+                                    TextWrapping="Wrap" />
+
                             </StackPanel>
 
                             <!--  Relaunch as Admin Button  -->
                             <StackPanel Grid.Row="1">
+
                                 <StackPanel
                                     x:Name="AdminSP"
                                     Margin="0 16 0 0"
@@ -307,12 +324,20 @@
 
                                 </StackPanel>
 
-                                <Button
-                                    Margin="0 16 16 16"
-                                    Command="{x:Bind ViewModel.RelaunchAsAdminCommand}"
-                                    Content="Relaunch as Admin"
-                                    Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                <StackPanel Margin="0 16 16 16" Orientation="Horizontal" Visibility="{x:Bind ViewModel.IsRelaunchButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <TextBlock
+                                        Margin="0 10 0 8"
+                                        Style="{ThemeResource CaptionTextBlockStyle}"
+                                        Text="To administer the server you need to Run As Administrator"
+                                        TextWrapping="Wrap" />
 
+                                    <Button
+                                        Margin="10 0 0 0"
+                                        Command="{x:Bind ViewModel.RelaunchAsAdminCommand}"
+                                        Content="Relaunch as Admin"
+                                         />
+
+                                </StackPanel>
                             </StackPanel>
 
                             <!--  Install/Uninstall Service Buttons  -->
