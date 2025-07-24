@@ -299,6 +299,7 @@ public partial class SettingsViewModel : ObservableRecipient
                 ServiceIsRunning = false;
                 ServiceStatusText = $"Error: {ex.Message}";
             });
+            // Do not rethrow or exit
         }
         UpdateServiceButtonStates();
     }
@@ -345,10 +346,13 @@ public partial class SettingsViewModel : ObservableRecipient
         }
         catch { }
 
-        CanInstallService = !installed;
-        CanUninstallService = installed;
-        CanStartService = installed && !running;
-        CanStopService = installed && running;
+        TheDispatcher?.TryEnqueue(() =>
+        {
+            CanInstallService = !installed;
+            CanUninstallService = installed;
+            CanStartService = installed && !running;
+            CanStopService = installed && running;
+        });
     }
 
     private static string GetVersionDescription()
@@ -509,10 +513,16 @@ public partial class SettingsViewModel : ObservableRecipient
             try
             {
                 var status = GetServiceStatus();
-                if (ServiceStatus != status)
+                TheDispatcher?.TryEnqueue(() =>
                 {
-                    ServiceStatus = status;
-                }
+                    if (ServiceStatus != status)
+                    {
+                        ServiceStatus = status;
+                        ServiceIsRunning = status == ServiceStatus.Running;
+                        ServiceStatusText = ServiceIsRunning ? "Running" : "Stopped";
+                        UpdateServiceButtonStates();
+                    }
+                });
             }
             catch { }
             await Task.Delay(3000);
