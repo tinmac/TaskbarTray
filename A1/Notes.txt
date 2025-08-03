@@ -5,7 +5,7 @@
 Todo
 ----
 
-Change app to MSIX & check persistance of settings
+Change app to MSIX & check persistance of settings..
 
 
 Links
