@@ -4,7 +4,6 @@
 
 Todo
 ----
-Worker Service buttons enabled/disabled logic
 
 Change app to MSIX & check persistance of settings
 

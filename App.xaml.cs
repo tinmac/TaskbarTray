@@ -214,7 +214,7 @@ public sealed partial class App : Application
 
             // Create Icons!!
             //
-           // ConvertSvgToIco();
+            ConvertSvgToIco();
         }
         catch (Exception ex)
         {
